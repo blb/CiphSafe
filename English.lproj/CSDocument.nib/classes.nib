@@ -3,6 +3,21 @@
         {CLASS = BLBTableView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }, 
         {CLASS = BLBTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
         {
+            ACTIONS = {doGenerate = id; doOpenURL = id; }; 
+            CLASS = CSWinCtrlEntry; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                "_accountText" = NSTextField; 
+                "_category" = NSComboBox; 
+                "_mainButton" = NSButton; 
+                "_nameText" = NSTextField; 
+                "_notes" = NSTextView; 
+                "_passwordText" = NSTextField; 
+                "_urlText" = NSTextField; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
             ACTIONS = {
                 cmmCopyField = id; 
                 cmmOpenURL = id; 
@@ -10,7 +25,10 @@
                 doAddEntry = id; 
                 doDeleteEntry = id; 
                 doResetSearch = id; 
+                doSetCategory = id; 
                 doViewEntry = id; 
+                newCategoryCancel = id; 
+                newCategoryOK = id; 
             }; 
             CLASS = CSWinCtrlMain; 
             LANGUAGE = ObjC; 
@@ -22,6 +40,8 @@
                 "_documentStatus" = NSTextField; 
                 "_documentView" = BLBTableView; 
                 "_documentViewButton" = NSButton; 
+                "_newCategory" = NSTextField; 
+                "_newCategoryWindow" = NSPanel; 
                 "_searchWhat" = NSPopUpButton; 
             }; 
             SUPERCLASS = NSWindowController; 

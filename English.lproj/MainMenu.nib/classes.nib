@@ -13,6 +13,7 @@
             CLASS = CSAppController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                "_editMenuSetCategory" = NSMenuItem; 
                 "_prefsAlphanumOnly" = NSButton; 
                 "_prefsAutoOpen" = NSButton; 
                 "_prefsAutoOpenName" = NSTextField; 
@@ -34,7 +35,12 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {deselectAll = id; doAddEntry = id; doChangePassphrase = id; }; 
+            ACTIONS = {
+                deselectAll = id; 
+                doAddEntry = id; 
+                doChangePassphrase = id; 
+                doSetCategory = id; 
+            }; 
             CLASS = FirstResponder; 
             LANGUAGE = ObjC; 
             SUPERCLASS = NSObject; 

@@ -51,6 +51,10 @@
    IBOutlet NSMenu *_contextualMenu;
    IBOutlet NSMenu *_cmmTableHeader;
    IBOutlet NSPopUpButton *_searchWhat;
+
+   // New Category window
+   IBOutlet NSPanel *_newCategoryWindow;
+   IBOutlet NSTextField *_newCategory;
 }
 
 // Actions from the main window
@@ -58,6 +62,13 @@
 - (IBAction) doViewEntry:(id)sender;
 - (IBAction) doDeleteEntry:(id)sender;
 - (IBAction) doResetSearch:(id)sender;
+
+// Actions from the new category window
+- (IBAction) newCategoryOK:(id)sender;
+- (IBAction) newCategoryCancel:(id)sender;
+
+// Actions from the main menu
+- (IBAction) doSetCategory:(id)sender;
 
 // Actions from the contextual menu
 - (IBAction) cmmCopyField:(id)sender;

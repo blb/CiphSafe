@@ -206,6 +206,15 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 
 
 /*
+ * Sent by the category combo box
+ */
+- (void) comboBoxWillDismiss:(NSNotification *)notification
+{
+   [ self updateDocumentEditedStatus ];
+}
+
+
+/*
  * Sent by the text view, but not for undo/redo
  */
 - (void)textDidChange:(NSNotification *)notification
@@ -263,10 +272,37 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 - (void) updateDocumentEditedStatus
 {
    if( [ self nameChanged ] || [ self accountChanged ] ||
-       [ self passwordChanged ] || [ self urlChanged ] || [ self notesChanged ] )
+       [ self passwordChanged ] || [ self urlChanged ] ||
+       [ self categoryChanged ] || [ self notesChanged ] )
       [ [ self window ] setDocumentEdited:YES ];
    else
       [ [ self window ] setDocumentEdited:NO ];
+}
+
+
+/*
+ * Provide information to combo boxes for categories
+ */
+- (int) numberOfItemsInComboBox:(NSComboBox *)aComboBox
+{
+   if( [ aComboBox isEqual:_category ] )
+      return [ [ [ self document ] categories ] count ];
+   return 0;
+}
+
+- (id) comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(int)index
+{
+   if( [ aComboBox isEqual:_category ] )
+      return [ [ [ self document ] categories ] objectAtIndex:index ];
+   return nil;
+}
+
+- (unsigned int) comboBox:(NSComboBox *)aComboBox
+                 indexOfItemWithStringValue:(NSString *)aString
+{
+   if( [ aComboBox isEqual:_category ] )
+      return [ [ [ self document ] categories ] indexOfObject:aString ];
+   return -1;
 }
 
 
@@ -289,6 +325,11 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 }
 
 - (BOOL) urlChanged
+{
+   return YES;
+}
+
+- (BOOL) categoryChanged
 {
    return YES;
 }

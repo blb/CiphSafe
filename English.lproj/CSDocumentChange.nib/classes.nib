@@ -12,6 +12,7 @@
             LANGUAGE = ObjC; 
             OUTLETS = {
                 "_accountText" = NSTextField; 
+                "_category" = NSComboBox; 
                 "_mainButton" = NSButton; 
                 "_nameText" = NSTextField; 
                 "_notes" = NSTextView; 

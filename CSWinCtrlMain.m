@@ -72,6 +72,7 @@
 #define CSWINCTRLMAIN_LOC_NEEDCOLTEXT \
            NSLocalizedString( @"At least one column is needed in order to " \
            @"be useful", @"" )
+#define CSWINCTRLMAIN_LOC_NEWCATEGORY NSLocalizedString( @"New CategoryÉ", @"" )
 
 @interface CSWinCtrlMain (InternalMethods)
 - (void) _setTableViewSpacing;
@@ -83,6 +84,7 @@
 - (void) _setDisplayOfColumnID:(NSString *)colID enabled:(BOOL)enabled;
 - (void) _addTableColumnWithID:(NSString *)colID;
 - (void) _updateCornerMenu;
+- (void) _updateSetCategoryMenu;
 - (void) _filterView;
 - (void) _setSearchResultList:(NSArray *)newList;
 - (void) _updateStatusField;
@@ -126,6 +128,7 @@ static NSArray *searchWhatArray;
                                                  CSDocModelKey_Acct,
                                                  CSDocModelKey_Passwd,
                                                  CSDocModelKey_URL,
+                                                 CSDocModelKey_Category,
                                                  CSDocModelKey_Notes,
                                                  nil ];
    searchWhatArray = [ [ NSArray alloc ] initWithObjects:@"Search in:",
@@ -133,6 +136,7 @@ static NSArray *searchWhatArray;
                                                          CSDocModelKey_Acct,
                                                          CSDocModelKey_Passwd,
                                                          CSDocModelKey_URL,
+                                                         CSDocModelKey_Category,
                                                          CSDocModelKey_Notes,
                                                          nil ];
 
@@ -262,10 +266,27 @@ static NSArray *searchWhatArray;
 
 
 /*
+ * Simple end modals
+ */
+- (IBAction) newCategoryOK:(id)sender
+{
+   [ NSApp stopModal ];
+   [ _newCategoryWindow orderOut:self ];
+}
+
+- (IBAction) newCategoryCancel:(id)sender
+{
+   [ NSApp abortModal ];
+   [ _newCategoryWindow orderOut:self ];
+}
+
+
+/*
  * Refresh all the views in the window
  */
 - (void) refreshWindow
 {
+   [ self _updateSetCategoryMenu ];
    [ self _filterView ];
    [ _documentView reloadData ];
    [ _documentView deselectAll:self ];
@@ -320,7 +341,8 @@ static NSArray *searchWhatArray;
 
    menuItemAction = [ menuItem action ];
    if( menuItemAction == @selector( copy: ) ||
-       menuItemAction == @selector( cut: ) )
+       menuItemAction == @selector( cut: ) ||
+       menuItemAction == @selector( doSetCategory: ) )
       retval = ( [ _documentView numberOfSelectedRows ] > 0 );
    else if( menuItemAction == @selector( paste: ) )
       retval = ( [ [ NSPasteboard generalPasteboard ]
@@ -475,6 +497,48 @@ static NSArray *searchWhatArray;
    }
 
    return retval;
+}
+
+
+/*
+ * Set the category on a bunch of entries
+ */
+- (IBAction) doSetCategory:(id)sender
+{
+   NSMenu *categoriesMenu;
+   NSString *category;
+   NSArray *selectedNamesArray;
+   CSDocument *document;
+   int index;
+
+   categoriesMenu = [ [ [ NSApp delegate ] editMenuSetCategoryMenuItem ]
+                      submenu ];
+   // Last item is new category
+   if( [ categoriesMenu indexOfItem:sender ] ==
+       ( [ categoriesMenu numberOfItems ] - 1 ) )
+   {
+      if( [ NSApp runModalForWindow:_newCategoryWindow ] == NSRunStoppedResponse )
+         category = [ _newCategory stringValue ];
+      else
+         category = nil;
+   }
+   else
+      category = [ sender title ];
+   selectedNamesArray = [ self _getSelectedNames ];
+   document = [ self document ];
+   if( category != nil )
+   {
+      for( index = 0; index < [ selectedNamesArray count ]; index++ )
+      {
+         [ document changeEntryWithName:[ selectedNamesArray objectAtIndex:index ]
+                    newName:nil
+                    account:nil
+                    password:nil
+                    URL:nil
+                    category:category
+                    notesRTFD:nil ];
+      }
+   }
 }
 
 
@@ -843,6 +907,33 @@ static NSArray *searchWhatArray;
       else
          [ [ _cmmTableHeader itemWithTag:index ] setState:NSOffState ];
    }
+}
+
+
+/*
+ * Update list of possible categories for the menu
+ */
+- (void) _updateSetCategoryMenu
+{
+   NSMenu *categoriesMenu;
+   NSEnumerator *oldItemsEnum, *currentCategoriesEnum;
+   id oldItem;
+   NSString *newItem;
+
+   categoriesMenu = [ [ [ NSApp delegate ] editMenuSetCategoryMenuItem ]
+                      submenu ];
+   oldItemsEnum = [ [ categoriesMenu itemArray ] objectEnumerator ];
+   while( ( oldItem = [ oldItemsEnum nextObject ] ) != nil )
+      [ categoriesMenu removeItem:oldItem ];
+   currentCategoriesEnum = [ [ [ self document ] categories ] objectEnumerator ];
+   while( ( newItem = [ currentCategoriesEnum nextObject ] ) != nil )
+      [ categoriesMenu addItemWithTitle:newItem
+                       action:@selector( doSetCategory: )
+                       keyEquivalent:@"" ];
+   [ categoriesMenu addItem:[ NSMenuItem separatorItem ] ];
+   [ categoriesMenu addItemWithTitle:CSWINCTRLMAIN_LOC_NEWCATEGORY
+                    action:@selector( doSetCategory: )
+                    keyEquivalent:@"" ];
 }
 
 

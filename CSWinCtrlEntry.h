@@ -50,6 +50,7 @@
    IBOutlet NSTextField *_accountText;
    IBOutlet NSTextField *_passwordText;
    IBOutlet NSTextField *_urlText;
+   IBOutlet NSComboBox *_category;
    IBOutlet NSTextView *_notes;
    IBOutlet NSButton *_mainButton;
 }
@@ -63,6 +64,12 @@
 // Our implementation of whether the data is dirty
 - (void) updateDocumentEditedStatus;
 
+// Methods to make it a data source for category combo boxes
+- (int) numberOfItemsInComboBox:(NSComboBox *)aComboBox;
+- (id) comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(int)index;
+- (unsigned int) comboBox:(NSComboBox *)aComboBox
+                 indexOfItemWithStringValue:(NSString *)aString;
+
 /*
  * Used by updateDocumentEditedStatus to determine if data is dirty; overridden
  * in subclasses
@@ -71,6 +78,7 @@
 - (BOOL) accountChanged;
 - (BOOL) passwordChanged;
 - (BOOL) urlChanged;
+- (BOOL) categoryChanged;
 - (BOOL) notesChanged;
 
 @end
