@@ -4,7 +4,15 @@
             ACTIONS = {passphraseAccept = id; passphraseCancel = id; }; 
             CLASS = CSWinCtrlPassphrase; 
             LANGUAGE = ObjC; 
-            OUTLETS = {passphraseNote = NSTextField; passphrasePhrase = NSTextField; }; 
+            OUTLETS = {
+                modalDelegate = id; 
+                passphraseNote1 = NSTextField; 
+                passphraseNote2 = NSTextField; 
+                passphrasePhrase1 = NSTextField; 
+                passphrasePhrase2 = NSTextField; 
+                passphrasePhraseConfirm = NSTextField; 
+                tabView = NSTabView; 
+            }; 
             SUPERCLASS = NSWindowController; 
         }, 
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
