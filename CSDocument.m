@@ -70,7 +70,8 @@
  */
 - (void) saveToFile:(NSString *)fileName
          saveOperation:(NSSaveOperationType)saveOperation
-         delegate:(id)delegate didSaveSelector:(SEL)didSaveSelector
+         delegate:(id)delegate
+         didSaveSelector:(SEL)didSaveSelector
          contextInfo:(void *)contextInfo
 {
    // If a filename was given and we don't yet have a key, or we're doing a save as
@@ -93,8 +94,11 @@
              note:CSPassphraseNote_Save ];
    }
    else
-      [ super saveToFile:fileName saveOperation:saveOperation delegate:delegate
-              didSaveSelector:didSaveSelector contextInfo:contextInfo ];
+      [ super saveToFile:fileName
+              saveOperation:saveOperation
+              delegate:delegate
+              didSaveSelector:didSaveSelector
+              contextInfo:contextInfo ];
 }
 
 
@@ -251,12 +255,24 @@
    int row;
    NSString *nextName, *acctString, *passwdString, *urlString;
 
+   /*
+    * This generates several pasteboard types:
+    *    CSDocumentPboardType - an archived NSMutableArray (docArray)
+    *    NSRTFDPboardType - RTFData, as data
+    *    NSRTFPboardType - RTF, as data
+    *    NSTabularTextPboardType - simple string, each entry tab-delimited
+    *    NSStringPboardType - same as NSTabularTextPboardType
+    */
    docArray = [ NSMutableArray arrayWithCapacity:10 ];
    attrEOL = [ [ NSAttributedString alloc ] initWithString:@"\n" ];
    rtfdStringRows = [ [ NSMutableAttributedString alloc ] initWithString:@"" ];
    nameEnumerator = [ names objectEnumerator ];
    while( ( nextName = [ nameEnumerator nextObject ] ) != nil )
    {
+      /*
+       * Here we generate an array of dictionaries for the CSDocumentPboardType
+       * and an attributed string to generate the RTFD/RTF/string types
+       */
       row = [ self rowForName:nextName ];
       acctString = [ self stringForKey:CSDocModelKey_Acct atRow:row ];
       urlString = [ self stringForKey:CSDocModelKey_URL atRow:row ];
@@ -451,24 +467,35 @@
 /*
  * Add the given entry
  */
-- (BOOL) addEntryWithName:(NSString *)name account:(NSString *)account
-         password:(NSString *)password URL:(NSString *)url
+- (BOOL) addEntryWithName:(NSString *)name
+         account:(NSString *)account
+         password:(NSString *)password
+         URL:(NSString *)url
          notesRTFD:(NSData *)notes
 {
-   return [ [ self _model ] addEntryWithName:name account:account
-                            password:password URL:url notesRTFD:notes ];
+   return [ [ self _model ] addEntryWithName:name
+                            account:account
+                            password:password
+                            URL:url
+                            notesRTFD:notes ];
 }
 
 
 /*
  * Change the given entry
  */
-- (BOOL) changeEntryWithName:(NSString *)name newName:(NSString *)newName
-         account:(NSString *)account password:(NSString *)password
-         URL:(NSString *)url notesRTFD:(NSData *)notes
+- (BOOL) changeEntryWithName:(NSString *)name
+         newName:(NSString *)newName
+         account:(NSString *)account
+         password:(NSString *)password
+         URL:(NSString *)url
+         notesRTFD:(NSData *)notes
 {
-   return [ [ self _model ] changeEntryWithName:name newName:newName
-                            account:account password:password URL:url
+   return [ [ self _model ] changeEntryWithName:name
+                            newName:newName
+                            account:account
+                            password:password
+                            URL:url
                             notesRTFD:notes ];
 }
 
@@ -547,16 +574,20 @@
    defaultCenter = [ NSNotificationCenter defaultCenter ];
    [ defaultCenter addObserver:self
                    selector:@selector( _updateViewForNotification: )
-                   name:CSDocModelDidChangeSortNotification object:docModel ];
+                   name:CSDocModelDidChangeSortNotification
+                   object:docModel ];
    [ defaultCenter addObserver:self
                    selector:@selector( _updateViewForNotification: )
-                   name:CSDocModelDidAddEntryNotification object:docModel ];
+                   name:CSDocModelDidAddEntryNotification
+                   object:docModel ];
    [ defaultCenter addObserver:self
                    selector:@selector( _updateViewForNotification: )
-                   name:CSDocModelDidChangeEntryNotification object:docModel ];
+                   name:CSDocModelDidChangeEntryNotification
+                   object:docModel ];
    [ defaultCenter addObserver:self
                    selector:@selector( _updateViewForNotification: )
-                   name:CSDocModelDidRemoveEntryNotification object:docModel ];
+                   name:CSDocModelDidRemoveEntryNotification
+                   object:docModel ];
 }
 
 
@@ -576,10 +607,12 @@
    if( [ [ notification name ]
          isEqualToString:CSDocModelDidChangeEntryNotification ] )
    {
+      // Get the change controller for the entry which has been changed
       changeController = [ CSWinCtrlChange controllerForEntryName:
                     [ [ notification userInfo ]
                       objectForKey:CSDocModelNotificationInfoKey_ChangedNameFrom ]
                       inDocument:self ];
+      // If there is one, we tell it to update the entry it represents
       if( changeController != nil )
          [ changeController setEntryName:[ [ notification userInfo ]
                   objectForKey:CSDocModelNotificationInfoKey_ChangedNameTo ] ];
@@ -598,6 +631,7 @@
             [ [ changeController window ] performClose:self ];
       }
    }
+
    [ mainWindowController refreshWindow ];
 }
 

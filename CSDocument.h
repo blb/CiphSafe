@@ -41,12 +41,17 @@
 - (NSAttributedString *) RTFDStringNotesAtRow:(unsigned)row;
 - (NSAttributedString *) RTFStringNotesAtRow:(unsigned)row;
 - (unsigned) rowForName:(NSString *)name;
-- (BOOL) addEntryWithName:(NSString *)name account:(NSString *)account
-         password:(NSString *)password URL:(NSString *)url
+- (BOOL) addEntryWithName:(NSString *)name
+         account:(NSString *)account
+         password:(NSString *)password
+         URL:(NSString *)url
          notesRTFD:(NSData *)notes;
-- (BOOL) changeEntryWithName:(NSString *)name newName:(NSString *)newName
-         account:(NSString *)account password:(NSString *)password
-         URL:(NSString *)url notesRTFD:(NSData *)notes;
+- (BOOL) changeEntryWithName:(NSString *)name
+         newName:(NSString *)newName
+         account:(NSString *)account
+         password:(NSString *)password
+         URL:(NSString *)url
+         notesRTFD:(NSData *)notes;
 - (unsigned) deleteEntriesWithNamesInArray:(NSArray *)nameArray;
 
 @end
