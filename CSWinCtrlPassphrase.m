@@ -93,8 +93,11 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
    parentWindow = window;
    modalDelegate = delegate;
    sheetEndSelector = selector;
-   [ NSApp beginSheet:[ self window ] modalForWindow:parentWindow
-           modalDelegate:self didEndSelector:nil contextInfo:NULL ];
+   [ NSApp beginSheet:[ self window ]
+           modalForWindow:parentWindow
+           modalDelegate:self
+           didEndSelector:nil
+           contextInfo:NULL ];
 }
 
 
@@ -161,8 +164,11 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
          contextInfo:(void  *)contextInfo
 {
    if( returnCode == NSAlertDefaultReturn )   // Enter again
-      [ NSApp beginSheet:[ self window ] modalForWindow:parentWindow
-              modalDelegate:self didEndSelector:nil contextInfo:NULL ];
+      [ NSApp beginSheet:[ self window ]
+              modalForWindow:parentWindow
+              modalDelegate:self
+              didEndSelector:nil
+              contextInfo:NULL ];
    else   // Cancel all together
    {
       [ [ self _genKeyForConfirm:YES ] clearOutData ];
@@ -181,8 +187,11 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
       [ modalDelegate performSelector:sheetEndSelector
                       withObject:[ self _genKeyForConfirm:YES ] ];
    else   // Bring back the original sheet
-      [ NSApp beginSheet:[ self window ] modalForWindow:parentWindow
-              modalDelegate:self didEndSelector:nil contextInfo:NULL ];
+      [ NSApp beginSheet:[ self window ]
+              modalForWindow:parentWindow
+              modalDelegate:self
+              didEndSelector:nil
+              contextInfo:NULL ];
 }
 
 
@@ -193,8 +202,7 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
 {
    // XXX This may leave stuff around, but there's no way around it
    return [ [ passphrasePhrase2 stringValue ]
-            isEqualToString:
-               [ passphrasePhraseConfirm stringValue ] ];
+            isEqualToString:[ passphrasePhraseConfirm stringValue ] ];
 }
 
 

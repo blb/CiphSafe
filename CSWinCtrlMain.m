@@ -20,6 +20,9 @@
 #define CSWINCTRLMAIN_LOC_CUT NSLocalizedString( @"Cut", @"" )
 
 @interface CSWinCtrlMain (InternalMethods)
+- (void) _deleteSheetDidEnd:(NSWindow *)sheet
+         returnCode:(int)returnCode
+         contextInfo:(void *)contextInfo;
 - (void) _setSortingImageForColumn:(NSTableColumn *)tableColumn;
 - (NSArray *) _getSelectedNames;
 - (NSArray *) _namesFromRows:(NSArray *)rows;
@@ -98,25 +101,13 @@
          sheetQuestion = CSWINCTRLMAIN_LOC_SUREDELROWS;
       else
          sheetQuestion = CSWINCTRLMAIN_LOC_SUREDELONEROW;
-      delSelector = @selector( deleteSheetDidEnd:returnCode:contextInfo: );
+      delSelector = @selector( _deleteSheetDidEnd:returnCode:contextInfo: );
       NSBeginCriticalAlertSheet( CSWINCTRLMAIN_LOC_SURE, CSWINCTRLMAIN_LOC_DELETE,
                                  CSWINCTRLMAIN_LOC_CANCEL, nil,
                                  [ self window ], self, delSelector, nil,
                                  NULL, sheetQuestion );
    }
    else
-      [ [ self document ]
-        deleteEntriesWithNamesInArray:[ self _getSelectedNames ] ];
-}
-
-
-/*
- * Called when the "really delete" sheet is done
- */
-- (void) deleteSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode
-         contextInfo:(void *)contextInfo
-{
-   if( returnCode == NSAlertDefaultReturn )   // They said delete...
       [ [ self document ]
         deleteEntriesWithNamesInArray:[ self _getSelectedNames ] ];
 }
@@ -264,7 +255,8 @@
 /*
  * Support dragging of tableview rows
  */
-- (BOOL) tableView:(NSTableView *)tv writeRows:(NSArray *)rows
+- (BOOL) tableView:(NSTableView *)tv
+         writeRows:(NSArray *)rows
          toPasteboard:(NSPasteboard *)pboard
 {
    return [ [ self document ] copyNames:[ self _namesFromRows:rows ]
@@ -277,7 +269,8 @@
  * CSDocumentPboardType)
  */
 - (NSDragOperation) tableView:(NSTableView*)tv
-                    validateDrop:(id <NSDraggingInfo>)info proposedRow:(int)row
+                    validateDrop:(id <NSDraggingInfo>)info
+                    proposedRow:(int)row
                     proposedDropOperation:(NSTableViewDropOperation)op
 {
    return NSDragOperationCopy;
@@ -287,8 +280,10 @@
 /*
  * Accept a drop
  */
-- (BOOL) tableView:(NSTableView*)tv acceptDrop:(id <NSDraggingInfo>)info
-         row:(int)row dropOperation:(NSTableViewDropOperation)op
+- (BOOL) tableView:(NSTableView*)tv
+         acceptDrop:(id <NSDraggingInfo>)info
+         row:(int)row
+         dropOperation:(NSTableViewDropOperation)op
 {
    return [ [ self document ] retrieveEntriesFromPasteboard:
                                  [ info draggingPasteboard ]
@@ -376,6 +371,19 @@
 - (void) dealloc
 {
    [ super dealloc ];
+}
+
+
+/*
+ * Called when the "really delete" sheet is done
+ */
+- (void) _deleteSheetDidEnd:(NSWindow *)sheet
+         returnCode:(int)returnCode
+         contextInfo:(void *)contextInfo
+{
+   if( returnCode == NSAlertDefaultReturn )   // They said delete...
+      [ [ self document ]
+        deleteEntriesWithNamesInArray:[ self _getSelectedNames ] ];
 }
 
 
