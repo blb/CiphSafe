@@ -63,7 +63,7 @@ int sortEntries( id dict1, id dict2, void *context );
 
 /*
  * Initialize with the given data encrypted with the given key; if the key
- * doens't work, releases itself and returns nil
+ * doesn't work, releases itself and returns nil
  */
 - (id) initWithEncryptedData:(NSData *)encryptedData bfKey:(NSData *)bfKey
 {
@@ -231,6 +231,8 @@ int sortEntries( id dict1, id dict2, void *context );
 
 /*
  * Return the RTF version for the notes on the given row
+ *
+ * XXX Note this returns an autoreleased NSData with possibly sensitive information
  */
 - (NSData *) RTFNotesAtRow:(unsigned)row
 {
@@ -240,6 +242,9 @@ int sortEntries( id dict1, id dict2, void *context );
 
 /*
  * Return an attributed string with the RTFD notes on the given row
+ *
+ * XXX Note this returns an autoreleased NSString with possibly sensitive
+ * information
  */
 - (NSAttributedString *) RTFDStringNotesAtRow:(unsigned)row
 {
@@ -251,6 +256,9 @@ int sortEntries( id dict1, id dict2, void *context );
 
 /*
  * Return an attributed string with the RTF notes on the given row
+ *
+ * XXX Note this returns an autoreleased NSString with possibly sensitive
+ * information
  */
 - (NSAttributedString *) RTFStringNotesAtRow:(unsigned)row
 {
@@ -283,6 +291,9 @@ int sortEntries( id dict1, id dict2, void *context );
 /*
  * Add a new entry with the given data; returns YES if all went okay, NO if
  * an entry with that name already exists.
+ *
+ * XXX Note that the name of the added entry will live on in the undo manager
+ * and is also given to the notification center
  */
 - (BOOL) addEntryWithName:(NSString *)name account:(NSString *)account
          password:(NSString *)password URL:(NSString *)url
@@ -325,8 +336,8 @@ int sortEntries( id dict1, id dict2, void *context );
  * if an entry with newName already exists or an entry with the given name
  * doesn't exist
  *
- * XXX One security issue here is we cannot clear out the old data, as it needs to
- * go into the undo manager
+ * XXX Note that the changed entry will live on in the undo manager
+ * and both the old and new names are given to the notification center
  */
 - (BOOL) changeEntryWithName:(NSString *)name newName:(NSString *)newName
          account:(NSString *)account password:(NSString *)password
@@ -387,9 +398,8 @@ int sortEntries( id dict1, id dict2, void *context );
  * Delete all entries given by the names in the array; returns number of entries
  * actually deleted (it, obviously, can't delete entries which aren't present).
  *
- * XXX One security issue here is we cannot clear out the data prior to deletion,
- * as it needs to go into the undo manager, as well as the names going into the
- * notification
+ * XXX Note that the deleted entries will live on in the undo manager
+ * and the names are also given to the notification center
  */
 - (unsigned) deleteEntriesWithNamesInArray:(NSArray *)nameArray
 {
@@ -448,7 +458,13 @@ int sortEntries( id dict1, id dict2, void *context );
  */
 - (void) dealloc
 {
-   // XXX Should clean allEntries
+   /*
+    * XXX At this point, we should go through all entries in allEntries, and
+    * clear out each dictionary entry; however, since the entries are mostly
+    * strings, and these tend to be NSCFString, ie, bridged to CFString, and
+    * CFString being more difficult to look into than, say, NSData, we can't
+    * clear it out.
+    */
    [ allEntries release ];
    [ undoManager release ];
    [ super dealloc ];
