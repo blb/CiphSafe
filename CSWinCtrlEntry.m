@@ -39,6 +39,13 @@ static const char *genOther    = "`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
    self = [ super initWithWindowNibName:windowNibName ];
    if( self != nil )
    {
+      /*
+       * Create an undo manager for the notes field, so that "Undo Typing" won't
+       * be present in the Edit menu when sitting on a text field which doesn't
+       * support undo
+       * Watching undo/redo change notifications lets us update the 'document
+       * is dirty' status
+       */
       notesUM = [ [ NSUndoManager alloc ] init ];
       [ [ NSNotificationCenter defaultCenter ]
         addObserver:self
@@ -50,6 +57,7 @@ static const char *genOther    = "`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
         selector:@selector( _undoManagerDidChange: )
         name:NSUndoManagerDidRedoChangeNotification
         object:notesUM ];
+      // Undo manager for everything else in the window
       otherUM = [ [ NSUndoManager alloc ] init ];
    }
 
@@ -93,7 +101,7 @@ static const char *genOther    = "`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
    [ randomString deleteCharactersInRange:
                      NSMakeRange( 0, [ randomString length ] ) ];
 
-   [ self updateDocumentEditedStatus ];
+   [ [ self window ] setDocumentEdited:YES ];
 }
 
 
@@ -160,7 +168,7 @@ static const char *genOther    = "`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
 
 
 /*
- * Sent by the text view
+ * Sent by the text view, but not for undo/redo
  */
 - (void)textDidChange:(NSNotification *)notification
 {
