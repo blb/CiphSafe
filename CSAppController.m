@@ -15,10 +15,11 @@ NSString * const CSPrefDictKey_GenSize = @"CSPrefDictKey_GenSize";
 NSString * const CSPrefDictKey_AlphanumOnly = @"CSPrefDictKey_AlphanumOnly";
 NSString * const CSPrefDictKey_IncludePasswd = @"CSPrefDictKey_IncludePasswd";
 
-
 NSString * const CSPassphraseNote_Save = @"Passphrase hint";
 NSString * const CSPassphraseNote_Load = @"Passphrase for file";
 NSString * const CSPassphraseNote_Change = @"New passphrase";
+
+NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 
 // Defines for localized strings
 #define CSAPPCONTROLLER_LOC_SHORTPHRASE \

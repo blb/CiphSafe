@@ -19,6 +19,9 @@ extern NSString * const CSPassphraseNote_Save;
 extern NSString * const CSPassphraseNote_Load;
 extern NSString * const CSPassphraseNote_Change;
 
+// Name of our internal pasteboard type
+extern NSString * const CSDocumentPboardType;
+
 @interface CSAppController : NSObject
 {
    BOOL shouldWarnOnShortPhrase;
