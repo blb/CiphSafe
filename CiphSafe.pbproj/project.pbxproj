@@ -236,6 +236,7 @@
 				F46463FE0353C9B801A8070A,
 				F4EA37B903494DDD01A8070A,
 				F4EA37BA03494DDD01A8070A,
+				F4BB092E03C90B3301A8070A,
 			);
 			isa = PBXGroup;
 			name = Resources;
@@ -332,9 +333,9 @@
 	<key>CFBundleExecutable</key>
 	<string>CiphSafe</string>
 	<key>CFBundleGetInfoString</key>
-	<string>0.6.0, Copyright © 2002 Bryan L Blackburn</string>
+	<string>0.8.0, Copyright © 2002 Bryan L Blackburn</string>
 	<key>CFBundleIconFile</key>
-	<string></string>
+	<string>CiphSafe.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.withay.ciphsafe</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -344,11 +345,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.6.0</string>
+	<string>0.8.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>0.6.0</string>
+	<string>0.8.0</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
@@ -398,6 +399,7 @@
 				F4EA37BF0349833201A8070A,
 				F46463FF0353C9B801A8070A,
 				F45C2DA403BD0DCD01A8070A,
+				F4BB092F03C90B3301A8070A,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -884,6 +886,17 @@
 		};
 		F4B9097B03A6A48401A8070A = {
 			fileRef = F4B9094B03A6A48401A8070A;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F4BB092E03C90B3301A8070A = {
+			isa = PBXFileReference;
+			path = CiphSafe.icns;
+			refType = 4;
+		};
+		F4BB092F03C90B3301A8070A = {
+			fileRef = F4BB092E03C90B3301A8070A;
 			isa = PBXBuildFile;
 			settings = {
 			};
