@@ -8,15 +8,6 @@
 
 @implementation CSTableView
 
-static NSColor *tableViewAltBGColor;
-
-+ (void) initialize
-{
-   tableViewAltBGColor = [ [ NSColor colorWithCalibratedRed:0.93
-                                     green:0.95 blue:1.0 alpha:1.0 ] retain ];
-}
-
-
 /*
  * Set the cells to not draw a background, so the striping works nicely
  */
@@ -28,6 +19,17 @@ static NSColor *tableViewAltBGColor;
    tableColumns = [ self tableColumns ];
    for( index = 0; index < [ tableColumns count ]; index++ )
       [ [ [ tableColumns objectAtIndex:index ] dataCell ] setDrawsBackground:NO ];
+}
+
+
+/*
+ * Set the stripe color (the one other than white)
+ */
+- (void) setStripeColor:(NSColor *)newStripeColor
+{
+   [ newStripeColor retain ];
+   [ stripeColor release ];
+   stripeColor = newStripeColor;
 }
 
 
@@ -48,7 +50,8 @@ static NSColor *tableViewAltBGColor;
  */
 - (void) highlightSelectionInClipRect:(NSRect)clipRect
 {
-   [ self _drawStripesInRect:clipRect ];
+   if( stripeColor != nil )
+      [ self _drawStripesInRect:clipRect ];
    [ super highlightSelectionInClipRect:clipRect ];
 }
 
@@ -94,6 +97,16 @@ static NSColor *tableViewAltBGColor;
 
 
 /*
+ * Cleanup
+ */
+- (void) dealloc
+{
+   [ self setStripeColor:nil ];
+   [ super dealloc ];
+}
+
+
+/*
  * This routine does the actual blue stripe drawing, filling in every other row
  * of the table with a blue background so you can follow the rows easier with
  * your eyes.  Shamelessly lifted from Apple's MP3 Player sample code.
@@ -117,7 +130,7 @@ static NSColor *tableViewAltBGColor;
    stripeRect.size.height = fullRowHeight;
 
    // Set the color
-   [ tableViewAltBGColor set ];
+   [ stripeColor set ];
    // ...and draw the stripes
    while( stripeRect.origin.y < clipBottom )
    {
