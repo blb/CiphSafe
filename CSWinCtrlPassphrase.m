@@ -213,8 +213,9 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
 - (NSMutableData *) _genKeyForConfirm:(BOOL)useConfirmTab
 {
    NSString *passphrase;
-   NSData *passphraseData;
-   NSMutableData *keyData;
+   NSData *passphraseData, *dataFirst, *dataSecond;
+   NSMutableData *keyData, *tmpData;
+   int pdLen;
 
    if( useConfirmTab )
    {
@@ -232,6 +233,10 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
    }
 
    passphraseData = [ passphrase dataUsingEncoding:NSUnicodeStringEncoding ];
+   pdLen = [ passphraseData length ];
+   dataFirst = [ passphraseData subdataWithRange:NSMakeRange( 0, pdLen / 2 ) ];
+   dataSecond = [ passphraseData subdataWithRange:NSMakeRange( pdLen / 2,
+                                                              pdLen - pdLen / 2 ) ];
    /*
     * XXX At this point, passphrase should be cleared, however, there is no way,
     * that I've yet found, to do that...here's hoping it gets released and the
@@ -239,9 +244,13 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
     */
    passphrase = nil;
 
-   keyData = [ passphraseData SHA1Hash ];
+   keyData = [ dataFirst SHA1Hash ];
+   tmpData = [ dataSecond SHA1Hash ];
+   [ keyData appendData:tmpData ];
+   [ tmpData clearOutData ];
+   [ dataFirst clearOutData ];
+   [ dataSecond clearOutData ];
    [ passphraseData clearOutData ];
-   passphraseData = nil;
 
    return keyData;
 }
