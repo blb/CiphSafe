@@ -97,6 +97,12 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
                                             docName ] ];
    [ _passphraseNote1 setStringValue:NSLocalizedString( noteType, nil ) ];
    [ self _setAndSizeWindowForView:_nonConfirmView ];
+   [ [ NSRunLoop currentRunLoop ]
+     performSelector:@selector( makeFirstResponder: )
+     target:[ self window ]
+     argument:_passphrasePhrase1
+     order:9999
+     modes:[ NSArray arrayWithObject:NSDefaultRunLoopMode ] ];
    _parentWindow = nil;
    windowReturn = [ NSApp runModalForWindow:[ self window ] ];
    [ [ self window ] orderOut:self ];
@@ -123,6 +129,12 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
    [ [ self window ] setTitle:@"" ];
    [ _passphraseNote2 setStringValue:NSLocalizedString( noteType, nil ) ];
    [ self _setAndSizeWindowForView:_confirmView ];
+   [ [ NSRunLoop currentRunLoop ]
+     performSelector:@selector( makeFirstResponder: )
+     target:[ self window ]
+     argument:_passphrasePhrase2
+     order:9999
+     modes:[ NSArray arrayWithObject:NSDefaultRunLoopMode ] ];
    _parentWindow = window;
    _modalDelegate = delegate;
    _sheetEndSelector = selector;
