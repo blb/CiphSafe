@@ -1,6 +1,7 @@
 {
     IBClasses = (
         {CLASS = BLBTableView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }, 
+        {CLASS = BLBTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
         {
             ACTIONS = {
                 cmmCopyAccount = id; 
@@ -11,6 +12,7 @@
                 cmmOpenURL = id; 
                 doAddEntry = id; 
                 doDeleteEntry = id; 
+                doResetSearch = id; 
                 doViewEntry = id; 
             }; 
             CLASS = CSWinCtrlMain; 
@@ -18,13 +20,15 @@
             OUTLETS = {
                 "_contextualMenu" = NSMenu; 
                 "_documentDeleteButton" = NSButton; 
+                "_documentSearch" = NSTextField; 
                 "_documentStatus" = NSTextField; 
                 "_documentView" = BLBTableView; 
                 "_documentViewButton" = NSButton; 
             }; 
             SUPERCLASS = NSWindowController; 
         }, 
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }
     ); 
     IBVersion = 1; 
 }
