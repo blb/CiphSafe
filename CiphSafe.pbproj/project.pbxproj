@@ -279,6 +279,7 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = "";
 				OPTIMIZATION_CFLAGS = "-O0";
+				OTHER_CFLAGS = "-Wall -W -Wno-unused-parameter -Wnewline-eof";
 				PRODUCT_NAME = CiphSafe;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
