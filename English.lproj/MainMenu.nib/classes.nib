@@ -1,19 +1,10 @@
 {
     IBClasses = (
         {
-            ACTIONS = {
-                openPrefs = id; 
-                passphraseAccept = id; 
-                passphraseCancel = id; 
-                prefsCancel = id; 
-                prefsSave = id; 
-            }; 
+            ACTIONS = {openPrefs = id; prefsCancel = id; prefsSave = id; }; 
             CLASS = CSAppController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                passphraseNote = NSTextField; 
-                passphrasePhrase = NSTextField; 
-                passphraseWindow = NSWindow; 
                 prefsAlphanumOnly = NSButton; 
                 prefsClearClipboard = NSButton; 
                 prefsCloseAdd = NSButton; 
