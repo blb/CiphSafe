@@ -522,8 +522,8 @@ static NSString *MENUSPACE = @"   ";
 
 
 /*
- * Return if the given menu item represents a window owned bya CSWinCtrlEntry
- * controller
+ * Return if the given menu item represents a window owned the given window
+ * controller class/subclass
  */
 - (BOOL) _isMenuItem:(id)menuItem forWindowControllerClass:(Class)theClass
 {
