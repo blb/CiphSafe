@@ -266,6 +266,15 @@
 
 
 /*
+ * Return just the main window controller
+ */
+- (CSWinCtrlMain *) mainWindowController
+{
+   return _mainWindowController;
+}
+
+
+/*
  * Enable certain menu items only when it makes sense
  */
 - (BOOL) validateMenuItem:(NSMenuItem *)menuItem

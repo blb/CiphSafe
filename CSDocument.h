@@ -51,6 +51,9 @@
 // Actions from the menu
 - (IBAction) doChangePassphrase:(id)sender;
 
+// Return just the main window controller
+- (CSWinCtrlMain *) mainWindowController;
+
 // Creating new windows
 - (void) openAddEntryWindow;
 - (void) viewEntries:(NSArray *)namesArray;
