@@ -242,6 +242,20 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 }
 
 
+/* 
+ * Make sure any attached sheet gets ended prior to closing, otherwise the
+ * app gets stuck
+ */
+- (void) windowWillClose:(NSNotification *)notification
+{
+   NSWindow *sheet;
+
+   sheet = [ [ self window ] attachedSheet ];
+   if( sheet != nil )
+      [ NSApp endSheet:sheet ];
+}
+
+
 /*
  * Update the window's edited status based on whether anything in the window
  * has changed
