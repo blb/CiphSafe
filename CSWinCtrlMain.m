@@ -142,7 +142,7 @@ static NSAttributedString *defaultSearchString;
    [ self _setSortingImageForColumn:_previouslySelectedColumn ];
    /*
     * The table view is set as the initialFirstResponder, but we have to do
-    * this anyway
+    * this as well
     */
    [ [ self window ] makeFirstResponder:_documentView ];
    [ _documentView registerForDraggedTypes:
