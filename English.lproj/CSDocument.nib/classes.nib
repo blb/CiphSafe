@@ -15,8 +15,8 @@
             CLASS = CSWinCtrlMain; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                "_cmmTableHeader" = NSMenu; 
                 "_contextualMenu" = NSMenu; 
-                "_cornerMenu" = NSMenu; 
                 "_documentDeleteButton" = NSButton; 
                 "_documentSearch" = BLBTextField; 
                 "_documentStatus" = NSTextField; 
