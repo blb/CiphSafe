@@ -45,7 +45,6 @@
    CSWinCtrlMain *_mainWindowController;
    CSWinCtrlPassphrase *_passphraseWindowController;
    NSInvocation *_getKeyInvocation;
-   NSWindow *sheetFocusedWindow;
 }
 
 // Actions from the menu
