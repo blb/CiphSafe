@@ -248,8 +248,7 @@
 
 
 /*
- * Make sure cells don't draw the background, otherwise the striping will
- * look funny; also denote if a string is too long to be shown completely
+ * Denote if a string is too long to be shown completely
  */
 - (void) tableView:(NSTableView *)tableView willDisplayCell:(id)theCell
          forTableColumn:(NSTableColumn *)tableColumn row:(int)rowIndex
@@ -259,8 +258,6 @@
    int lastGlyph;
    NSRange glyphRange, characterRange;
    NSMutableAttributedString *newString;
-
-   [ theCell setDrawsBackground:NO ];
 
    cellAttrString = [ theCell attributedStringValue ];
    cellWidth = [ tableColumn width ];
