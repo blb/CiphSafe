@@ -1,6 +1,6 @@
 {
     IBClasses = (
-        {CLASS = CSTableView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }, 
+        {CLASS = BLBTableView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }, 
         {
             ACTIONS = {
                 cmmCopyAccount = id; 
@@ -18,7 +18,7 @@
                 contextualMenu = NSMenu; 
                 documentDeleteButton = NSButton; 
                 documentStatus = NSTextField; 
-                documentView = CSTableView; 
+                documentView = BLBTableView; 
                 documentViewButton = NSButton; 
             }; 
             SUPERCLASS = NSWindowController; 

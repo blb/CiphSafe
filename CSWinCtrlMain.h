@@ -1,13 +1,13 @@
 /* CSWinCtrlMain.h */
 
 #import <AppKit/AppKit.h>
-#import "CSTableView.h"
+#import "BLBTableView.h"
 
-@interface CSWinCtrlMain : NSWindowController <CSTableView_CMM>
+@interface CSWinCtrlMain : NSWindowController <BLBTableView_CMM>
 {
    NSTableColumn *previouslySelectedColumn;
 
-   IBOutlet CSTableView *documentView;
+   IBOutlet BLBTableView *documentView;
    IBOutlet NSButton *documentDeleteButton;
    IBOutlet NSButton *documentViewButton;
    IBOutlet NSTextField *documentStatus;
