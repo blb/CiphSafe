@@ -51,13 +51,9 @@
 #define CSDOCUMENT_NAME @"CiphSafe Document"
 
 @interface CSDocument (InternalMethods)
-- (void) _addNotificationsForWindow:(NSWindow *)window;
 - (NSString *) _uniqueNameForName:(NSString *)name;
 - (CSDocModel *) _model;
 - (void) _setupModel;
-- (void) _windowWillBeginSheetNotification:(NSNotification *)notification;
-- (void) _windowDidEndSheetNotification:(NSNotification *)notification;
-- (void) _windowDidBecomeKeyNotification:(NSNotification *)notification;
 - (void) _updateViewForNotification:(NSNotification *)notification;
 - (void) _getKeyResult:(NSMutableData *)newKey;
 - (void) _saveToFile:(NSString *)fileName
@@ -91,7 +87,6 @@
    _mainWindowController = [ [ CSWinCtrlMain alloc ] init ];
    [ self addWindowController:_mainWindowController ];
    [ _mainWindowController release ];
-   [ self _addNotificationsForWindow:[ _mainWindowController window ] ];
 }
 
 
@@ -217,7 +212,6 @@
       winController = [ [ CSWinCtrlAdd alloc ] init ];
       [ self addWindowController:winController ];
       [ winController release ];
-      [ self _addNotificationsForWindow:[ winController window ] ];
    }
    [ winController showWindow:self ];
 }
@@ -242,7 +236,6 @@
                            initForEntryName:[ namesArray objectAtIndex:index ] ];
          [ self addWindowController:winController ];
          [ winController release ];
-         [ self _addNotificationsForWindow:[ winController window ] ];
       }
       [ winController showWindow:self ];
    }
@@ -605,29 +598,6 @@
 
 
 /*
- * Add notifications we want to the given window
- */
-- (void) _addNotificationsForWindow:(NSWindow *)window
-{
-   NSNotificationCenter *defaultCenter;
-
-   defaultCenter = [ NSNotificationCenter defaultCenter ];
-   [ defaultCenter addObserver:self
-                   selector:@selector( _windowWillBeginSheetNotification: )
-                   name:NSWindowWillBeginSheetNotification
-                   object:window ];
-   [ defaultCenter addObserver:self
-                   selector:@selector( _windowDidEndSheetNotification: )
-                   name:NSWindowDidEndSheetNotification
-                   object:window ];
-   [ defaultCenter addObserver:self
-                   selector:@selector( _windowDidBecomeKeyNotification: )
-                   name:NSWindowDidBecomeKeyNotification
-                   object:window ];
-}
-
-
-/*
  * Return a name which doesn't yet exist (eg, 'name' would result in 'name' if
  * 'name' didn't already exist, 'name copy' if it did, then 'name copy #' if
  * 'name copy', etc)
@@ -698,43 +668,6 @@
                    name:CSDocModelDidRemoveEntryNotification
                    object:_docModel ];
    [ _mainWindowController refreshWindow ];
-}
-
-
-/*
- * Called when a window opens a sheet
- */
-- (void) _windowWillBeginSheetNotification:(NSNotification *)notification
-{
-   sheetFocusedWindow = [ notification object ];
-}
-
-
-/*
- * Called when a window controller closes a sheet
- */
-- (void) _windowDidEndSheetNotification:(NSNotification *)notification
-{
-   sheetFocusedWindow = nil;
-}
-
-
-/*
- * Allow only the window with a sheet to be key (per HIG); otherwise, don't
- * do anything
- */
-- (void) _windowDidBecomeKeyNotification:(NSNotification *)notification
-{
-   if( sheetFocusedWindow != nil &&
-       ![ [ notification object ] isEqual:sheetFocusedWindow ] )
-   {
-      NSBeep();
-      [ sheetFocusedWindow performSelector:@selector( makeKeyAndOrderFront: )
-                           withObject:self
-                           afterDelay:0.1
-                           inModes:
-                              [ NSArray arrayWithObject:NSDefaultRunLoopMode ] ];
-   }
 }
 
 
