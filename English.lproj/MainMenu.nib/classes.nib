@@ -1,11 +1,20 @@
 {
     IBClasses = (
         {
-            ACTIONS = {openPrefs = id; prefsCancel = id; prefsSave = id; }; 
+            ACTIONS = {
+                openPrefs = id; 
+                prefsAutoOpenClicked = id; 
+                prefsAutoOpenSelectPath = id; 
+                prefsCancel = id; 
+                prefsSave = id; 
+            }; 
             CLASS = CSAppController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
                 prefsAlphanumOnly = NSButton; 
+                prefsAutoOpen = NSButton; 
+                prefsAutoOpenName = NSTextField; 
+                prefsAutoOpenSelect = NSButton; 
                 prefsClearClipboard = NSButton; 
                 prefsCloseAdd = NSButton; 
                 prefsCloseEdit = NSButton; 
