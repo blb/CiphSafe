@@ -115,15 +115,18 @@ static NSAttributedString *defaultSearchString;
    NSString *displayName;
    NSString *windowFrameString;
 
-   displayName = [ [ self document ] displayName ];
-   windowFrameString = [ [ NSUserDefaults standardUserDefaults ]
-                         stringForKey:[ NSString stringWithFormat:
-                                                    @"NSWindow Frame %@",
-                                                    displayName ] ];
-   if( windowFrameString != nil )
-      [ [ self window ] setFrameFromString:windowFrameString ];
-   [ _documentView setAutosaveName:displayName ];
-   [ _documentView setAutosaveTableColumns:YES ];
+   if( [ [ self document ] fileName ] != nil )
+   {
+      displayName = [ [ self document ] displayName ];
+      windowFrameString = [ [ NSUserDefaults standardUserDefaults ]
+                            stringForKey:[ NSString stringWithFormat:
+                                                       @"NSWindow Frame %@",
+                                                       displayName ] ];
+      if( windowFrameString != nil )
+         [ [ self window ] setFrameFromString:windowFrameString ];
+      [ _documentView setAutosaveName:displayName ];
+      [ _documentView setAutosaveTableColumns:YES ];
+   }
    [ _documentView setDrawsGrid:NO ];
    [ _documentView setDrawsGrid:YES ];
    [ _documentView setStripeColor:[ NSColor colorWithCalibratedRed:0.93
@@ -562,12 +565,19 @@ static NSAttributedString *defaultSearchString;
 - (void) windowWillClose:(NSNotification *)notification
 {
    NSUserDefaults *userDefaults;
+   NSString *displayName;
 
-   userDefaults = [ NSUserDefaults standardUserDefaults ];
-   [ userDefaults setObject:[ [ self window ] stringWithSavedFrame ]
-                  forKey:[ NSString stringWithFormat:@"NSWindow Frame %@",
-                                       [ [ self document ] displayName ] ] ];
-   [ userDefaults synchronize ];
+   if( [ [ self document ] fileName ] != nil )
+   {
+      userDefaults = [ NSUserDefaults standardUserDefaults ];
+      displayName = [ [ self document ] displayName ];
+      [ userDefaults setObject:[ [ self window ] stringWithSavedFrame ]
+                     forKey:[ NSString stringWithFormat:@"NSWindow Frame %@",
+                                                        displayName ] ];
+      [ _documentView setAutosaveName:displayName ];
+      [ _documentView setAutosaveTableColumns:YES ];
+      [ userDefaults synchronize ];
+   }
    [ self _setSearchResultList:nil ];
 }
 
