@@ -1,3 +1,4 @@
+// Interesting security issues are noted with XXX in comments
 /* CSDocModel.m */
 
 #import "CSDocModel.h"
@@ -72,12 +73,13 @@ int sortEntries( id dict1, id dict2, void *context );
    if( encryptedData == nil || bfKey == nil )
       return nil;
 
-   if( ( self = [ super init ] ) )
+   self = [ super init ];
+   if( self != nil )
    {
       // Separate into the IV and compressed & encrypted data
-      iv = [ NSData dataWithBytes:[ encryptedData bytes ] length:8 ];
-      ceData = [ NSData dataWithBytes:[ encryptedData bytes ] + 8
-                        length:[ encryptedData length ] - 8 ];
+      iv = [ encryptedData subdataWithRange:NSMakeRange( 0, 8 ) ];
+      ceData = [ encryptedData subdataWithRange:
+                                  NSMakeRange( 8, [ encryptedData length ] - 8 ) ];
 
       decryptedData = [ ceData blowfishDecryptedDataWithKey:bfKey iv:iv ];
       if( decryptedData != nil )
@@ -86,11 +88,11 @@ int sortEntries( id dict1, id dict2, void *context );
          [ decryptedData clearOutData ];
          if( uncompressedData != nil )
          {
-            allEntries = [ [ NSUnarchiver unarchiveObjectWithData:
-                                             uncompressedData ] retain ];
+            allEntries = [ NSUnarchiver unarchiveObjectWithData:uncompressedData ];
             [ uncompressedData clearOutData ];
             if( allEntries != nil )
             {
+               [ allEntries retain ];
                [ self _setupSelf ];
                [ allEntries sortUsingFunction:sortEntries context:self ];
             }
@@ -113,7 +115,7 @@ int sortEntries( id dict1, id dict2, void *context );
 - (NSData *) encryptedDataWithKey:(NSData *)bfKey
 {
    NSData *iv, *archivedData, *ceData;
-   NSMutableData *compressedData, *ivAndData = nil;
+   NSMutableData *compressedData, *ivAndData;
 
    iv = [ NSData randomDataOfLength:8 ];
    archivedData = [ NSArchiver archivedDataWithRootObject:allEntries ];
@@ -195,7 +197,8 @@ int sortEntries( id dict1, id dict2, void *context );
    sortAscending = sortAsc;
    [ allEntries sortUsingFunction:sortEntries context:self ];
    [ [ NSNotificationCenter defaultCenter ]
-     postNotificationName:CSDocModelDidChangeSortNotification object:self ];
+     postNotificationName:CSDocModelDidChangeSortNotification
+     object:self ];
 }
 
 
@@ -240,9 +243,8 @@ int sortEntries( id dict1, id dict2, void *context );
  */
 - (NSAttributedString *) RTFDStringNotesAtRow:(unsigned)row
 {
-   return [ [ [ NSAttributedString alloc ]
-              initWithRTFD:[ self RTFDNotesAtRow:row ]
-              documentAttributes:NULL ]
+   return [ [ [ NSAttributedString alloc ] initWithRTFD:[ self RTFDNotesAtRow:row ]
+                                           documentAttributes:NULL ]
             autorelease ];
 }
 
@@ -252,15 +254,14 @@ int sortEntries( id dict1, id dict2, void *context );
  */
 - (NSAttributedString *) RTFStringNotesAtRow:(unsigned)row
 {
-   return [ [ [ NSAttributedString alloc ]
-              initWithRTF:[ self RTFNotesAtRow:row ]
-              documentAttributes:NULL ]
+   return [ [ [ NSAttributedString alloc ] initWithRTF:[ self RTFNotesAtRow:row ]
+                                           documentAttributes:NULL ]
             autorelease ];
 }
 
 
 /*
- * Return the row number for the given name
+ * Return the row number for the given name, -1 if not found
  */
 - (unsigned) rowForName:(NSString *)name
 {
@@ -268,14 +269,11 @@ int sortEntries( id dict1, id dict2, void *context );
    unsigned rowNum;
 
    rowNum = -1;
-   for( index = 0; index < [ allEntries count ]; index++ )
+   for( index = 0; index < [ allEntries count ] && rowNum == -1; index++ )
    {
       if( [ [ [ allEntries objectAtIndex:index ] objectForKey:CSDocModelKey_Name ]
             isEqualToString:name ] )
-      {
          rowNum = index;
-         break;
-      }
    }
 
    return rowNum;
@@ -304,15 +302,16 @@ int sortEntries( id dict1, id dict2, void *context );
    if( undoManager != nil )
    {
       [ undoManager registerUndoWithTarget:self
-                  selector:@selector( deleteEntryWithName: )
-                  object:name ];
+                    selector:@selector( deleteEntryWithName: )
+                    object:name ];
       if( ![ undoManager isUndoing ] && ![ undoManager isRedoing ] )
          [ undoManager setActionName:CSDOCMODEL_LOC_ADD ];
    }
 
    [ allEntries sortUsingFunction:sortEntries context:self ];
    [ [ NSNotificationCenter defaultCenter ]
-      postNotificationName:CSDocModelDidAddEntryNotification object:self
+      postNotificationName:CSDocModelDidAddEntryNotification
+      object:self
       userInfo:[ NSDictionary dictionaryWithObject:name
                               forKey:CSDocModelNotificationInfoKey_AddedName ] ];
 
@@ -326,7 +325,7 @@ int sortEntries( id dict1, id dict2, void *context );
  * if an entry with newName already exists or an entry with the given name
  * doesn't exist
  *
- * One security issue here is we cannot clear out the old data, as it needs to
+ * XXX One security issue here is we cannot clear out the old data, as it needs to
  * go into the undo manager
  */
 - (BOOL) changeEntryWithName:(NSString *)name newName:(NSString *)newName
@@ -350,7 +349,8 @@ int sortEntries( id dict1, id dict2, void *context );
    if( undoManager != nil )
    {
       [ [ undoManager prepareWithInvocationTarget:self ]
-        changeEntryWithName:realNewName newName:name
+        changeEntryWithName:realNewName
+        newName:name
         account:[ theEntry objectForKey:CSDocModelKey_Acct ]
         password:[ theEntry objectForKey:CSDocModelKey_Passwd ]
         URL:[ theEntry objectForKey:CSDocModelKey_URL ]
@@ -372,7 +372,8 @@ int sortEntries( id dict1, id dict2, void *context );
 
    [ allEntries sortUsingFunction:sortEntries context:self ];
    [ [ NSNotificationCenter defaultCenter ]
-     postNotificationName:CSDocModelDidChangeEntryNotification object:self
+     postNotificationName:CSDocModelDidChangeEntryNotification
+     object:self
      userInfo:[ NSDictionary dictionaryWithObjectsAndKeys:
                           name, CSDocModelNotificationInfoKey_ChangedNameFrom,
                           realNewName, CSDocModelNotificationInfoKey_ChangedNameTo,
@@ -386,8 +387,9 @@ int sortEntries( id dict1, id dict2, void *context );
  * Delete all entries given by the names in the array; returns number of entries
  * actually deleted (it, obviously, can't delete entries which aren't present).
  *
- * One security issue here is we cannot clear out the data prior to deletion, as
- * it needs to go into the undo manager
+ * XXX One security issue here is we cannot clear out the data prior to deletion,
+ * as it needs to go into the undo manager, as well as the names going into the
+ * notification
  */
 - (unsigned) deleteEntriesWithNamesInArray:(NSArray *)nameArray
 {
@@ -400,7 +402,7 @@ int sortEntries( id dict1, id dict2, void *context );
       if( theEntry != nil )
       {
          numDeleted++;
-         [ theEntry retain ];
+         [ theEntry retain ];   // Hold for the undo manager
          [ allEntries removeObject:theEntry ];
          if( undoManager != nil )
          {
@@ -413,7 +415,7 @@ int sortEntries( id dict1, id dict2, void *context );
             if( ![ undoManager isUndoing ] && ![ undoManager isRedoing ] )
                [ undoManager setActionName:CSDOCMODEL_LOC_DELETE ];
          }
-         [ theEntry release ];
+         [ theEntry release ];   // Undo manager now has it
       }
    }
 
@@ -421,7 +423,8 @@ int sortEntries( id dict1, id dict2, void *context );
    {
       [ allEntries sortUsingFunction:sortEntries context:self ];
       [ [ NSNotificationCenter defaultCenter ]
-        postNotificationName:CSDocModelDidRemoveEntryNotification object:self
+        postNotificationName:CSDocModelDidRemoveEntryNotification
+        object:self
         userInfo:[ NSDictionary dictionaryWithObject:nameArray
                              forKey:CSDocModelNotificationInfoKey_DeletedNames ] ];
    }
@@ -447,8 +450,7 @@ int sortEntries( id dict1, id dict2, void *context );
 {
    // XXX Should clean allEntries
    [ allEntries release ];
-   if( undoManager != nil )
-      [ undoManager release ];
+   [ undoManager release ];
    [ super dealloc ];
 }
 
