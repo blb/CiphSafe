@@ -50,6 +50,9 @@ NSString * const CSPrefDictKey_AutoOpenPath = @"CSPrefDictKey_AutoOpenPath";
 NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 
 @interface CSAppController (InternalMethods)
+- (void) _selectPathSheetDidEnd:(NSOpenPanel *)sheet
+         returnCode:(int)returnCode
+         contextInfo:(void  *)contextInfo;
 - (void) _configureAutoOpenControls;
 - (void) _setStateOfButton:(NSButton *)button fromKey:(NSString *)key;
 - (void) _setPrefKey:(NSString *)key fromButton:(NSButton *)button;
@@ -274,7 +277,7 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
    NSOpenPanel *openPanel;
    SEL didEndSel;
 
-   didEndSel = @selector( selectPathSheetDidEnd:returnCode:contextInfo: );
+   didEndSel = @selector( _selectPathSheetDidEnd:returnCode:contextInfo: );
    openPanel = [ NSOpenPanel openPanel ];
    [ openPanel setCanChooseFiles:YES ];
    [ openPanel setCanChooseDirectories:NO ];
@@ -292,7 +295,7 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 /*
  * Open panel to select an autoopen file ended
  */
-- (void) selectPathSheetDidEnd:(NSOpenPanel *)sheet
+- (void) _selectPathSheetDidEnd:(NSOpenPanel *)sheet
          returnCode:(int)returnCode
          contextInfo:(void  *)contextInfo
 {
