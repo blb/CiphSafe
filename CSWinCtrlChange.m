@@ -1,3 +1,4 @@
+// Interesting security issues are noted with XXX in comments
 /* CSWinCtrlChange.m */
 
 #import "CSWinCtrlChange.h"
@@ -164,8 +165,10 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
          // This won't work if we do it right away, so put it on the event queue
          [ [ NSRunLoop currentRunLoop ]
            performSelector:@selector( makeFirstResponder: )
-           target:[ self window ] argument:nameText
-           order:9999 modes:[ NSArray arrayWithObject:NSDefaultRunLoopMode ] ];
+           target:[ self window ]
+           argument:nameText
+           order:9999
+           modes:[ NSArray arrayWithObject:NSDefaultRunLoopMode ] ];
       }
       else
          [ [ self window ] performClose:self ];
@@ -188,7 +191,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 
    if( ( retval = [ super windowShouldClose:sender ] ) == YES )
       [ CSWinCtrlChange _removeController:self forDocument:[ self document ] ];
-// XXX clear out controls if possible
+
    return retval;
 }
 
@@ -209,7 +212,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 
    return ![ [ accountText stringValue ]
              isEqualToString:[ [ self document ] stringForKey:CSDocModelKey_Acct
-                                                   atRow:row ] ];
+                                                 atRow:row ] ];
 }
 
 - (BOOL) passwordChanged
@@ -220,7 +223,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 
    return ![ [ passwordText stringValue ]
              isEqualToString:[ [ self document ] stringForKey:CSDocModelKey_Passwd
-                                                   atRow:row ] ];
+                                                 atRow:row ] ];
 }
 
 - (BOOL) urlChanged
@@ -231,7 +234,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 
    return ![ [ urlText stringValue ]
              isEqualToString:[ [ self document ] stringForKey:CSDocModelKey_URL
-                                                   atRow:row ] ];
+                                                 atRow:row ] ];
 }
 
 - (BOOL) notesChanged
@@ -308,7 +311,8 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 {
    int myEntryRowNum;
    NSRange fullNotesRange;
-// XXX clear out controls prior to this, if possible
+
+   // XXX If it were possible, we'd clear out controls here
    [ nameText setStringValue:myEntryName ];
    myEntryRowNum = [ [ self document ] rowForName:myEntryName ];
    if( myEntryRowNum >= 0 )

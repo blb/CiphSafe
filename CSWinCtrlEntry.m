@@ -1,3 +1,7 @@
+// Interesting security issues are noted with XXX in comments
+
+// XXX If it were possible, we'd clear out all the controls in windowWillClose:
+
 /* CSWinCtrlEntry.m */
 
 #import "CSWinCtrlEntry.h"
@@ -16,6 +20,13 @@
 #define CSWINCTRLENTRY_LOC_CLOSEANYWAY NSLocalizedString( @"Close Anyway", @"" )
 #define CSWINCTRLENTRY_LOC_DONTCLOSE NSLocalizedString( @"Don't Close", @"" )
 
+@interface CSWinCtrlEntry (InternalMethods)
+- (void) _closeSheetDidEnd:(NSWindow *)sheet
+         returnCode:(int)returnCode
+         contextInfo:(void *)contextInfo;
+- (void) _undoManagerDidChange:(NSNotification *)notification;
+@end
+
 @implementation CSWinCtrlEntry
 
 // Character strings for password generation
@@ -30,11 +41,13 @@ static const char *genOther    = "`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
    {
       notesUM = [ [ NSUndoManager alloc ] init ];
       [ [ NSNotificationCenter defaultCenter ]
-        addObserver:self selector:@selector( _undoManagerDidChange: )
+        addObserver:self
+        selector:@selector( _undoManagerDidChange: )
         name:NSUndoManagerDidUndoChangeNotification
         object:notesUM ];
       [ [ NSNotificationCenter defaultCenter ]
-        addObserver:self selector:@selector( _undoManagerDidChange: )
+        addObserver:self
+        selector:@selector( _undoManagerDidChange: )
         name:NSUndoManagerDidRedoChangeNotification
         object:notesUM ];
       otherUM = [ [ NSUndoManager alloc ] init ];
@@ -70,12 +83,16 @@ static const char *genOther    = "`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
    for( index = 0; index < genSize; index++ )
       [ randomString appendFormat:@"%c",
                         [ genString characterAtIndex:( randomBytes[ index ] %
-                                                     [ genString length ] ) ] ];
+                                                       [ genString length ] ) ] ];
    [ passwordText setStringValue:randomString ];
    [ randomData clearOutData ];
-// XXX does delete... clear the memory?
+   /*
+    * XXX deleteCharactersInRange: probably just changes its length; strings are
+    * a pain in the ass in Cocoa from a security point of view
+    */
    [ randomString deleteCharactersInRange:
                      NSMakeRange( 0, [ randomString length ] ) ];
+
    [ self updateDocumentEditedStatus ];
 }
 
@@ -158,7 +175,7 @@ static const char *genOther    = "`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
 {
    BOOL retval;
    id alertPanel;
-// XXX maybe should clear controls here if possible
+
    retval = YES;
    if( [ [ self window ] isDocumentEdited ] )
    {
@@ -166,35 +183,15 @@ static const char *genOther    = "`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
                                             CSWINCTRLENTRY_LOC_NOTSAVEDCLOSE,
                                             CSWINCTRLENTRY_LOC_CLOSEANYWAY,
                                             CSWINCTRLENTRY_LOC_DONTCLOSE, nil );
-      [ NSApp beginSheet:alertPanel modalForWindow:[ self window ]
+      [ NSApp beginSheet:alertPanel
+              modalForWindow:[ self window ]
               modalDelegate:self
-              didEndSelector:@selector( closeSheetDidEnd:returnCode:contextInfo: )
+              didEndSelector:@selector( _closeSheetDidEnd:returnCode:contextInfo: )
               contextInfo:NULL ];
       retval = NO;
    }
 
    return retval;
-}
-
-
-/*
- * Handle the "should close" sheet
- */
-- (void) closeSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode
-         contextInfo:(void *)contextInfo;
-{
-   if( returnCode == NSAlertDefaultReturn )
-   {
-      // Close the window this way so the proper delegation is performed
-      [ [ self window ] setDocumentEdited:NO ];
-      [ [ NSRunLoop currentRunLoop ]
-        performSelector:@selector( performClose: ) target:[ self window ]
-        argument:self order:9999
-        modes:[ NSArray arrayWithObject:NSDefaultRunLoopMode ] ];
-   }
-   [ sheet orderOut:self ];
-   [ NSApp endSheet:sheet ];
-   NSReleaseAlertPanel( sheet );
 }
 
 
@@ -249,6 +246,30 @@ static const char *genOther    = "`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
    [ notesUM release ];
    [ otherUM release ];
    [ super dealloc ];
+}
+
+
+/*
+ * Handle the "should close" sheet
+ */
+- (void) _closeSheetDidEnd:(NSWindow *)sheet
+         returnCode:(int)returnCode
+         contextInfo:(void *)contextInfo
+{
+   if( returnCode == NSAlertDefaultReturn )
+   {
+      // Close the window this way so the proper delegation is performed
+      [ [ self window ] setDocumentEdited:NO ];
+      [ [ NSRunLoop currentRunLoop ]
+        performSelector:@selector( performClose: )
+        target:[ self window ]
+        argument:self
+        order:9999
+        modes:[ NSArray arrayWithObject:NSDefaultRunLoopMode ] ];
+   }
+   [ sheet orderOut:self ];
+   [ NSApp endSheet:sheet ];
+   NSReleaseAlertPanel( sheet );
 }
 
 
