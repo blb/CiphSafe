@@ -527,7 +527,27 @@ int sortEntries( id dict1, id dict2, void *context );
               ignoreCase:(BOOL)ignoreCase
               forKey:(NSString *)key
 {
-   return nil;
+   unsigned compareOptions;
+   NSMutableArray *retval;
+   unsigned index;
+   NSRange searchResult;
+
+   compareOptions = 0;
+   retval = [ NSMutableArray arrayWithCapacity:10 ];
+   if( ignoreCase )
+      compareOptions = NSCaseInsensitiveSearch;
+   for( index = 0; index < [ _allEntries count ]; index++ )
+   {
+      searchResult = [ [ [ _allEntries objectAtIndex:index ]
+                         objectForKey:key ]
+                       rangeOfString:findMe options:compareOptions ];
+      if( searchResult.location != NSNotFound )
+
+         [ retval addObject:[ NSNumber numberWithUnsignedInt:index ] ];
+
+   }
+
+   return retval;
 }
 
 
