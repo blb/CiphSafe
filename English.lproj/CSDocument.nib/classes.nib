@@ -1,0 +1,29 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {
+                cmmCopyAccount = id; 
+                cmmCopyName = id; 
+                cmmCopyNotes = id; 
+                cmmCopyPassword = id; 
+                cmmCopyURL = id; 
+                docAddEntry = id; 
+                docChangePassphrase = id; 
+                docDeleteEntry = id; 
+                docViewEntry = id; 
+            }; 
+            CLASS = CSDocument; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                contextualMenu = NSMenu; 
+                documentDeleteButton = NSButton; 
+                documentView = NSTableView; 
+                documentViewButton = NSButton; 
+            }; 
+            SUPERCLASS = NSDocument; 
+        }, 
+        {CLASS = CSTableView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

@@ -1,0 +1,26 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {doAdd = id; doClear = id; }; 
+            CLASS = CSWinCtrlAdd; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = CSWinCtrlEntry; 
+        }, 
+        {
+            ACTIONS = {doGenerate = id; doOpenURL = id; }; 
+            CLASS = CSWinCtrlEntry; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                accountText = NSTextField; 
+                mainButton = NSButton; 
+                nameText = NSTextField; 
+                notes = NSTextView; 
+                passwordText = NSTextField; 
+                urlText = NSTextField; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

@@ -1,0 +1,39 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {
+                openPrefs = id; 
+                passphraseAccept = id; 
+                passphraseCancel = id; 
+                prefsCancel = id; 
+                prefsSave = id; 
+            }; 
+            CLASS = CSAppController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                passphraseNote = NSTextField; 
+                passphrasePhrase = NSTextField; 
+                passphraseWindow = NSWindow; 
+                prefsAlphanumOnly = NSButton; 
+                prefsClearClipboard = NSButton; 
+                prefsCloseAdd = NSButton; 
+                prefsCloseEdit = NSButton; 
+                prefsConfirmDelete = NSButton; 
+                prefsCreateNew = NSButton; 
+                prefsGenSize = NSTextField; 
+                prefsIncludePasswd = NSButton; 
+                prefsKeepBackup = NSButton; 
+                prefsWarnShort = NSButton; 
+                prefsWindow = NSWindow; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {docAddEntry = id; docChangePassphrase = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}
