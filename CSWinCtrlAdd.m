@@ -113,7 +113,7 @@
            target:[ self window ]
            argument:_nameText
            order:9999
-           modes:[ NSArray arrayWithObject:NSDefaultRunLoopMode ] ];
+           modes:[ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ] ];
       }
       else
          [ [ self window ] performClose:self ];

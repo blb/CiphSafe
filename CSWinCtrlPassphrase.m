@@ -102,7 +102,7 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
      target:[ self window ]
      argument:_passphrasePhrase1
      order:9999
-     modes:[ NSArray arrayWithObject:NSDefaultRunLoopMode ] ];
+     modes:[ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ] ];
    _parentWindow = nil;
    windowReturn = [ NSApp runModalForWindow:[ self window ] ];
    [ [ self window ] orderOut:self ];
@@ -134,7 +134,7 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
      target:[ self window ]
      argument:_passphrasePhrase2
      order:9999
-     modes:[ NSArray arrayWithObject:NSDefaultRunLoopMode ] ];
+     modes:[ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ] ];
    _parentWindow = window;
    _modalDelegate = delegate;
    _sheetEndSelector = selector;

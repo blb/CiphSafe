@@ -367,7 +367,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
         target:[ self window ]
         argument:self
         order:9999
-        modes:[ NSArray arrayWithObject:NSDefaultRunLoopMode ] ];
+        modes:[ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ] ];
    }
    [ sheet orderOut:self ];
    [ NSApp endSheet:sheet ];
