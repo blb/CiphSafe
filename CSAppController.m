@@ -1,8 +1,6 @@
 /* CSAppController.m */
 
 #import "CSAppController.h"
-#import "NSData_crypto.h"
-#import "NSData_clear.h"
 
 NSString * const CSPrefDictKey_SaveBackup = @"CSPrefDictKey_SaveBackup";
 NSString * const CSPrefDictKey_CloseAdd = @"CSPrefDictKey_CloseAdd";
@@ -15,22 +13,7 @@ NSString * const CSPrefDictKey_GenSize = @"CSPrefDictKey_GenSize";
 NSString * const CSPrefDictKey_AlphanumOnly = @"CSPrefDictKey_AlphanumOnly";
 NSString * const CSPrefDictKey_IncludePasswd = @"CSPrefDictKey_IncludePasswd";
 
-NSString * const CSPassphraseNote_Save = @"Passphrase hint";
-NSString * const CSPassphraseNote_Load = @"Passphrase for file";
-NSString * const CSPassphraseNote_Change = @"New passphrase";
-
 NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
-
-// Defines for localized strings
-#define CSAPPCONTROLLER_LOC_SHORTPHRASE \
-        NSLocalizedString( @"Short Passphrase", "short passphrase" )
-#define CSAPPCONTROLLER_LOC_PHRASEISSHORT \
-        NSLocalizedString( @"The entered passphrase is somewhat short, do " \
-                           @"you wish to use it anyway?", @"" )
-#define CSAPPCONTROLLER_LOC_USEIT NSLocalizedString( @"Use It", @"" )
-#define CSAPPCONTROLLER_LOC_ENTERAGAIN NSLocalizedString( @"Enter Again", @"" )
-#define CSAPPCONTROLLER_LOC_WINTITLE \
-        NSLocalizedString( @"Enter passphrase for %@", @"" )
 
 @interface CSAppController (InternalMethods)
 - (void) _setStateOfButton:(NSButton *)button fromKey:(NSString *)key;
@@ -160,83 +143,6 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 - (IBAction) prefsCancel:(id)sender
 {
    [ prefsWindow performClose:self ];
-}
-
-
-/*
- * Passphrase methods
- */
-/*
- * Open the passphrase window to request a passphrase; noteType is one of
- * the CSPassphraseNote_* variables
- */
-- (NSMutableData *) getEncryptionKeyWithNote:(NSString *)noteType
-                    warnOnShortPassphrase:(BOOL)shouldWarn
-                    forDocumentNamed:(NSString *)docName
-{
-   int windowReturn;
-   NSString *passphrase;
-   NSData *passphraseData;
-   NSMutableData *keyData;
-
-   keyData = nil;
-   shouldWarnOnShortPhrase = shouldWarn;
-
-   [ passphraseWindow setTitle:
-                         [ NSString stringWithFormat:CSAPPCONTROLLER_LOC_WINTITLE,
-                         docName ] ];
-
-   [ passphraseNote setStringValue:NSLocalizedString( noteType, nil ) ];
-   windowReturn = [ NSApp runModalForWindow:passphraseWindow ];
-
-   passphrase = [ passphrasePhrase stringValue ];
-   // XXX Might setStringValue: leave any cruft around?
-   [ passphrasePhrase setStringValue:@"" ];
-   [ passphraseWindow orderOut:self ];
-   if( windowReturn == NSRunStoppedResponse )
-   {
-      passphraseData = [ passphrase dataUsingEncoding:NSUnicodeStringEncoding ];
-      keyData = [ passphraseData SHA1Hash ];
-      [ passphraseData clearOutData ];
-      passphraseData = nil;
-   }
-
-   /*
-    * XXX At this point, passphrase should be cleared, however, there is no
-    * way, that I've yet found, to do that...here's hoping it gets released
-    * and cleared soon...
-    */
-   passphrase = nil;
-
-   return keyData;
-}
-
-/*
- * Passphrase was accepted; warn if it's pretty short
- */
-- (IBAction) passphraseAccept:(id)sender
-{
-   if( [ [ passphrasePhrase stringValue ] length ] < 8 && shouldWarnOnShortPhrase )
-   {
-      if( NSRunInformationalAlertPanel( CSAPPCONTROLLER_LOC_SHORTPHRASE,
-                                        CSAPPCONTROLLER_LOC_PHRASEISSHORT,
-                                        CSAPPCONTROLLER_LOC_USEIT,
-                                        CSAPPCONTROLLER_LOC_ENTERAGAIN,
-                                        nil ) ==
-          NSAlertDefaultReturn )
-         [ NSApp stopModal ];
-   }
-   else
-      [ NSApp stopModal ];
-}
-
-
-/*
- * Passphrase not entered
- */
-- (IBAction) passphraseCancel:(id)sender
-{
-   [ NSApp abortModal ];
 }
 
 
