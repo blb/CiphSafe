@@ -231,6 +231,7 @@
 				2A37F4B4FDCFA73011CA2CEA,
 				F4EA37BD0349833201A8070A,
 				F4709C4E0347B66901A8070A,
+				F45C2DA203BD0DCD01A8070A,
 				089C165FFE840EACC02AAC07,
 				F46463FE0353C9B801A8070A,
 				F4EA37B903494DDD01A8070A,
@@ -373,6 +374,7 @@
 				F4638750039DAAC701A8070A,
 				F4CC4E4603B3D0F701A8070A,
 				F43DBE7B03BA4DEB01A8070A,
+				F45C2DA003BD0B8301A8070A,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -395,6 +397,7 @@
 				F4EA37BC03494DDD01A8070A,
 				F4EA37BF0349833201A8070A,
 				F46463FF0353C9B801A8070A,
+				F45C2DA403BD0DCD01A8070A,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -416,6 +419,7 @@
 				F4638751039DAAC701A8070A,
 				F4CC4E4703B3D0F701A8070A,
 				F43DBE7C03BA4DEB01A8070A,
+				F45C2DA103BD0B8301A8070A,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -521,6 +525,49 @@
 			settings = {
 			};
 		};
+		F45C2D9E03BD0B8301A8070A = {
+			isa = PBXFileReference;
+			path = CSWinCtrlPassphrase.h;
+			refType = 4;
+		};
+		F45C2D9F03BD0B8301A8070A = {
+			isa = PBXFileReference;
+			path = CSWinCtrlPassphrase.m;
+			refType = 4;
+		};
+		F45C2DA003BD0B8301A8070A = {
+			fileRef = F45C2D9E03BD0B8301A8070A;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F45C2DA103BD0B8301A8070A = {
+			fileRef = F45C2D9F03BD0B8301A8070A;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F45C2DA203BD0DCD01A8070A = {
+			children = (
+				F45C2DA303BD0DCD01A8070A,
+			);
+			isa = PBXVariantGroup;
+			name = CSPassphrase.nib;
+			path = "";
+			refType = 4;
+		};
+		F45C2DA303BD0DCD01A8070A = {
+			isa = PBXFileReference;
+			name = English;
+			path = English.lproj/CSPassphrase.nib;
+			refType = 4;
+		};
+		F45C2DA403BD0DCD01A8070A = {
+			fileRef = F45C2DA203BD0DCD01A8070A;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F4638743039CA38001A8070A = {
 			isa = PBXFileReference;
 			path = CSTableView.h;
@@ -553,6 +600,8 @@
 				F477F7D9036E2EB301A8070A,
 				F43DBE7903BA4DEB01A8070A,
 				F43DBE7A03BA4DEB01A8070A,
+				F45C2D9E03BD0B8301A8070A,
+				F45C2D9F03BD0B8301A8070A,
 			);
 			isa = PBXGroup;
 			name = WinControllers;
