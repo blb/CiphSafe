@@ -101,6 +101,7 @@
 static NSArray *cmmCopyFields;
 static NSAttributedString *defaultSearchString;
 static NSArray *columnSelectionArray;
+static NSArray *searchWhatArray;
 
 + (void) initialize
 {
@@ -127,6 +128,14 @@ static NSArray *columnSelectionArray;
                                                  CSDocModelKey_URL,
                                                  CSDocModelKey_Notes,
                                                  nil ];
+   searchWhatArray = [ [ NSArray alloc ] initWithObjects:@"Search in:",
+                                                         CSDocModelKey_Name,
+                                                         CSDocModelKey_Acct,
+                                                         CSDocModelKey_Passwd,
+                                                         CSDocModelKey_URL,
+                                                         CSDocModelKey_Notes,
+                                                         nil ];
+
 }
 
 
@@ -148,6 +157,8 @@ static NSArray *columnSelectionArray;
  */
 - (void) awakeFromNib
 {
+   int index;
+
    if( [ [ self document ] fileName ] != nil )
    {
       [ self _loadSavedWindowState ];
@@ -182,6 +193,10 @@ static NSArray *columnSelectionArray;
    [ self _setTableViewSpacing ];
    [ _documentSearch setObjectValue:defaultSearchString ];
    [ self refreshWindow ];
+   [ _searchWhat setAutoenablesItems:NO ];
+   [ [ _searchWhat itemAtIndex:0 ] setEnabled:NO ];
+   for( index = 1; index < [ _searchWhat numberOfItems ]; index++ )
+      [ [ _searchWhat itemAtIndex:index ] setEnabled:YES ];
    [ [ NSNotificationCenter defaultCenter ]
      addObserver:self
      selector:@selector( _prefsDidChange: )
@@ -843,7 +858,8 @@ static NSArray *columnSelectionArray;
       [ self _setSearchResultList:[ [ self document ]
                                     rowsMatchingString:searchString
                                     ignoreCase:YES
-                                    forKey:CSDocModelKey_Name ] ];
+                                    forKey:[ searchWhatArray objectAtIndex:
+                                        [ _searchWhat indexOfSelectedItem ] ] ] ];
    else
       [ self _setSearchResultList:nil ];
 }

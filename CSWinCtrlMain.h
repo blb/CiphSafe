@@ -50,6 +50,7 @@
    IBOutlet BLBTextField *_documentSearch;
    IBOutlet NSMenu *_contextualMenu;
    IBOutlet NSMenu *_cmmTableHeader;
+   IBOutlet NSPopUpButton *_searchWhat;
 }
 
 // Actions from the main window
