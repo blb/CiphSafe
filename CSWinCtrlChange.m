@@ -72,7 +72,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
                       inDocument:(NSDocument *)document
 {
    NSArray *arrayForDocument;
-   unsigned index;
+   int index;
    CSWinCtrlChange *curController;
 
    arrayForDocument = [ controllerList objectForKey:

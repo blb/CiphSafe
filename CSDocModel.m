@@ -238,7 +238,7 @@ int sortEntries( id dict1, id dict2, void *context );
 /*
  * Return total number of entries
  */
-- (unsigned) entryCount
+- (int) entryCount
 {
    return [ _allEntries count ];
 }
@@ -247,7 +247,7 @@ int sortEntries( id dict1, id dict2, void *context );
 /*
  * Return the value for the given key on the given row
  */
-- (NSString *) stringForKey:(NSString *)key atRow:(unsigned)row
+- (NSString *) stringForKey:(NSString *)key atRow:(int)row
 {
    return [ [ _allEntries objectAtIndex:row ] objectForKey:key ];
 }
@@ -256,7 +256,7 @@ int sortEntries( id dict1, id dict2, void *context );
 /*
  * Return the RTFD for the notes on the given row
  */
-- (NSData *) RTFDNotesAtRow:(unsigned)row
+- (NSData *) RTFDNotesAtRow:(int)row
 {
    return [ [ _allEntries objectAtIndex:row ] objectForKey:CSDocModelKey_Notes ];
 }
@@ -268,7 +268,7 @@ int sortEntries( id dict1, id dict2, void *context );
  * XXX Note this returns an autoreleased NSData with possibly sensitive
  * information
  */
-- (NSData *) RTFNotesAtRow:(unsigned)row
+- (NSData *) RTFNotesAtRow:(int)row
 {
    return [ [ self RTFDStringNotesAtRow:row ] RTFWithDocumentAttributes:NULL ];
 }
@@ -280,7 +280,7 @@ int sortEntries( id dict1, id dict2, void *context );
  * XXX Note this returns an autoreleased NSString with possibly sensitive
  * information
  */
-- (NSAttributedString *) RTFDStringNotesAtRow:(unsigned)row
+- (NSAttributedString *) RTFDStringNotesAtRow:(int)row
 {
    return [ [ [ NSAttributedString alloc ]
               initWithRTFD:[ self RTFDNotesAtRow:row ]
@@ -295,7 +295,7 @@ int sortEntries( id dict1, id dict2, void *context );
  * XXX Note this returns an autoreleased NSString with possibly sensitive
  * information
  */
-- (NSAttributedString *) RTFStringNotesAtRow:(unsigned)row
+- (NSAttributedString *) RTFStringNotesAtRow:(int)row
 {
    return [ [ [ NSAttributedString alloc ]
               initWithRTF:[ self RTFNotesAtRow:row ] documentAttributes:NULL ]
@@ -306,10 +306,10 @@ int sortEntries( id dict1, id dict2, void *context );
 /*
  * Return the row number for the given name, -1 if not found
  */
-- (unsigned) rowForName:(NSString *)name
+- (int) rowForName:(NSString *)name
 {
-   unsigned index;
-   unsigned rowNum;
+   int index;
+   int rowNum;
 
    rowNum = -1;
    for( index = 0; index < [ _allEntries count ] && rowNum == -1; index++ )
@@ -450,9 +450,9 @@ int sortEntries( id dict1, id dict2, void *context );
  * XXX Note that the deleted entries will live on in the undo manager
  * and the names are also given to the notification center
  */
-- (unsigned) deleteEntriesWithNamesInArray:(NSArray *)nameArray
+- (int) deleteEntriesWithNamesInArray:(NSArray *)nameArray
 {
-   unsigned index, numDeleted;
+   int index, numDeleted;
    NSMutableDictionary *theEntry;
 
    for( index = numDeleted = 0; index < [ nameArray count ]; index++ )
@@ -512,7 +512,7 @@ int sortEntries( id dict1, id dict2, void *context );
    unsigned compareOptions;
    NSNumber *retval;
    NSRange searchRange;
-   unsigned index;
+   int index;
 
    compareOptions = 0;
    retval = nil;
@@ -524,7 +524,7 @@ int sortEntries( id dict1, id dict2, void *context );
       if( [ [ [ _allEntries objectAtIndex:index ] objectForKey:key ]
             compare:findMe options:compareOptions range:searchRange ]
           == NSOrderedSame )
-         retval = [ NSNumber numberWithUnsignedInt:index ];
+         retval = [ NSNumber numberWithInt:index ];
    }
 
    return retval;
@@ -532,7 +532,7 @@ int sortEntries( id dict1, id dict2, void *context );
 
 
 /*
- * Return an array (of elements supporting unsignedIntValue message) of all
+ * Return an array (of elements supporting intValue message) of all
  * matching entries
  */
 - (NSArray *) rowsMatchingString:(NSString *)findMe
@@ -541,7 +541,7 @@ int sortEntries( id dict1, id dict2, void *context );
 {
    unsigned compareOptions;
    NSMutableArray *retval;
-   unsigned index;
+   int index;
    NSRange searchResult;
 
    compareOptions = 0;
@@ -554,7 +554,7 @@ int sortEntries( id dict1, id dict2, void *context );
                        rangeOfString:findMe options:compareOptions ];
       if( searchResult.location != NSNotFound )
 
-         [ retval addObject:[ NSNumber numberWithUnsignedInt:index ] ];
+         [ retval addObject:[ NSNumber numberWithInt:index ] ];
 
    }
 

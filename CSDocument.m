@@ -222,7 +222,7 @@
  */
 - (void) viewEntries:(NSArray *)namesArray
 {
-   unsigned index;
+   int index;
    CSWinCtrlChange *winController;
 
    for( index = 0; index < [ namesArray count ]; index++ )
@@ -415,7 +415,7 @@
 /*
  * Number of rows/entries
  */
-- (unsigned) entryCount
+- (int) entryCount
 {
    return [ [ self _model ] entryCount ];
 }
@@ -469,7 +469,7 @@
 /*
  * Get the string value for some key at the given row
  */
-- (NSString *) stringForKey:(NSString *)key atRow:(unsigned)row
+- (NSString *) stringForKey:(NSString *)key atRow:(int)row
 {
    return [ [ self _model ] stringForKey:key atRow:row ];
 }
@@ -478,7 +478,7 @@
 /*
  * Get the notes value for the given row
  */
-- (NSData *) RTFDNotesAtRow:(unsigned)row
+- (NSData *) RTFDNotesAtRow:(int)row
 {
    return [ [ self _model ] RTFDNotesAtRow:row ];
 }
@@ -487,7 +487,7 @@
 /*
  * Get the notes value (RTF version) for the given row
  */
-- (NSData *) RTFNotesAtRow:(unsigned)row
+- (NSData *) RTFNotesAtRow:(int)row
 {
    return [ [ self _model ] RTFNotesAtRow:row ];
 }
@@ -496,7 +496,7 @@
 /*
  * Get the RTFD attributed string version of the notes
  */
-- (NSAttributedString *) RTFDStringNotesAtRow:(unsigned)row
+- (NSAttributedString *) RTFDStringNotesAtRow:(int)row
 {
    return [ [ self _model ] RTFDStringNotesAtRow:row ];
 }
@@ -505,7 +505,7 @@
 /*
  * Get the RTF attributed string version of the notes
  */
-- (NSAttributedString *) RTFStringNotesAtRow:(unsigned)row
+- (NSAttributedString *) RTFStringNotesAtRow:(int)row
 {
    return [ [ self _model ] RTFStringNotesAtRow:row ];
 }
@@ -514,7 +514,7 @@
 /*
  * Find the row for a given name
  */
-- (unsigned) rowForName:(NSString *)name
+- (int) rowForName:(NSString *)name
 {
    return [ [ self _model ] rowForName:name ];
 }
@@ -559,7 +559,7 @@
 /*
  * Delete all entries with the given names
  */
-- (unsigned) deleteEntriesWithNamesInArray:(NSArray *)nameArray
+- (int) deleteEntriesWithNamesInArray:(NSArray *)nameArray
 {
    return [ [ self _model ] deleteEntriesWithNamesInArray:nameArray ];
 }
@@ -683,7 +683,7 @@
 - (void) _updateViewForNotification:(NSNotification *)notification
 {
    NSArray *namesArray;
-   unsigned index;
+   int index;
    CSWinCtrlChange *changeController;
 
    /*

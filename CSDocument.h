@@ -61,18 +61,18 @@
          undoName:(NSString *)undoName;
 
 // Methods to add/change/delete/find entries
-- (unsigned) entryCount;
+- (int) entryCount;
 - (void) setSortKey:(NSString *)newSortKey;
 - (NSString *) sortKey;
 - (void) setSortAscending:(BOOL)sortAsc;
 - (BOOL) isSortAscending;
 - (void) setSortKey:(NSString *)newSortKey ascending:(BOOL)sortAsc;
-- (NSString *) stringForKey:(NSString *)key atRow:(unsigned)row;
-- (NSData *) RTFDNotesAtRow:(unsigned)row;
-- (NSData *) RTFNotesAtRow:(unsigned)row;
-- (NSAttributedString *) RTFDStringNotesAtRow:(unsigned)row;
-- (NSAttributedString *) RTFStringNotesAtRow:(unsigned)row;
-- (unsigned) rowForName:(NSString *)name;
+- (NSString *) stringForKey:(NSString *)key atRow:(int)row;
+- (NSData *) RTFDNotesAtRow:(int)row;
+- (NSData *) RTFNotesAtRow:(int)row;
+- (NSAttributedString *) RTFDStringNotesAtRow:(int)row;
+- (NSAttributedString *) RTFStringNotesAtRow:(int)row;
+- (int) rowForName:(NSString *)name;
 - (BOOL) addEntryWithName:(NSString *)name
          account:(NSString *)account
          password:(NSString *)password
@@ -84,7 +84,7 @@
          password:(NSString *)password
          URL:(NSString *)url
          notesRTFD:(NSData *)notes;
-- (unsigned) deleteEntriesWithNamesInArray:(NSArray *)nameArray;
+- (int) deleteEntriesWithNamesInArray:(NSArray *)nameArray;
 - (NSNumber *) firstRowBeginningWithString:(NSString *)findMe
                ignoreCase:(BOOL)ignoreCase
                forKey:(NSString *)key;

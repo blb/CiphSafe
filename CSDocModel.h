@@ -86,13 +86,13 @@ extern NSString * const CSDocModelNotificationInfoKey_DeletedNames;
 - (void) setSortKey:(NSString *)newSortKey ascending:(BOOL)sortAsc;
 
 // Entry access
-- (unsigned) entryCount;
-- (NSString *) stringForKey:(NSString *)key atRow:(unsigned)row;
-- (NSData *) RTFDNotesAtRow:(unsigned)row;
-- (NSData *) RTFNotesAtRow:(unsigned)row;
-- (NSAttributedString *) RTFDStringNotesAtRow:(unsigned)row;
-- (NSAttributedString *) RTFStringNotesAtRow:(unsigned)row;
-- (unsigned) rowForName:(NSString *)name;
+- (int) entryCount;
+- (NSString *) stringForKey:(NSString *)key atRow:(int)row;
+- (NSData *) RTFDNotesAtRow:(int)row;
+- (NSData *) RTFNotesAtRow:(int)row;
+- (NSAttributedString *) RTFDStringNotesAtRow:(int)row;
+- (NSAttributedString *) RTFStringNotesAtRow:(int)row;
+- (int) rowForName:(NSString *)name;
 - (BOOL) addEntryWithName:(NSString *)name
          account:(NSString *)account
          password:(NSString *)password
@@ -104,7 +104,7 @@ extern NSString * const CSDocModelNotificationInfoKey_DeletedNames;
          password:(NSString *)password
          URL:(NSString *)url
          notesRTFD:(NSData *)notes;
-- (unsigned) deleteEntriesWithNamesInArray:(NSArray *)nameArray;
+- (int) deleteEntriesWithNamesInArray:(NSArray *)nameArray;
 - (BOOL) deleteEntryWithName:(NSString *)name;
 
 

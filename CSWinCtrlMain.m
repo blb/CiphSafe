@@ -785,7 +785,7 @@ static NSAttributedString *defaultSearchString;
       [ nameArray addObject:[ [ self document ]
                               stringForKey:CSDocModelKey_Name
                               atRow:[ self _rowForFilteredRow:
-                                              [ nextRow unsignedIntValue ] ] ] ];
+                                              [ nextRow intValue ] ] ] ];
 
    return nameArray;
 }
