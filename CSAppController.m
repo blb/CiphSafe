@@ -49,10 +49,15 @@ NSString * const CSPrefDictKey_AlphanumOnly = @"CSPrefDictKey_AlphanumOnly";
 NSString * const CSPrefDictKey_IncludePasswd = @"CSPrefDictKey_IncludePasswd";
 NSString * const CSPrefDictKey_AutoOpen = @"CSPrefDictKey_AutoOpen";
 NSString * const CSPrefDictKey_AutoOpenPath = @"CSPrefDictKey_AutoOpenPath";
+NSString * const CSPrefDictKey_CloseAfterTimeout =
+   @"CSPrefDictKey_CloseAfterTimeout";
+NSString * const CSPrefDictKey_CloseTimeout = @"CSPrefDictKey_CloseTimeout";
 
 NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 
 @interface CSAppController (InternalMethods)
+- (void) _queuePendingCloseAll;
+- (void) _cancelPendingCloseAll;
 - (void) _windowsMenuDidUpdate:(NSNotification *)aNotification;
 - (void) _rearrangeWindowMenu:(id)unused;
 - (BOOL) _isMenuItem:(id)menuItem forWindowControllerClass:(Class)theClass;
@@ -60,6 +65,7 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
          returnCode:(int)returnCode
          contextInfo:(void *)contextInfo;
 - (void) _configureAutoOpenControls;
+- (void) _configureTimeoutControls;
 - (void) _setStateOfButton:(NSButton *)button fromKey:(NSString *)key;
 - (void) _setPrefKey:(NSString *)key fromButton:(NSButton *)button;
 @end
@@ -99,13 +105,20 @@ static NSString *MENUSPACE = @"   ";
                                       CSPrefDictKey_IncludePasswd,
                                    @"NO",
                                       CSPrefDictKey_AutoOpen,
+                                   @"NO",
+                                      CSPrefDictKey_CloseAfterTimeout,
+                                   @"10",
+                                      CSPrefDictKey_CloseTimeout,
                                    nil ];
    userDefaults = [ NSUserDefaults standardUserDefaults ];
    [ userDefaults registerDefaults:appDefaults ];
-   // Sanity check
+   // Sanity checks
    if( [ userDefaults integerForKey:CSPrefDictKey_GenSize ] < 1 ||
        [ userDefaults integerForKey:CSPrefDictKey_GenSize ] > 255 )
       [ userDefaults setInteger:8 forKey:CSPrefDictKey_GenSize ];
+   if( [ userDefaults integerForKey:CSPrefDictKey_CloseTimeout ] < 1 ||
+       [ userDefaults integerForKey:CSPrefDictKey_CloseTimeout ] > 3600 )
+      [ userDefaults setInteger:10 forKey:CSPrefDictKey_CloseTimeout ];
 }
 
 
@@ -151,6 +164,24 @@ static NSString *MENUSPACE = @"   ";
    }
    else
       return [ userDefaults boolForKey:CSPrefDictKey_CreateNew ];
+}
+
+
+/*
+ * When activated, cancel any pending closeAll
+ */
+- (void) applicationDidBecomeActive:(NSNotification *)aNotification
+{
+   [ self _cancelPendingCloseAll ];
+}
+
+
+/*
+ * When we lose active status, queue up a closeAll: if enabled
+ */
+- (void) applicationDidResignActive:(NSNotification *)aNotification
+{
+   [ self _queuePendingCloseAll ];
 }
 
 
@@ -210,6 +241,11 @@ static NSString *MENUSPACE = @"   ";
    if( autoOpenPath != nil )
       [ _prefsAutoOpenName setStringValue:autoOpenPath ];
    [ self _configureAutoOpenControls ];
+   [ self _setStateOfButton:_prefsCloseAfterTimeout
+          fromKey:CSPrefDictKey_CloseAfterTimeout ];
+   [ _prefsTimeout setIntValue:
+                      [ userDefaults integerForKey:CSPrefDictKey_CloseTimeout ] ];
+   [ self _configureTimeoutControls ];
    // Password tab
    [ _prefsGenSize setIntValue:
                       [ userDefaults integerForKey:CSPrefDictKey_GenSize ] ];
@@ -257,6 +293,10 @@ static NSString *MENUSPACE = @"   ";
          [ userDefaults setObject:autoOpenPath
                         forKey:CSPrefDictKey_AutoOpenPath ];
       }
+      [ self _setPrefKey:CSPrefDictKey_CloseAfterTimeout
+             fromButton:_prefsCloseAfterTimeout ];
+      [ userDefaults setInteger:[ _prefsTimeout intValue ]
+                     forKey:CSPrefDictKey_CloseTimeout ];
       // Password tab
       [ userDefaults setInteger:[ _prefsGenSize intValue ]
                      forKey:CSPrefDictKey_GenSize ];
@@ -318,6 +358,15 @@ static NSString *MENUSPACE = @"   ";
 
 
 /*
+ * When the close after timeout checkbox is checked/unchecked
+ */
+- (IBAction) prefsCloseAfterTimeoutClicked:(id)sender
+{
+   [ self _configureTimeoutControls ];
+}
+
+
+/*
  * Enable only valid menu items
  */
 - (BOOL) validateMenuItem:(id <NSMenuItem>)menuItem
@@ -345,6 +394,34 @@ static NSString *MENUSPACE = @"   ";
      closeAllDocumentsWithDelegate:self
      didCloseAllSelector:@selector( _docController:didCloseAll:contextInfo: )
      contextInfo:NULL ];
+}
+
+
+/* 
+ * Queue up a close all message, if enabled
+ */
+- (void) _queuePendingCloseAll
+{
+   NSUserDefaults *userDefaults;
+
+   userDefaults = [ NSUserDefaults standardUserDefaults ];
+   if( [ userDefaults boolForKey:CSPrefDictKey_CloseAfterTimeout ] )
+      [ self performSelector:@selector( closeAll: )
+             withObject:self
+             afterDelay:( [ userDefaults integerForKey:
+                                            CSPrefDictKey_CloseTimeout ]
+                          * 60 ) ];
+}
+
+
+/*
+ * Cancel any pending closeAll: performs put in the queue
+ */
+- (void) _cancelPendingCloseAll
+{
+   [ [ self class ] cancelPreviousPerformRequestsWithTarget:self
+                    selector:@selector( closeAll: )
+                    object:self ];
 }
 
 
@@ -491,6 +568,16 @@ static NSString *MENUSPACE = @"   ";
       enableLinkedControls = YES;
    [ _prefsAutoOpenName setEnabled:enableLinkedControls ];
    [ _prefsAutoOpenSelect setEnabled:enableLinkedControls ];
+}
+
+
+/*
+ * Enable/disable timeout controls
+ */
+- (void) _configureTimeoutControls
+{
+   [ _prefsTimeout setEnabled:
+                      ( [ _prefsCloseAfterTimeout state ] == NSOnState ) ];
 }
 
 
