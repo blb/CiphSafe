@@ -58,11 +58,7 @@
 - (IBAction) doResetSearch:(id)sender;
 
 // Actions from the contextual menu
-- (IBAction) cmmCopyAccount:(id)sender;
-- (IBAction) cmmCopyPassword:(id)sender;
-- (IBAction) cmmCopyURL:(id)sender;
-- (IBAction) cmmCopyName:(id)sender;
-- (IBAction) cmmCopyNotes:(id)sender;
+- (IBAction) cmmCopyField:(id)sender;
 - (IBAction) cmmOpenURL:(id)sender;
 
 // Refresh the window and contents

@@ -82,17 +82,24 @@
 - (void) _setSortingImageForColumn:(NSTableColumn *)tableColumn;
 - (NSArray *) _getSelectedNames;
 - (NSArray *) _namesFromRows:(NSArray *)rows;
-- (void) _copyEntryString:(NSString *)columnName;
 - (int) _rowForFilteredRow:(int)row;
 - (int) _filteredRowForRow:(int)row;
 @end
 
 @implementation CSWinCtrlMain
 
+static NSArray *cmmCopyFields;
 static NSAttributedString *defaultSearchString;
 
 + (void) initialize
 {
+   // Mapping from CMM tags for copy to field names
+   cmmCopyFields = [ [ NSArray alloc ] initWithObjects:CSDocModelKey_Acct,
+                                                       CSDocModelKey_Passwd,
+                                                       CSDocModelKey_URL,
+                                                       CSDocModelKey_Name,
+                                                       CSDocModelKey_Notes,
+                                                       nil ];
    defaultSearchString = [ [ NSAttributedString alloc ]
                            initWithString:CSWINCTRLMAIN_LOC_SEARCH
                            attributes:
@@ -110,9 +117,7 @@ static NSAttributedString *defaultSearchString;
 {
    self = [ super initWithWindowNibName:@"CSDocument" ];
    if( self != nil )
-   {
       [ self setShouldCloseDocument:YES ];
-   }
 
    return self;
 }
@@ -447,61 +452,38 @@ static NSAttributedString *defaultSearchString;
 
 
 /*
- * Copy the account to the pasteboard
+ * Copy the entry's field according to which menu was used to get here (ie
+ * through the cmmCopyField mapping and the menu tags)
  */
-- (IBAction) cmmCopyAccount:(id)sender
+- (IBAction) cmmCopyField:(id)sender
 {
-   [ self _copyEntryString:CSDocModelKey_Acct ];
-}
-
-
-
-/*
- * Copy the password to the pasteboard
- */
-- (IBAction) cmmCopyPassword:(id)sender
-{
-   [ self _copyEntryString:CSDocModelKey_Passwd ];
-}
-
-
-/*
- * Copy URL
- */
-- (IBAction) cmmCopyURL:(id)sender
-{
-   [ self _copyEntryString:CSDocModelKey_URL ];
-}
-
-
-/*
- * Copy Name
- */
-- (IBAction) cmmCopyName:(id)sender
-{
-   [ self _copyEntryString:CSDocModelKey_Name ];
-}
-
-
-/*
- * Provide the RTF and RTFD data from the notes field
- */
-- (IBAction) cmmCopyNotes:(id)sender
-{
-   NSPasteboard *generalPasteboard;
+   NSString *fieldName;
+   NSPasteboard *generalPB;
    int selectedRow;
 
-   generalPasteboard = [ NSPasteboard generalPasteboard ];
-   [ generalPasteboard declareTypes:[ NSArray arrayWithObjects:NSRTFDPboardType,
-                                                               NSRTFPboardType,
-                                                               nil ]
-     owner:nil ];
-
+   fieldName = [ cmmCopyFields objectAtIndex:[ sender tag ] ];
+   generalPB = [ NSPasteboard generalPasteboard ];
    selectedRow = [ self _rowForFilteredRow:[ _documentView selectedRow ] ];
-   [ generalPasteboard setData:[ [ self document ] RTFDNotesAtRow:selectedRow ]
-                       forType:NSRTFDPboardType ];
-   [ generalPasteboard setData:[ [ self document ] RTFNotesAtRow:selectedRow ]
-                       forType:NSRTFPboardType ];
+   if( [ fieldName isEqual:CSDocModelKey_Notes ] )
+   {
+      [ generalPB declareTypes:[ NSArray arrayWithObjects:NSRTFDPboardType,
+                                                          NSRTFPboardType,
+                                                          nil ]
+                  owner:nil ];
+
+      [ generalPB setData:[ [ self document ] RTFDNotesAtRow:selectedRow ]
+                          forType:NSRTFDPboardType ];
+      [ generalPB setData:[ [ self document ] RTFNotesAtRow:selectedRow ]
+                          forType:NSRTFPboardType ];
+   }
+   else
+   {
+      [ generalPB declareTypes:[ NSArray arrayWithObject:NSStringPboardType ]
+                  owner:nil ];
+      [ generalPB setString:[ [ self document ] stringForKey:fieldName
+                                                atRow:selectedRow ]
+                  forType:NSStringPboardType ];
+   }
    [ [ NSApp delegate ] notePBChangeCount ];
 }
 
@@ -789,25 +771,6 @@ static NSAttributedString *defaultSearchString;
                                               [ nextRow intValue ] ] ] ];
 
    return nameArray;
-}
-
-
-/*
- * Copy the entry's column of the correct row to the pasteboard as a string
- */
-- (void) _copyEntryString:(NSString *)columnName
-{
-   NSPasteboard *generalPB;
-   int selectedRow;
-
-   generalPB = [ NSPasteboard generalPasteboard ];
-   [ generalPB declareTypes:[ NSArray arrayWithObject:NSStringPboardType ]
-               owner:nil ];
-   selectedRow = [ self _rowForFilteredRow:[ _documentView selectedRow ] ];
-   [ generalPB setString:[ [ self document ] stringForKey:columnName
-                                             atRow:selectedRow ]
-               forType:NSStringPboardType ];
-   [ [ NSApp delegate ] notePBChangeCount ];
 }
 
 
