@@ -185,6 +185,7 @@ static NSArray *columnSelectionArray;
                   autorelease ];
    [ cornerView setMenuToDisplay:_cornerMenu ];
    [ _documentView setCornerView:cornerView ];
+   [ [ _documentView headerView ] setMenu:_cornerMenu ];
    [ self _setTableViewSpacing ];
    [ _documentSearch setObjectValue:defaultSearchString ];
    [ self refreshWindow ];
