@@ -37,7 +37,7 @@
 
 @interface CSWinCtrlChange : CSWinCtrlEntry
 {
-   NSString *myEntryName;
+   NSString *_myEntryName;
 }
 
 // For finding an already-open controller

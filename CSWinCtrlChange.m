@@ -39,7 +39,8 @@
 #import "CSAppController.h"
 
 // Defines for localized strings
-#define CSWINCTRLCHANGE_LOC_VIEW NSLocalizedString( @"View/Change %@ in %@", @"" )
+#define CSWINCTRLCHANGE_LOC_VIEW \
+           NSLocalizedString( @"View/Change %@ in %@", @"" )
 
 @interface CSWinCtrlChange (InternalMethods)
 + (void) _addController:(CSWinCtrlChange *)newController
@@ -74,7 +75,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
    CSWinCtrlChange *curController;
 
    arrayForDocument = [ controllerList objectForKey:
-                                  [ CSWinCtrlChange _numberForDocument:document ] ];
+                                [ CSWinCtrlChange _numberForDocument:document ] ];
    if( arrayForDocument != nil )
    {
       for( index = 0; index < [ arrayForDocument count ]; index++ )
@@ -97,7 +98,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
    NSArray *arrayForDocument;
 
    arrayForDocument = [ controllerList objectForKey:
-                                  [ CSWinCtrlChange _numberForDocument:document ] ];
+                                [ CSWinCtrlChange _numberForDocument:document ] ];
 
    if( arrayForDocument != nil )
    {
@@ -114,7 +115,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 {
    self = [ super initWithWindowNibName:@"CSDocumentChange" ];
    if( self != nil )
-      myEntryName = [ name retain ];
+      _myEntryName = [ name retain ];
 
    return self;
 }
@@ -135,7 +136,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 - (NSString *) entryName
 {
-   return myEntryName;
+   return _myEntryName;
 }
 
 
@@ -145,8 +146,8 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 - (void) setEntryName:(NSString *)newEntryName
 {
    [ newEntryName retain ];
-   [ myEntryName release ];
-   myEntryName = newEntryName;
+   [ _myEntryName release ];
+   _myEntryName = newEntryName;
    [ self _updateFields ];
    [ self synchronizeWindowTitleWithDocumentName ];
 }
@@ -158,7 +159,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 - (IBAction) showWindow:(id)sender
 {
    [ self _updateFields ];
-   [ [ self window ] makeFirstResponder:nameText ];
+   [ [ self window ] makeFirstResponder:_nameText ];
    [ super showWindow:sender ];
 }
 
@@ -168,8 +169,9 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 - (void) synchronizeWindowTitleWithDocumentName
 {
-   [ [ self window ] setTitle:[ NSString stringWithFormat:CSWINCTRLCHANGE_LOC_VIEW,
-                                            myEntryName,
+   [ [ self window ] setTitle:
+                        [ NSString stringWithFormat:CSWINCTRLCHANGE_LOC_VIEW,
+                                            _myEntryName,
                                             [ [ self document ] displayName ] ] ];
 }
 
@@ -181,24 +183,24 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 {
    NSRange fullNotesRange;
 
-   fullNotesRange = NSMakeRange( 0, [ [ notes textStorage ] length ] );
-   if( [ [ self document ] changeEntryWithName:myEntryName
-                           newName:[ nameText stringValue ]
-                           account:[ accountText stringValue ]
-                           password:[ passwordText stringValue ]
-                           URL:[ urlText stringValue ]
-                           notesRTFD:[ notes RTFDFromRange:fullNotesRange ] ] )
+   fullNotesRange = NSMakeRange( 0, [ [ _notes textStorage ] length ] );
+   if( [ [ self document ] changeEntryWithName:_myEntryName
+                           newName:[ _nameText stringValue ]
+                           account:[ _accountText stringValue ]
+                           password:[ _passwordText stringValue ]
+                           URL:[ _urlText stringValue ]
+                           notesRTFD:[ _notes RTFDFromRange:fullNotesRange ] ] )
    {
       [ [ self window ] setDocumentEdited:NO ];
       if( ![ [ NSUserDefaults standardUserDefaults ]
              boolForKey:CSPrefDictKey_CloseEdit ] )
       {
-         [ self setEntryName:[ nameText stringValue ] ];
+         [ self setEntryName:[ _nameText stringValue ] ];
          // This won't work if we do it right away, so put it on the event queue
          [ [ NSRunLoop currentRunLoop ]
            performSelector:@selector( makeFirstResponder: )
            target:[ self window ]
-           argument:nameText
+           argument:_nameText
            order:9999
            modes:[ NSArray arrayWithObject:NSDefaultRunLoopMode ] ];
       }
@@ -233,16 +235,16 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 - (BOOL) nameChanged
 {
-   return ![ [ nameText stringValue ] isEqualToString:myEntryName ];
+   return ![ [ _nameText stringValue ] isEqualToString:_myEntryName ];
 }
 
 - (BOOL) accountChanged
 {
    int row;
 
-   row = [ [ self document ] rowForName:myEntryName ];
+   row = [ [ self document ] rowForName:_myEntryName ];
 
-   return ![ [ accountText stringValue ]
+   return ![ [ _accountText stringValue ]
              isEqualToString:[ [ self document ] stringForKey:CSDocModelKey_Acct
                                                  atRow:row ] ];
 }
@@ -251,9 +253,9 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 {
    int row;
 
-   row = [ [ self document ] rowForName:myEntryName ];
+   row = [ [ self document ] rowForName:_myEntryName ];
 
-   return ![ [ passwordText stringValue ]
+   return ![ [ _passwordText stringValue ]
              isEqualToString:[ [ self document ] stringForKey:CSDocModelKey_Passwd
                                                  atRow:row ] ];
 }
@@ -262,9 +264,9 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 {
    int row;
 
-   row = [ [ self document ] rowForName:myEntryName ];
+   row = [ [ self document ] rowForName:_myEntryName ];
 
-   return ![ [ urlText stringValue ]
+   return ![ [ _urlText stringValue ]
              isEqualToString:[ [ self document ] stringForKey:CSDocModelKey_URL
                                                  atRow:row ] ];
 }
@@ -273,9 +275,9 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 {
    int row;
 
-   row = [ [ self document ] rowForName:myEntryName ];
+   row = [ [ self document ] rowForName:_myEntryName ];
 
-   return ![ [ notes textStorage ]
+   return ![ [ _notes textStorage ]
              isEqualToAttributedString:[ [ self document ]
                                          RTFDStringNotesAtRow:row ] ];
 }
@@ -286,7 +288,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 - (void) dealloc
 {
-   [ myEntryName release ];
+   [ _myEntryName release ];
    [ super dealloc ];
 }
 
@@ -300,7 +302,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
    NSMutableArray *arrayForDocument;
 
    arrayForDocument = [ controllerList objectForKey:
-                                  [ CSWinCtrlChange _numberForDocument:document ] ];
+                                [ CSWinCtrlChange _numberForDocument:document ] ];
    if( arrayForDocument == nil )
    {
       arrayForDocument = [ NSMutableArray arrayWithCapacity:5 ];
@@ -320,7 +322,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
    NSMutableArray *arrayForDocument;
 
    arrayForDocument = [ controllerList objectForKey:
-                                  [ CSWinCtrlChange _numberForDocument:document ] ];
+                                [ CSWinCtrlChange _numberForDocument:document ] ];
    NSAssert( arrayForDocument != nil,
              @"attempt to remove controller for document with no controllers" );
    [ arrayForDocument removeObject:oldController ];
@@ -345,22 +347,22 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
    NSRange fullNotesRange;
 
    // XXX If it were possible, we'd clear out controls here
-   [ nameText setStringValue:myEntryName ];
-   myEntryRowNum = [ [ self document ] rowForName:myEntryName ];
+   [ _nameText setStringValue:_myEntryName ];
+   myEntryRowNum = [ [ self document ] rowForName:_myEntryName ];
    if( myEntryRowNum >= 0 )
    {
-      [ mainButton setEnabled:YES ];
-      [ accountText setStringValue:[ [ self document ]
-                                     stringForKey:CSDocModelKey_Acct
-                                     atRow:myEntryRowNum ] ];
-      [ passwordText setStringValue:[ [ self document ]
-                                      stringForKey:CSDocModelKey_Passwd
+      [ _mainButton setEnabled:YES ];
+      [ _accountText setStringValue:[ [ self document ]
+                                      stringForKey:CSDocModelKey_Acct
                                       atRow:myEntryRowNum ] ];
-      [ urlText setStringValue:[ [ self document ] stringForKey:CSDocModelKey_URL
-                                                   atRow:myEntryRowNum ] ];
-      fullNotesRange = NSMakeRange( 0, [ [ notes textStorage ] length ] );
-      [ notes replaceCharactersInRange:fullNotesRange
-              withRTFD:[ [ self document ] RTFDNotesAtRow:myEntryRowNum ] ];
+      [ _passwordText setStringValue:[ [ self document ]
+                                       stringForKey:CSDocModelKey_Passwd
+                                       atRow:myEntryRowNum ] ];
+      [ _urlText setStringValue:[ [ self document ] stringForKey:CSDocModelKey_URL
+                                                    atRow:myEntryRowNum ] ];
+      fullNotesRange = NSMakeRange( 0, [ [ _notes textStorage ] length ] );
+      [ _notes replaceCharactersInRange:fullNotesRange
+               withRTFD:[ [ self document ] RTFDNotesAtRow:myEntryRowNum ] ];
       [ self updateDocumentEditedStatus ];
    }
 }

@@ -101,7 +101,7 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
         openDocumentWithContentsOfFile:
            [ userDefaults objectForKey:CSPrefDictKey_AutoOpenPath ]
         display:YES ];
-   lastPBChangeCount = [ [ NSPasteboard generalPasteboard ] changeCount ] - 1;
+   _lastPBChangeCount = [ [ NSPasteboard generalPasteboard ] changeCount ] - 1;
 }
 
 
@@ -138,7 +138,7 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
    generalPB = [ NSPasteboard generalPasteboard ];
    if( [ [ NSUserDefaults standardUserDefaults ]
          boolForKey:CSPrefDictKey_ClearClipboard ] &&
-       [ generalPB changeCount ] == lastPBChangeCount )
+       [ generalPB changeCount ] == _lastPBChangeCount )
    {
       [ generalPB declareTypes:[ NSArray arrayWithObject:@"" ] owner:nil ];
       [ generalPB setString:@"" forType:@"" ];
@@ -152,7 +152,7 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
  */
 - (void) notePBChangeCount
 {
-   lastPBChangeCount = [ [ NSPasteboard generalPasteboard ] changeCount ];
+   _lastPBChangeCount = [ [ NSPasteboard generalPasteboard ] changeCount ];
 }
 
 
@@ -169,30 +169,30 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 
    userDefaults = [ NSUserDefaults standardUserDefaults ];
    // Interface tab
-   [ self _setStateOfButton:prefsCloseAdd fromKey:CSPrefDictKey_CloseAdd ];
-   [ self _setStateOfButton:prefsCloseEdit fromKey:CSPrefDictKey_CloseEdit ];
-   [ self _setStateOfButton:prefsConfirmDelete 
+   [ self _setStateOfButton:_prefsCloseAdd fromKey:CSPrefDictKey_CloseAdd ];
+   [ self _setStateOfButton:_prefsCloseEdit fromKey:CSPrefDictKey_CloseEdit ];
+   [ self _setStateOfButton:_prefsConfirmDelete 
           fromKey:CSPrefDictKey_ConfirmDelete ];
-   [ self _setStateOfButton:prefsWarnShort fromKey:CSPrefDictKey_WarnShort ];
-   [ self _setStateOfButton:prefsCreateNew fromKey:CSPrefDictKey_CreateNew ];
-   [ self _setStateOfButton:prefsIncludePasswd
+   [ self _setStateOfButton:_prefsWarnShort fromKey:CSPrefDictKey_WarnShort ];
+   [ self _setStateOfButton:_prefsCreateNew fromKey:CSPrefDictKey_CreateNew ];
+   [ self _setStateOfButton:_prefsIncludePasswd
           fromKey:CSPrefDictKey_IncludePasswd ];
-   [ self _setStateOfButton:prefsAutoOpen fromKey:CSPrefDictKey_AutoOpen ];
+   [ self _setStateOfButton:_prefsAutoOpen fromKey:CSPrefDictKey_AutoOpen ];
    autoOpenPath = [ userDefaults stringForKey:CSPrefDictKey_AutoOpenPath ];
    if( autoOpenPath != nil )
-      [ prefsAutoOpenName setStringValue:autoOpenPath ];
+      [ _prefsAutoOpenName setStringValue:autoOpenPath ];
    [ self _configureAutoOpenControls ];
    // Password tab
-   [ prefsGenSize setIntValue:
-                     [ userDefaults integerForKey:CSPrefDictKey_GenSize ] ];
-   [ self _setStateOfButton:prefsAlphanumOnly
+   [ _prefsGenSize setIntValue:
+                      [ userDefaults integerForKey:CSPrefDictKey_GenSize ] ];
+   [ self _setStateOfButton:_prefsAlphanumOnly
           fromKey:CSPrefDictKey_AlphanumOnly ];
    // Misc tab
-   [ self _setStateOfButton:prefsKeepBackup fromKey:CSPrefDictKey_SaveBackup ];
-   [ self _setStateOfButton:prefsClearClipboard
+   [ self _setStateOfButton:_prefsKeepBackup fromKey:CSPrefDictKey_SaveBackup ];
+   [ self _setStateOfButton:_prefsClearClipboard
           fromKey:CSPrefDictKey_ClearClipboard ];
 
-   [ prefsWindow makeKeyAndOrderFront:self ];
+   [ _prefsWindow makeKeyAndOrderFront:self ];
 }
 
 
@@ -204,20 +204,20 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
    NSUserDefaults *userDefaults;
    NSString *autoOpenPath;
 
-   [ prefsGenSize validateEditing ];
-   if( [ prefsGenSize intValue ] != 0 )
+   [ _prefsGenSize validateEditing ];
+   if( [ _prefsGenSize intValue ] != 0 )
    {
       userDefaults = [ NSUserDefaults standardUserDefaults ];
       // Interface tab
-      [ self _setPrefKey:CSPrefDictKey_CloseAdd fromButton:prefsCloseAdd ];
-      [ self _setPrefKey:CSPrefDictKey_CloseEdit fromButton:prefsCloseEdit ];
+      [ self _setPrefKey:CSPrefDictKey_CloseAdd fromButton:_prefsCloseAdd ];
+      [ self _setPrefKey:CSPrefDictKey_CloseEdit fromButton:_prefsCloseEdit ];
       [ self _setPrefKey:CSPrefDictKey_ConfirmDelete
-             fromButton:prefsConfirmDelete ];
-      [ self _setPrefKey:CSPrefDictKey_WarnShort fromButton:prefsWarnShort ];
-      [ self _setPrefKey:CSPrefDictKey_CreateNew fromButton:prefsCreateNew ];
+             fromButton:_prefsConfirmDelete ];
+      [ self _setPrefKey:CSPrefDictKey_WarnShort fromButton:_prefsWarnShort ];
+      [ self _setPrefKey:CSPrefDictKey_CreateNew fromButton:_prefsCreateNew ];
       [ self _setPrefKey:CSPrefDictKey_IncludePasswd
-             fromButton:prefsIncludePasswd ];
-      autoOpenPath = [ prefsAutoOpenName stringValue ];
+             fromButton:_prefsIncludePasswd ];
+      autoOpenPath = [ _prefsAutoOpenName stringValue ];
       if( autoOpenPath == nil || [ autoOpenPath length ] == 0 )
       {
          [ userDefaults setBool:NO forKey:CSPrefDictKey_AutoOpen ];
@@ -225,21 +225,21 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
       }
       else
       {
-         [ self _setPrefKey:CSPrefDictKey_AutoOpen fromButton:prefsAutoOpen ];
+         [ self _setPrefKey:CSPrefDictKey_AutoOpen fromButton:_prefsAutoOpen ];
          [ userDefaults setObject:autoOpenPath
                         forKey:CSPrefDictKey_AutoOpenPath ];
       }
       // Password tab
-      [ userDefaults setInteger:[ prefsGenSize intValue ]
+      [ userDefaults setInteger:[ _prefsGenSize intValue ]
                      forKey:CSPrefDictKey_GenSize ];
       [ self _setPrefKey:CSPrefDictKey_AlphanumOnly
-             fromButton:prefsAlphanumOnly ];
+             fromButton:_prefsAlphanumOnly ];
       // Misc tab
-      [ self _setPrefKey:CSPrefDictKey_SaveBackup fromButton:prefsKeepBackup ];
+      [ self _setPrefKey:CSPrefDictKey_SaveBackup fromButton:_prefsKeepBackup ];
       [ self _setPrefKey:CSPrefDictKey_ClearClipboard
-             fromButton:prefsClearClipboard ];
+             fromButton:_prefsClearClipboard ];
 
-      [ prefsWindow orderOut:self ];
+      [ _prefsWindow orderOut:self ];
    }
    else
       NSBeep();
@@ -251,7 +251,7 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
  */
 - (IBAction) prefsCancel:(id)sender
 {
-   [ prefsWindow orderOut:self ];
+   [ _prefsWindow orderOut:self ];
 }
 
 
@@ -280,9 +280,9 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
    [ openPanel setCanChooseDirectories:NO ];
    [ openPanel setAllowsMultipleSelection:NO ];
    [ openPanel beginSheetForDirectory:nil
-               file:[ prefsAutoOpenName stringValue ]
+               file:[ _prefsAutoOpenName stringValue ]
                types:[ NSArray arrayWithObject:@"csd" ]
-               modalForWindow:prefsWindow
+               modalForWindow:_prefsWindow
                modalDelegate:self
                didEndSelector:didEndSel
                contextInfo:NULL ];
@@ -297,8 +297,8 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
          contextInfo:(void  *)contextInfo
 {
    if( returnCode == NSOKButton )
-      [ prefsAutoOpenName setStringValue:[ [ sheet filenames ]
-                                           objectAtIndex:0 ] ];
+      [ _prefsAutoOpenName setStringValue:[ [ sheet filenames ]
+                                            objectAtIndex:0 ] ];
 }
 
 
@@ -310,10 +310,10 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
    BOOL enableLinkedControls;
 
    enableLinkedControls = NO;
-   if( [ prefsAutoOpen state ] == NSOnState )
+   if( [ _prefsAutoOpen state ] == NSOnState )
       enableLinkedControls = YES;
-   [ prefsAutoOpenName setEnabled:enableLinkedControls ];
-   [ prefsAutoOpenSelect setEnabled:enableLinkedControls ];
+   [ _prefsAutoOpenName setEnabled:enableLinkedControls ];
+   [ _prefsAutoOpenSelect setEnabled:enableLinkedControls ];
 }
 
 

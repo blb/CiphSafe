@@ -40,11 +40,11 @@
 
 @interface CSDocument : NSDocument 
 {
-   CSDocModel *docModel;
-   NSMutableData *bfKey;
-   CSWinCtrlMain *mainWindowController;
-   CSWinCtrlPassphrase *passphraseWindowController;
-   NSInvocation *getKeyInvocation;
+   CSDocModel *_docModel;
+   NSMutableData *_bfKey;
+   CSWinCtrlMain *_mainWindowController;
+   CSWinCtrlPassphrase *_passphraseWindowController;
+   NSInvocation *_getKeyInvocation;
 }
 
 // Actions from the menu

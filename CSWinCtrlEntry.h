@@ -43,15 +43,15 @@
 
 @interface CSWinCtrlEntry : NSWindowController
 {
-   NSUndoManager *notesUM;
-   NSUndoManager *otherUM;
+   NSUndoManager *_notesUM;
+   NSUndoManager *_otherUM;
 
-   IBOutlet NSTextField *nameText;
-   IBOutlet NSTextField *accountText;
-   IBOutlet NSTextField *passwordText;
-   IBOutlet NSTextField *urlText;
-   IBOutlet NSTextView *notes;
-   IBOutlet NSButton *mainButton;
+   IBOutlet NSTextField *_nameText;
+   IBOutlet NSTextField *_accountText;
+   IBOutlet NSTextField *_passwordText;
+   IBOutlet NSTextField *_urlText;
+   IBOutlet NSTextView *_notes;
+   IBOutlet NSButton *_mainButton;
 }
 
 // Gererate an random password

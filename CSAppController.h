@@ -53,26 +53,26 @@ extern NSString * const CSDocumentPboardType;
 
 @interface CSAppController : NSObject
 {
-   int lastPBChangeCount;
+   int _lastPBChangeCount;
 
    // Preferences window
-   IBOutlet NSWindow *prefsWindow;
+   IBOutlet NSWindow *_prefsWindow;
    // Interface tab
-   IBOutlet NSButton *prefsCloseAdd;
-   IBOutlet NSButton *prefsCloseEdit;
-   IBOutlet NSButton *prefsConfirmDelete;
-   IBOutlet NSButton *prefsWarnShort;
-   IBOutlet NSButton *prefsCreateNew;
-   IBOutlet NSButton *prefsIncludePasswd;
-   IBOutlet NSButton *prefsAutoOpen;
-   IBOutlet NSTextField *prefsAutoOpenName;
-   IBOutlet NSButton *prefsAutoOpenSelect;
+   IBOutlet NSButton *_prefsCloseAdd;
+   IBOutlet NSButton *_prefsCloseEdit;
+   IBOutlet NSButton *_prefsConfirmDelete;
+   IBOutlet NSButton *_prefsWarnShort;
+   IBOutlet NSButton *_prefsCreateNew;
+   IBOutlet NSButton *_prefsIncludePasswd;
+   IBOutlet NSButton *_prefsAutoOpen;
+   IBOutlet NSTextField *_prefsAutoOpenName;
+   IBOutlet NSButton *_prefsAutoOpenSelect;
    // Generated passwords tab
-   IBOutlet NSTextField *prefsGenSize;
-   IBOutlet NSButton *prefsAlphanumOnly;
+   IBOutlet NSTextField *_prefsGenSize;
+   IBOutlet NSButton *_prefsAlphanumOnly;
    // Miscellaneous tab
-   IBOutlet NSButton *prefsKeepBackup;
-   IBOutlet NSButton *prefsClearClipboard;
+   IBOutlet NSButton *_prefsKeepBackup;
+   IBOutlet NSButton *_prefsClearClipboard;
 }
 
 // Note the general pasteboard's current change count

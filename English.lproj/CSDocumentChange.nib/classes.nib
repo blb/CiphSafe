@@ -11,12 +11,12 @@
             CLASS = CSWinCtrlEntry; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                accountText = NSTextField; 
-                mainButton = NSButton; 
-                nameText = NSTextField; 
-                notes = NSTextView; 
-                passwordText = NSTextField; 
-                urlText = NSTextField; 
+                "_accountText" = NSTextField; 
+                "_mainButton" = NSButton; 
+                "_nameText" = NSTextField; 
+                "_notes" = NSTextView; 
+                "_passwordText" = NSTextField; 
+                "_urlText" = NSTextField; 
             }; 
             SUPERCLASS = NSWindowController; 
         }, 

@@ -85,23 +85,25 @@
  */
 - (void) awakeFromNib
 {
-   [ documentView setDrawsGrid:NO ];
-   [ documentView setDrawsGrid:YES ];
-   [ documentView setStripeColor:[ NSColor colorWithCalibratedRed:0.93
-                                     green:0.95 blue:1.0 alpha:1.0 ] ];
-   [ documentView setDoubleAction:@selector( doViewEntry: ) ];
-   previouslySelectedColumn = [ documentView tableColumnWithIdentifier:
-                                                [ [ self document ] sortKey ] ];
-   [ documentView setHighlightedTableColumn:previouslySelectedColumn ];
-   [ self _setSortingImageForColumn:previouslySelectedColumn ];
+   [ _documentView setDrawsGrid:NO ];
+   [ _documentView setDrawsGrid:YES ];
+   [ _documentView setStripeColor:[ NSColor colorWithCalibratedRed:0.93
+                                            green:0.95
+                                            blue:1.0
+                                            alpha:1.0 ] ];
+   [ _documentView setDoubleAction:@selector( doViewEntry: ) ];
+   _previouslySelectedColumn = [ _documentView tableColumnWithIdentifier:
+                                                  [ [ self document ] sortKey ] ];
+   [ _documentView setHighlightedTableColumn:_previouslySelectedColumn ];
+   [ self _setSortingImageForColumn:_previouslySelectedColumn ];
    /*
     * The table view is set as the initialFirstResponder, but we have to do
     * this anyway
     */
-   [ [ self window ] makeFirstResponder:documentView ];
+   [ [ self window ] makeFirstResponder:_documentView ];
    [ self refreshWindow ];
-   [ documentView registerForDraggedTypes:
-                     [ NSArray arrayWithObject:CSDocumentPboardType ] ];
+   [ _documentView registerForDraggedTypes:
+                      [ NSArray arrayWithObject:CSDocumentPboardType ] ];
 }
 
 
@@ -134,7 +136,7 @@
    if( [ [ NSUserDefaults standardUserDefaults ]
          boolForKey:CSPrefDictKey_ConfirmDelete ] )
    {
-      if( [ documentView numberOfSelectedRows ] > 1 )
+      if( [ _documentView numberOfSelectedRows ] > 1 )
          sheetQuestion = CSWINCTRLMAIN_LOC_SUREDELROWS;
       else
          sheetQuestion = CSWINCTRLMAIN_LOC_SUREDELONEROW;
@@ -157,15 +159,15 @@
 {
    int entryCount;
 
-   [ documentView reloadData ];
-   [ documentView deselectAll:self ];
+   [ _documentView reloadData ];
+   [ _documentView deselectAll:self ];
    entryCount = [ [ self document ] entryCount ];
    if( entryCount == 1 )
-      [ documentStatus setStringValue:CSWINCTRLMAIN_LOC_ONEENTRY ];
+      [ _documentStatus setStringValue:CSWINCTRLMAIN_LOC_ONEENTRY ];
    else
-      [ documentStatus setStringValue:[ NSString stringWithFormat:
-                                                    CSWINCTRLMAIN_LOC_NUMENTRIES,
-                                                    entryCount ] ];
+      [ _documentStatus setStringValue:[ NSString stringWithFormat:
+                                                     CSWINCTRLMAIN_LOC_NUMENTRIES,
+                                                     entryCount ] ];
 }
 
 
@@ -217,7 +219,7 @@
    menuItemAction = [ menuItem action ];
    if( menuItemAction == @selector( copy: ) ||
        menuItemAction == @selector( cut: ) )
-      retval = ( [ documentView numberOfSelectedRows ] > 0 );
+      retval = ( [ _documentView numberOfSelectedRows ] > 0 );
    else if( menuItemAction == @selector( paste: ) )
       retval = ( [ [ NSPasteboard generalPasteboard ]
                    availableTypeFromArray:
@@ -278,7 +280,7 @@
    else   // Otherwise, set new sort key
       [ [ self document ] setSortKey:tableID ascending:YES ];
 
-   [ documentView setHighlightedTableColumn:tableColumn ];
+   [ _documentView setHighlightedTableColumn:tableColumn ];
    [ self _setSortingImageForColumn:tableColumn ];
 }
 
@@ -291,13 +293,13 @@
 {
    BOOL enableState;
 
-   if( [ documentView numberOfSelectedRows ] == 0 )
+   if( [ _documentView numberOfSelectedRows ] == 0 )
       enableState = NO;
    else
       enableState = YES;
 
-   [ documentDeleteButton setEnabled:enableState ];
-   [ documentViewButton setEnabled:enableState ];
+   [ _documentDeleteButton setEnabled:enableState ];
+   [ _documentViewButton setEnabled:enableState ];
 }
 
 
@@ -349,9 +351,9 @@
  */
 - (NSMenu *) contextualMenuForTableViewRow:(int)row
 {
-   [ documentView selectRow:row byExtendingSelection:NO ];
+   [ _documentView selectRow:row byExtendingSelection:NO ];
 
-   return contextualMenu;
+   return _contextualMenu;
 }
 
 
@@ -406,10 +408,10 @@
      owner:nil ];
 
    [ generalPasteboard setData:[ [ self document ]
-                                 RTFDNotesAtRow:[ documentView selectedRow ] ]
+                                 RTFDNotesAtRow:[ _documentView selectedRow ] ]
                        forType:NSRTFDPboardType ];
    [ generalPasteboard setData:[ [ self document ]
-                                 RTFNotesAtRow:[ documentView selectedRow ] ]
+                                 RTFNotesAtRow:[ _documentView selectedRow ] ]
                        forType:NSRTFPboardType ];
    [ [ NSApp delegate ] notePBChangeCount ];
 }
@@ -426,7 +428,7 @@
    urlIsInvalid = YES;
    theURL = [ NSURL URLWithString:[ [ self document ]
                                     stringForKey:CSDocModelKey_URL
-                                    atRow:[ documentView selectedRow ] ] ];
+                                    atRow:[ _documentView selectedRow ] ] ];
    if( theURL != nil && [ [ NSWorkspace sharedWorkspace ] openURL:theURL ] )
       urlIsInvalid = NO;
 
@@ -457,15 +459,15 @@
 - (void) _setSortingImageForColumn:(NSTableColumn *)tableColumn
 {
    if( [ [ self document ] isSortAscending ] )
-      [ documentView setIndicatorImage:[ NSImage imageNamed:@"sortArrowUp" ]
-                     inTableColumn:tableColumn ];
+      [ _documentView setIndicatorImage:[ NSImage imageNamed:@"sortArrowUp" ]
+                      inTableColumn:tableColumn ];
    else
-      [ documentView setIndicatorImage:[ NSImage imageNamed:@"sortArrowDown" ]
-                     inTableColumn:tableColumn ];
-   if( ![ previouslySelectedColumn isEqual:tableColumn ] )
-      [ documentView setIndicatorImage:nil
-                     inTableColumn:previouslySelectedColumn ];
-   previouslySelectedColumn = tableColumn;
+      [ _documentView setIndicatorImage:[ NSImage imageNamed:@"sortArrowDown" ]
+                      inTableColumn:tableColumn ];
+   if( ![ _previouslySelectedColumn isEqual:tableColumn ] )
+      [ _documentView setIndicatorImage:nil
+                      inTableColumn:_previouslySelectedColumn ];
+   _previouslySelectedColumn = tableColumn;
 }
 
 
@@ -474,7 +476,7 @@
  */
 - (NSArray *) _getSelectedNames
 {
-   return [ self _namesFromRows:[ [ documentView selectedRowEnumerator ]
+   return [ self _namesFromRows:[ [ _documentView selectedRowEnumerator ]
                                   allObjects ] ];
 }
 
@@ -510,7 +512,7 @@
    [ generalPB declareTypes:[ NSArray arrayWithObject:NSStringPboardType ]
                owner:nil ];
    [ generalPB setString:[ [ self document ] stringForKey:columnName
-                                             atRow:[ documentView selectedRow ] ]
+                                             atRow:[ _documentView selectedRow ] ]
                forType:NSStringPboardType ];
    [ [ NSApp delegate ] notePBChangeCount ];
 }

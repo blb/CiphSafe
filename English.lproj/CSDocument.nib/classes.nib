@@ -16,11 +16,11 @@
             CLASS = CSWinCtrlMain; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                contextualMenu = NSMenu; 
-                documentDeleteButton = NSButton; 
-                documentStatus = NSTextField; 
-                documentView = BLBTableView; 
-                documentViewButton = NSButton; 
+                "_contextualMenu" = NSMenu; 
+                "_documentDeleteButton" = NSButton; 
+                "_documentStatus" = NSTextField; 
+                "_documentView" = BLBTableView; 
+                "_documentViewButton" = NSButton; 
             }; 
             SUPERCLASS = NSWindowController; 
         }, 

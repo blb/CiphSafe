@@ -60,8 +60,8 @@
 - (void) setStripeColor:(NSColor *)newStripeColor
 {
    [ newStripeColor retain ];
-   [ stripeColor release ];
-   stripeColor = newStripeColor;
+   [ _stripeColor release ];
+   _stripeColor = newStripeColor;
 }
 
 
@@ -82,7 +82,7 @@
  */
 - (void) highlightSelectionInClipRect:(NSRect)clipRect
 {
-   if( stripeColor != nil )
+   if( _stripeColor != nil )
       [ self _drawStripesInRect:clipRect ];
    [ super highlightSelectionInClipRect:clipRect ];
 }
@@ -162,7 +162,7 @@
    stripeRect.size.height = fullRowHeight;
 
    // Set the color
-   [ stripeColor set ];
+   [ _stripeColor set ];
    // ...and draw the stripes
    while( stripeRect.origin.y < clipBottom )
    {

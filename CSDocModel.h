@@ -61,10 +61,10 @@ extern NSString * const CSDocModelNotificationInfoKey_DeletedNames;
 
 @interface CSDocModel : NSObject
 {
-   NSMutableArray *allEntries;   // Of NSMutableDictionary's
-   NSString *sortKey;
-   BOOL sortAscending;
-   NSUndoManager *undoManager;
+   NSMutableArray *_allEntries;   // Of NSMutableDictionary's
+   NSString *_sortKey;
+   BOOL _sortAscending;
+   NSUndoManager *_undoManager;
 }
 
 // Initialization

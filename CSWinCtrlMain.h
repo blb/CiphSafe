@@ -37,13 +37,13 @@
 
 @interface CSWinCtrlMain : NSWindowController <BLBTableView_CMM>
 {
-   NSTableColumn *previouslySelectedColumn;
+   NSTableColumn *_previouslySelectedColumn;
 
-   IBOutlet BLBTableView *documentView;
-   IBOutlet NSButton *documentDeleteButton;
-   IBOutlet NSButton *documentViewButton;
-   IBOutlet NSTextField *documentStatus;
-   IBOutlet NSMenu *contextualMenu;
+   IBOutlet BLBTableView *_documentView;
+   IBOutlet NSButton *_documentDeleteButton;
+   IBOutlet NSButton *_documentViewButton;
+   IBOutlet NSTextField *_documentStatus;
+   IBOutlet NSMenu *_contextualMenu;
 }
 
 // Actions from the main window

@@ -11,20 +11,20 @@
             CLASS = CSAppController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                prefsAlphanumOnly = NSButton; 
-                prefsAutoOpen = NSButton; 
-                prefsAutoOpenName = NSTextField; 
-                prefsAutoOpenSelect = NSButton; 
-                prefsClearClipboard = NSButton; 
-                prefsCloseAdd = NSButton; 
-                prefsCloseEdit = NSButton; 
-                prefsConfirmDelete = NSButton; 
-                prefsCreateNew = NSButton; 
-                prefsGenSize = NSTextField; 
-                prefsIncludePasswd = NSButton; 
-                prefsKeepBackup = NSButton; 
-                prefsWarnShort = NSButton; 
-                prefsWindow = NSWindow; 
+                "_prefsAlphanumOnly" = NSButton; 
+                "_prefsAutoOpen" = NSButton; 
+                "_prefsAutoOpenName" = NSTextField; 
+                "_prefsAutoOpenSelect" = NSButton; 
+                "_prefsClearClipboard" = NSButton; 
+                "_prefsCloseAdd" = NSButton; 
+                "_prefsCloseEdit" = NSButton; 
+                "_prefsConfirmDelete" = NSButton; 
+                "_prefsCreateNew" = NSButton; 
+                "_prefsGenSize" = NSTextField; 
+                "_prefsIncludePasswd" = NSButton; 
+                "_prefsKeepBackup" = NSButton; 
+                "_prefsWarnShort" = NSButton; 
+                "_prefsWindow" = NSWindow; 
             }; 
             SUPERCLASS = NSObject; 
         }, 

@@ -83,19 +83,19 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
        * Watching undo/redo change notifications lets us update the 'document
        * is dirty' status
        */
-      notesUM = [ [ NSUndoManager alloc ] init ];
+      _notesUM = [ [ NSUndoManager alloc ] init ];
       [ [ NSNotificationCenter defaultCenter ]
         addObserver:self
         selector:@selector( _undoManagerDidChange: )
         name:NSUndoManagerDidUndoChangeNotification
-        object:notesUM ];
+        object:_notesUM ];
       [ [ NSNotificationCenter defaultCenter ]
         addObserver:self
         selector:@selector( _undoManagerDidChange: )
         name:NSUndoManagerDidRedoChangeNotification
-        object:notesUM ];
+        object:_notesUM ];
       // Undo manager for everything else in the window
-      otherUM = [ [ NSUndoManager alloc ] init ];
+      _otherUM = [ [ NSUndoManager alloc ] init ];
    }
 
    return self;
@@ -130,7 +130,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
    for( index = 0; index < genSize; index++ )
       [ randomString appendFormat:@"%c",
                         genString[ randomBytes[ index ] % genStringLength ] ];
-   [ passwordText setStringValue:randomString ];
+   [ _passwordText setStringValue:randomString ];
    [ randomData clearOutData ];
    /*
     * XXX deleteCharactersInRange: probably just changes its length; strings are
@@ -152,7 +152,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
    NSURL *theURL;
 
    urlIsInvalid = YES;
-   theURL = [ NSURL URLWithString:[ urlText stringValue ] ];
+   theURL = [ NSURL URLWithString:[ _urlText stringValue ] ];
    if( theURL != nil && [ [ NSWorkspace sharedWorkspace ] openURL:theURL ] )
       urlIsInvalid = NO;
 
@@ -169,10 +169,10 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
  */
 - (NSUndoManager *) windowWillReturnUndoManager:(NSWindow *)window
 {
-   if( [ [ self window ] firstResponder ] == notes )
-      return notesUM;
+   if( [ [ self window ] firstResponder ] == _notes )
+      return _notesUM;
    else
-      return otherUM;
+      return _otherUM;
 }
 
 
@@ -194,13 +194,13 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
    NSString *nameTextString;
 
    [ self updateDocumentEditedStatus ];
-   if( [ [ aNotification object ] isEqual:nameText ] )
+   if( [ [ aNotification object ] isEqual:_nameText ] )
    {
-      nameTextString = [ nameText stringValue ];
+      nameTextString = [ _nameText stringValue ];
       if( nameTextString == nil || [ nameTextString length ] == 0 )
-         [ mainButton setEnabled:NO ];
+         [ _mainButton setEnabled:NO ];
       else
-         [ mainButton setEnabled:YES ];
+         [ _mainButton setEnabled:YES ];
    }
 }
 
@@ -232,7 +232,8 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
       [ NSApp beginSheet:alertPanel
               modalForWindow:[ self window ]
               modalDelegate:self
-              didEndSelector:@selector( _closeSheetDidEnd:returnCode:contextInfo: )
+              didEndSelector:
+                 @selector( _closeSheetDidEnd:returnCode:contextInfo: )
               contextInfo:NULL ];
       retval = NO;
    }
@@ -289,8 +290,8 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
  */
 - (void) dealloc
 {
-   [ notesUM release ];
-   [ otherUM release ];
+   [ _notesUM release ];
+   [ _otherUM release ];
    [ super dealloc ];
 }
 

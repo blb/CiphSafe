@@ -72,7 +72,7 @@
    if( self != nil )
    {
       // Note this window controller is NOT added to NSDocument's list
-      passphraseWindowController = [ [ CSWinCtrlPassphrase alloc ] init ];
+      _passphraseWindowController = [ [ CSWinCtrlPassphrase alloc ] init ];
    }
 
    return self;
@@ -84,9 +84,9 @@
  */
 - (void) makeWindowControllers
 {
-   mainWindowController = [ [ CSWinCtrlMain alloc ] init ];
-   [ self addWindowController:mainWindowController ];
-   [ mainWindowController release ];
+   _mainWindowController = [ [ CSWinCtrlMain alloc ] init ];
+   [ self addWindowController:_mainWindowController ];
+   [ _mainWindowController release ];
 }
 
 
@@ -102,28 +102,31 @@
    SEL mySelector;
    NSMethodSignature *mySelSig;
 
-   // If a filename was given and we don't yet have a key, or we're doing a save as
+   /*
+    * If a filename was given and we don't yet have a key, or we're doing a
+    * save as
+    */
    if( fileName != nil &&
-       ( bfKey == nil || ![ fileName isEqualToString:[ self fileName ] ] ) )
+       ( _bfKey == nil || ![ fileName isEqualToString:[ self fileName ] ] ) )
    {
       // Setup to call [ self _saveToFile:... ] on successful passphrase request
       mySelector = @selector( _saveToFile:saveOperation:delegate:didSaveSelector:
                               contextInfo: );
       mySelSig = [ CSDocument instanceMethodSignatureForSelector:mySelector ];
-      getKeyInvocation = [ NSInvocation invocationWithMethodSignature:mySelSig ];
-      [ getKeyInvocation setTarget:self ];
-      [ getKeyInvocation setSelector:mySelector ];
-      [ getKeyInvocation retainArguments ];
-      [ getKeyInvocation setArgument:&fileName atIndex:2 ];
-      [ getKeyInvocation setArgument:&saveOperation atIndex:3 ];
-      [ getKeyInvocation setArgument:&delegate atIndex:4 ];
-      [ getKeyInvocation setArgument:&didSaveSelector atIndex:5 ];
-      [ getKeyInvocation setArgument:&contextInfo atIndex:6 ];
-      [ getKeyInvocation retain ];
-      [ passphraseWindowController getEncryptionKeyWithNote:CSPassphraseNote_Save
-                                   inWindow:[ mainWindowController window ]
-                                   modalDelegate:self
-                                   sendToSelector:@selector( _getKeyResult:) ];
+      _getKeyInvocation = [ NSInvocation invocationWithMethodSignature:mySelSig ];
+      [ _getKeyInvocation setTarget:self ];
+      [ _getKeyInvocation setSelector:mySelector ];
+      [ _getKeyInvocation retainArguments ];
+      [ _getKeyInvocation setArgument:&fileName atIndex:2 ];
+      [ _getKeyInvocation setArgument:&saveOperation atIndex:3 ];
+      [ _getKeyInvocation setArgument:&delegate atIndex:4 ];
+      [ _getKeyInvocation setArgument:&didSaveSelector atIndex:5 ];
+      [ _getKeyInvocation setArgument:&contextInfo atIndex:6 ];
+      [ _getKeyInvocation retain ];
+      [ _passphraseWindowController getEncryptionKeyWithNote:CSPassphraseNote_Save
+                                    inWindow:[ _mainWindowController window ]
+                                    modalDelegate:self
+                                    sendToSelector:@selector( _getKeyResult:) ];
    }
    else
       [ super saveToFile:fileName
@@ -140,9 +143,9 @@
 - (NSData *) dataRepresentationOfType:(NSString *)aType
 {
    NSAssert( [ aType isEqualToString:CSDOCUMENT_NAME ], @"Unknown file type" );
-   NSAssert( bfKey != nil, @"key is nil" );
+   NSAssert( _bfKey != nil, @"key is nil" );
 
-   return [ [ self _model ] encryptedDataWithKey:bfKey ];
+   return [ [ self _model ] encryptedDataWithKey:_bfKey ];
 }
 
 
@@ -153,26 +156,26 @@
 {
    NSAssert( [ aType isEqualToString:CSDOCUMENT_NAME ], @"Unknown file type" );
 
-   if( docModel != nil )   // This'll happen on revert
+   if( _docModel != nil )   // This'll happen on revert
    {
       [ CSWinCtrlChange closeOpenControllersForDocument:self ];
-      [ docModel release ];
-      docModel = nil;
+      [ _docModel release ];
+      _docModel = nil;
    }
    
    // Loop through until we either successfully open it, or the user cancels
-   while( docModel == nil )
+   while( _docModel == nil )
    {
-      if( bfKey == nil )
-         [ self _setBFKey:[ passphraseWindowController
+      if( _bfKey == nil )
+         [ self _setBFKey:[ _passphraseWindowController
                                getEncryptionKeyWithNote:CSPassphraseNote_Load
                                forDocumentNamed:[ self displayName ] ] ];
 
-      if( bfKey != nil )
+      if( _bfKey != nil )
       {
-         docModel = [ [ CSDocModel alloc ] initWithEncryptedData:data
-                                           bfKey:bfKey ];
-         if( docModel != nil )
+         _docModel = [ [ CSDocModel alloc ] initWithEncryptedData:data
+                                            bfKey:_bfKey ];
+         if( _docModel != nil )
             [ self _setupModel ];
          else
             [ self _setBFKey:nil ];
@@ -181,7 +184,7 @@
          break;   // User cancelled
    }
 
-   return ( docModel != nil );
+   return ( _docModel != nil );
 }
 
 
@@ -250,15 +253,15 @@
    // Setup to call [ self saveDocument:self ] on successful passphrase request
    mySelector = @selector( saveDocument: );
    mySelSig = [ CSDocument instanceMethodSignatureForSelector:mySelector ];
-   getKeyInvocation = [ NSInvocation invocationWithMethodSignature:mySelSig ];
-   [ getKeyInvocation setTarget:self ];
-   [ getKeyInvocation setSelector:mySelector ];
-   [ getKeyInvocation setArgument:&self atIndex:2 ];
-   [ getKeyInvocation retain ];
-   [ passphraseWindowController getEncryptionKeyWithNote:CSPassphraseNote_Change
-                                inWindow:[ mainWindowController window ]
-                                modalDelegate:self
-                                sendToSelector:@selector( _getKeyResult:) ];
+   _getKeyInvocation = [ NSInvocation invocationWithMethodSignature:mySelSig ];
+   [ _getKeyInvocation setTarget:self ];
+   [ _getKeyInvocation setSelector:mySelector ];
+   [ _getKeyInvocation setArgument:&self atIndex:2 ];
+   [ _getKeyInvocation retain ];
+   [ _passphraseWindowController getEncryptionKeyWithNote:CSPassphraseNote_Change
+                                 inWindow:[ _mainWindowController window ]
+                                 modalDelegate:self
+                                 sendToSelector:@selector( _getKeyResult:) ];
 }
 
 
@@ -273,7 +276,7 @@
    menuItemAction = [ menuItem action ];
 
    if( menuItemAction == @selector( doChangePassphrase: ) )
-      retval = ( bfKey != nil );
+      retval = ( _bfKey != nil );
    else if( menuItemAction == @selector( revertDocumentToSaved: ) )
       retval = [ self isDocumentEdited ];
    else
@@ -387,10 +390,10 @@
          [ self addEntryWithName:
                    [ self _uniqueNameForName:
                              [ entryDictionary objectForKey:CSDocModelKey_Name ] ]
-                   account:[ entryDictionary objectForKey:CSDocModelKey_Acct ]
-                   password:[ entryDictionary objectForKey:CSDocModelKey_Passwd ]
-                   URL:[ entryDictionary objectForKey:CSDocModelKey_URL ]
-                   notesRTFD:[ entryDictionary objectForKey:CSDocModelKey_Notes ] ];
+                account:[ entryDictionary objectForKey:CSDocModelKey_Acct ]
+                password:[ entryDictionary objectForKey:CSDocModelKey_Passwd ]
+                URL:[ entryDictionary objectForKey:CSDocModelKey_URL ]
+                notesRTFD:[ entryDictionary objectForKey:CSDocModelKey_Notes ] ];
       }
       [ [ self undoManager ] setActionName:undoName ];
       retval = YES;
@@ -562,8 +565,8 @@
 - (void) dealloc
 {
    [ self _setBFKey:nil ];
-   [ passphraseWindowController release ];
-   [ docModel release ];
+   [ _passphraseWindowController release ];
+   [ _docModel release ];
    [ super dealloc ];
 }
 
@@ -601,13 +604,13 @@
  */
 - (CSDocModel *) _model
 {
-   if( docModel == nil )
+   if( _docModel == nil )
    {
-      docModel = [ [ CSDocModel alloc ] init ];
+      _docModel = [ [ CSDocModel alloc ] init ];
       [ self _setupModel ];
    }
 
-   return docModel;
+   return _docModel;
 }
 
 
@@ -618,27 +621,27 @@
 {
    NSNotificationCenter *defaultCenter;
 
-   NSAssert( docModel != nil, @"docModel is nil" );
+   NSAssert( _docModel != nil, @"_docModel is nil" );
 
-   [ docModel setUndoManager:[ self undoManager ] ];
+   [ _docModel setUndoManager:[ self undoManager ] ];
    defaultCenter = [ NSNotificationCenter defaultCenter ];
    [ defaultCenter addObserver:self
                    selector:@selector( _updateViewForNotification: )
                    name:CSDocModelDidChangeSortNotification
-                   object:docModel ];
+                   object:_docModel ];
    [ defaultCenter addObserver:self
                    selector:@selector( _updateViewForNotification: )
                    name:CSDocModelDidAddEntryNotification
-                   object:docModel ];
+                   object:_docModel ];
    [ defaultCenter addObserver:self
                    selector:@selector( _updateViewForNotification: )
                    name:CSDocModelDidChangeEntryNotification
-                   object:docModel ];
+                   object:_docModel ];
    [ defaultCenter addObserver:self
                    selector:@selector( _updateViewForNotification: )
                    name:CSDocModelDidRemoveEntryNotification
-                   object:docModel ];
-   [ mainWindowController refreshWindow ];
+                   object:_docModel ];
+   [ _mainWindowController refreshWindow ];
 }
 
 
@@ -683,26 +686,26 @@
       }
    }
 
-   [ mainWindowController refreshWindow ];
+   [ _mainWindowController refreshWindow ];
 }
 
 
 /*
  * Callback for the passphrase controller, when run document-modally; simply
- * invokes getKeyInvocation if the user didn't hit cancel 
+ * invokes _getKeyInvocation if the user didn't hit cancel 
  */
 - (void) _getKeyResult:(NSMutableData *)newKey
 {
-   NSAssert( getKeyInvocation != nil, @"getKeyInvocation is nil" );
+   NSAssert( _getKeyInvocation != nil, @"_getKeyInvocation is nil" );
 
    if( newKey != nil )
    {
       [ self _setBFKey:newKey ];
-      [ getKeyInvocation invoke ];
+      [ _getKeyInvocation invoke ];
    }
 
-   [ getKeyInvocation release ];
-   getKeyInvocation = nil;
+   [ _getKeyInvocation release ];
+   _getKeyInvocation = nil;
 }
 
 
@@ -733,12 +736,12 @@
     * Normally, we could just retain, release, and set, but since we clear, we
     * have to check stuff first
    */
-   if( ![ newKey isEqual:bfKey ] )
+   if( ![ newKey isEqual:_bfKey ] )
    {
       [ newKey retain ];
-      [ bfKey clearOutData ];
-      [ bfKey release ];
-      bfKey = newKey;
+      [ _bfKey clearOutData ];
+      [ _bfKey release ];
+      _bfKey = newKey;
    }
 }
 
