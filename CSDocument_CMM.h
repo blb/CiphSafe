@@ -2,9 +2,9 @@
 
 #import <Cocoa/Cocoa.h>
 #import "CSDocument.h"
-#import "NSTableView_CMM.h"
+#import "CSTableView.h"
 
-@interface CSDocument (CMM) <NSTableView_withay_CMM>
+@interface CSDocument (CMM) <CSTableView_CMM>
 
 // Actions from the contextual menu
 - (IBAction) cmmCopyAccount:(id)sender;

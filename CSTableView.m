@@ -98,4 +98,25 @@ static NSColor *tableViewAltBGColor;
    }
 }
 
+
+/*
+ * The delegate must conform to the CSTableView_CMM protocol 
+ */
+- (NSMenu *) menuForEvent:(NSEvent *)theEvent
+{
+   NSPoint clickPoint;
+   int clickColumn, clickRow;
+
+   clickPoint = [ self convertPoint:[ theEvent locationInWindow ] fromView:nil ];
+   clickColumn = [ self columnAtPoint:clickPoint ];
+   clickRow = [ self rowAtPoint:clickPoint ];
+
+   if( clickColumn >= 0 && clickRow >= 0 &&
+       [ [ self delegate ]
+         conformsToProtocol:@protocol( CSTableView_CMM ) ] )
+      return [ [ self delegate ] contextualMenuForTableViewRow:clickRow ];
+
+   return nil;
+}
+
 @end
