@@ -40,6 +40,53 @@ static NSColor *tableViewAltBGColor;
 
 
 /*
+ * Draw only vertical lines for the grid
+ */
+- (void) drawGridInClipRect:(NSRect)aRect
+{
+   NSBezierPath *linePath;
+   int index;
+   NSAffineTransform *transform;
+   NSRect columnRect;
+
+   [ [ self gridColor ] set ];
+   linePath = [ NSBezierPath bezierPath ];
+   [ linePath setLineWidth:1.0 ];
+   [ linePath moveToPoint:NSMakePoint( -0.5, 0 ) ];
+   [ linePath lineToPoint:NSMakePoint( -0.5, aRect.size.height ) ];
+   for( index = 0; index < [ self numberOfColumns ]; index++ )
+   {
+      columnRect = [ self rectOfColumn:index ];
+      transform = [ NSAffineTransform transform ];
+      [ transform translateXBy:columnRect.origin.x + columnRect.size.width
+                  yBy:aRect.origin.y ];
+      [ [ transform transformBezierPath:linePath ] stroke ];
+   }
+}
+
+
+/*
+ * The delegate must conform to the CSTableView_CMM protocol 
+ */
+- (NSMenu *) menuForEvent:(NSEvent *)theEvent
+{
+   NSPoint clickPoint;
+   int clickColumn, clickRow;
+
+   clickPoint = [ self convertPoint:[ theEvent locationInWindow ] fromView:nil ];
+   clickColumn = [ self columnAtPoint:clickPoint ];
+   clickRow = [ self rowAtPoint:clickPoint ];
+
+   if( clickColumn >= 0 && clickRow >= 0 &&
+       [ [ self delegate ]
+         conformsToProtocol:@protocol( CSTableView_CMM ) ] )
+      return [ [ self delegate ] contextualMenuForTableViewRow:clickRow ];
+
+   return nil;
+}
+
+
+/*
  * This routine does the actual blue stripe drawing, filling in every other row
  * of the table with a blue background so you can follow the rows easier with
  * your eyes.  Shamelessly lifted from Apple's MP3 Player sample code.
@@ -70,53 +117,6 @@ static NSColor *tableViewAltBGColor;
       NSRectFill( stripeRect );
       stripeRect.origin.y += fullRowHeight * 2.0;
    }
-}
-
-
-/*
- * Draw only vertical lines for the grid
- */
-- (void) drawGridInClipRect:(NSRect)aRect
-{
-   NSBezierPath *linePath;
-   int index;
-   NSAffineTransform *transform;
-   NSRect columnRect;
-
-   [ [ self gridColor ] set ];
-   linePath = [ NSBezierPath bezierPath ];
-   [ linePath setLineWidth:1.0 ];
-   [ linePath moveToPoint:NSMakePoint( -0.5, 0 ) ];
-   [ linePath lineToPoint:NSMakePoint( -0.5, aRect.size.height ) ];
-   for( index = 0; index < [ self numberOfColumns ]; index++ )
-   {
-      columnRect = [ self rectOfColumn:index ];
-      transform = [ NSAffineTransform transform ];
-      [ transform translateXBy:columnRect.origin.x + columnRect.size.width
-                  yBy:0.0 ];
-      [ [ transform transformBezierPath:linePath ] stroke ];
-   }
-}
-
-
-/*
- * The delegate must conform to the CSTableView_CMM protocol 
- */
-- (NSMenu *) menuForEvent:(NSEvent *)theEvent
-{
-   NSPoint clickPoint;
-   int clickColumn, clickRow;
-
-   clickPoint = [ self convertPoint:[ theEvent locationInWindow ] fromView:nil ];
-   clickColumn = [ self columnAtPoint:clickPoint ];
-   clickRow = [ self rowAtPoint:clickPoint ];
-
-   if( clickColumn >= 0 && clickRow >= 0 &&
-       [ [ self delegate ]
-         conformsToProtocol:@protocol( CSTableView_CMM ) ] )
-      return [ [ self delegate ] contextualMenuForTableViewRow:clickRow ];
-
-   return nil;
 }
 
 @end
