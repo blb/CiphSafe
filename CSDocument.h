@@ -45,7 +45,6 @@
    CSWinCtrlMain *_mainWindowController;
    CSWinCtrlPassphrase *_passphraseWindowController;
    NSInvocation *_getKeyInvocation;
-   NSMutableArray *_currentCategories;
 }
 
 // Actions from the menu

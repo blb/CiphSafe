@@ -55,7 +55,6 @@
 - (CSDocModel *) _model;
 - (void) _setupModel;
 - (void) _updateViewForNotification:(NSNotification *)notification;
-- (void) _updateCategoryList:(id)unused;
 - (void) _getKeyResult:(NSMutableData *)newKey;
 - (void) _saveToFile:(NSString *)fileName
          saveOperation:(NSSaveOperationType)saveOperation
@@ -429,7 +428,31 @@
  */
 - (NSArray *) categories
 {
-   return _currentCategories;
+   NSMutableArray *categories;
+   int index;
+   NSString *category;
+
+   if( [ [ NSUserDefaults standardUserDefaults ]
+         boolForKey:CSPrefDictKey_IncludeDefaultCategories ] )
+      categories = [ NSMutableArray arrayWithObjects:
+                                       CSDocModelCategory_General,
+                                       CSDocModelCategory_Banking,
+                                       CSDocModelCategory_Forum,
+                                       CSDocModelCategory_Retail,
+                                       CSDocModelCategory_OtherWeb,
+                                       nil ];
+   else
+      categories = [ NSMutableArray arrayWithCapacity:10 ];
+   for( index = 0; index < [ self entryCount ]; index++ )
+   {
+      category = [ self stringForKey:CSDocModelKey_Category atRow:index ];
+      if( category != nil && ( [ category length ] > 0 ) &&
+          ![ categories containsObject:category ] )
+         [ categories addObject:category ];
+   }
+
+   return [ categories sortedArrayUsingSelector:
+                          @selector( caseInsensitiveCompare: ) ];
 }
 
 
@@ -701,11 +724,6 @@
                    selector:@selector( _updateViewForNotification: )
                    name:CSDocModelDidRemoveEntryNotification
                    object:_docModel ];
-   [ defaultCenter addObserver:self
-                   selector:@selector( _updateCategoryList: )
-                   name:CSApplicationDidChangePrefs
-                   object:nil ];
-   [ self _updateCategoryList:nil ];
    [ _mainWindowController refreshWindow ];
 }
 
@@ -719,7 +737,6 @@
    int index;
    CSWinCtrlChange *changeController;
 
-   [ self _updateCategoryList:nil ];
    /*
     * Need to keep change windows synchronized on changes and remove them
     * on deletes, as undo/redo will change them outside our control
@@ -753,40 +770,6 @@
    }
 
    [ _mainWindowController refreshWindow ];
-}
-
-
-/*
- * Update our list of categories
- */
-- (void) _updateCategoryList:(id)unused
-{
-   int index;
-   NSString *category;
-
-   [ _currentCategories release ];
-   if( [ [ NSUserDefaults standardUserDefaults ]
-         boolForKey:CSPrefDictKey_IncludeDefaultCategories ] )
-      _currentCategories = [ NSMutableArray arrayWithObjects:
-                                               CSDocModelCategory_General,
-                                               CSDocModelCategory_Banking,
-                                               CSDocModelCategory_Forum,
-                                               CSDocModelCategory_Retail,
-                                               CSDocModelCategory_OtherWeb,
-                                               nil ];
-   else
-      _currentCategories = [ NSMutableArray arrayWithCapacity:10 ];
-   for( index = 0; index < [ [ self _model ] entryCount ]; index++ )
-   {
-      category = [ [ self _model ] stringForKey:CSDocModelKey_Category
-                                   atRow:index ];
-      if( category != nil && ( [ category length ] > 0 ) &&
-          ![ _currentCategories containsObject:category ] )
-         [ _currentCategories addObject:category ];
-   }
-   _currentCategories = [ [ _currentCategories sortedArrayUsingSelector:
-                                            @selector( caseInsensitiveCompare: ) ]
-                          retain ];
 }
 
 
