@@ -761,7 +761,6 @@
    NSString *category;
 
    [ _currentCategories release ];
-NSLog( @"general is \"%@\"", CSDocModelCategory_General );
    _currentCategories = [ NSMutableArray arrayWithObjects:
                                             CSDocModelCategory_General,
                                             CSDocModelCategory_Banking,
