@@ -560,6 +560,32 @@
 
 
 /*
+ * Return the row number of the first matching entry
+ */
+- (NSNumber *) firstRowBeginningWithString:(NSString *)findMe
+               ignoreCase:(BOOL)ignoreCase
+               forKey:(NSString *)key
+{
+   return [ [ self _model ] firstRowBeginningWithString:findMe
+                            ignoreCase:ignoreCase
+                            forKey:key ];
+}
+
+
+/*
+ * Return an array (of NSNumber) of all matching entries
+ */
+- (NSArray *) rowsMatchingString:(NSString *)findMe
+              ignoreCase:(BOOL)ignoreCase
+              forKey:(NSString *)key
+{
+   return [ [ self _model ] rowsMatchingString:findMe
+                            ignoreCase:ignoreCase
+                            forKey:key ];
+}
+
+
+/*
  * Cleanup
  */
 - (void) dealloc

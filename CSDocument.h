@@ -59,7 +59,7 @@
 - (BOOL) retrieveEntriesFromPasteboard:(NSPasteboard *)pboard
          undoName:(NSString *)undoName;
 
-// Methods to add/change/delete entries
+// Methods to add/change/delete/find entries
 - (unsigned) entryCount;
 - (void) setSortKey:(NSString *)newSortKey;
 - (NSString *) sortKey;
@@ -84,5 +84,11 @@
          URL:(NSString *)url
          notesRTFD:(NSData *)notes;
 - (unsigned) deleteEntriesWithNamesInArray:(NSArray *)nameArray;
+- (NSNumber *) firstRowBeginningWithString:(NSString *)findMe
+               ignoreCase:(BOOL)ignoreCase
+               forKey:(NSString *)key;
+- (NSArray *) rowsMatchingString:(NSString *)findMe
+              ignoreCase:(BOOL)ignoreCase
+              forKey:(NSString *)key;
 
 @end
