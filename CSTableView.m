@@ -58,23 +58,17 @@ static NSColor *tableViewAltBGColor;
  */
 - (void) drawGridInClipRect:(NSRect)aRect
 {
-   NSBezierPath *linePath;
    int index;
    NSRect columnRect;
    float xPos;
 
    [ [ self gridColor ] set ];
-   linePath = [ NSBezierPath bezierPath ];
-   [ linePath setLineWidth:1.0 ];
    for( index = 0; index < [ self numberOfColumns ]; index++ )
    {
       columnRect = [ self rectOfColumn:index ];
-      xPos = columnRect.origin.x + columnRect.size.width - 0.5;
-      [ linePath moveToPoint:NSMakePoint( xPos, aRect.origin.y ) ];
-      [ linePath lineToPoint:NSMakePoint( xPos,
-                                          aRect.origin.y + aRect.size.height ) ];
+      xPos = columnRect.origin.x + columnRect.size.width - 1;
+      NSFrameRect( NSMakeRect( xPos, aRect.origin.y, 1, aRect.size.height ) );
    }
-   [ linePath stroke ];
 }
 
 
