@@ -190,6 +190,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
                            account:[ _accountText stringValue ]
                            password:[ _passwordText stringValue ]
                            URL:[ _urlText stringValue ]
+                           category:[ _category stringValue ]
                            notesRTFD:[ _notes RTFDFromRange:fullNotesRange ] ] )
    {
       [ [ self window ] setDocumentEdited:NO ];
@@ -255,6 +256,12 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 {
    return ![ self _doesField:_urlText
                   matchStringWithKey:CSDocModelKey_URL ];
+}
+
+- (BOOL) categoryChanged
+{
+   return ![ self _doesField:_category
+                  matchStringWithKey:CSDocModelKey_Category ];
 }
 
 - (BOOL) notesChanged
@@ -344,6 +351,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 - (void) _updateFields
 {
    int myEntryRowNum;
+   CSDocument *document;
    NSRange fullNotesRange;
 
    // XXX If it were possible, we'd clear out controls here
@@ -352,17 +360,18 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
    if( myEntryRowNum >= 0 )
    {
       [ _mainButton setEnabled:YES ];
-      [ _accountText setStringValue:[ [ self document ]
-                                      stringForKey:CSDocModelKey_Acct
-                                      atRow:myEntryRowNum ] ];
-      [ _passwordText setStringValue:[ [ self document ]
-                                       stringForKey:CSDocModelKey_Passwd
-                                       atRow:myEntryRowNum ] ];
-      [ _urlText setStringValue:[ [ self document ] stringForKey:CSDocModelKey_URL
-                                                    atRow:myEntryRowNum ] ];
+      document = [ self document ];
+      [ _accountText setStringValue:[ document stringForKey:CSDocModelKey_Acct
+                                               atRow:myEntryRowNum ] ];
+      [ _passwordText setStringValue:[ document stringForKey:CSDocModelKey_Passwd
+                                                atRow:myEntryRowNum ] ];
+      [ _urlText setStringValue:[ document stringForKey:CSDocModelKey_URL
+                                           atRow:myEntryRowNum ] ];
+      [ _category setStringValue:[ document stringForKey:CSDocModelKey_Category
+                                            atRow:myEntryRowNum ] ];
       fullNotesRange = NSMakeRange( 0, [ [ _notes textStorage ] length ] );
       [ _notes replaceCharactersInRange:fullNotesRange
-               withRTFD:[ [ self document ] RTFDNotesAtRow:myEntryRowNum ] ];
+               withRTFD:[ document RTFDNotesAtRow:myEntryRowNum ] ];
       [ self updateDocumentEditedStatus ];
    }
 }

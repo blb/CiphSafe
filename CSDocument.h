@@ -45,6 +45,7 @@
    CSWinCtrlMain *_mainWindowController;
    CSWinCtrlPassphrase *_passphraseWindowController;
    NSInvocation *_getKeyInvocation;
+   NSMutableArray *_currentCategories;
 }
 
 // Actions from the menu
@@ -61,6 +62,9 @@
 - (BOOL) copyNames:(NSArray *)names toPasteboard:(NSPasteboard *)pboard;
 - (BOOL) retrieveEntriesFromPasteboard:(NSPasteboard *)pboard
          undoName:(NSString *)undoName;
+
+// Category information
+- (NSArray *) categories;
 
 // Methods to add/change/delete/find entries
 - (int) entryCount;
@@ -79,12 +83,14 @@
          account:(NSString *)account
          password:(NSString *)password
          URL:(NSString *)url
+         category:(NSString *)category
          notesRTFD:(NSData *)notes;
 - (BOOL) changeEntryWithName:(NSString *)name
          newName:(NSString *)newName
          account:(NSString *)account
          password:(NSString *)password
          URL:(NSString *)url
+         category:(NSString *)category
          notesRTFD:(NSData *)notes;
 - (int) deleteEntriesWithNamesInArray:(NSArray *)nameArray;
 - (NSNumber *) firstRowBeginningWithString:(NSString *)findMe

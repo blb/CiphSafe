@@ -55,6 +55,7 @@
 - (CSDocModel *) _model;
 - (void) _setupModel;
 - (void) _updateViewForNotification:(NSNotification *)notification;
+- (void) _updateCategoryList;
 - (void) _getKeyResult:(NSMutableData *)newKey;
 - (void) _saveToFile:(NSString *)fileName
          saveOperation:(NSSaveOperationType)saveOperation
@@ -310,7 +311,7 @@
    NSAttributedString *attrString, *attrEOL;
    NSEnumerator *nameEnumerator;
    int row;
-   NSString *nextName, *acctString, *passwdString, *urlString;
+   NSString *nextName, *acctString, *passwdString, *urlString, *categoryString;
 
    /*
     * This generates several pasteboard types:
@@ -333,6 +334,7 @@
       row = [ self rowForName:nextName ];
       acctString = [ self stringForKey:CSDocModelKey_Acct atRow:row ];
       urlString = [ self stringForKey:CSDocModelKey_URL atRow:row ];
+      categoryString = [ self stringForKey:CSDocModelKey_Category atRow:row ];
       passwdString = [ self stringForKey:CSDocModelKey_Passwd atRow:row ];
       [ docArray addObject:[ NSDictionary dictionaryWithObjectsAndKeys:
                                              nextName,
@@ -343,18 +345,21 @@
                                                 CSDocModelKey_Passwd,
                                              urlString,
                                                 CSDocModelKey_URL,
+                                             categoryString,
+                                                CSDocModelKey_Category,
                                              [ self RTFDNotesAtRow:row ],
                                                 CSDocModelKey_Notes,
                                              nil ] ];
       if( [ [ NSUserDefaults standardUserDefaults ]
             boolForKey:CSPrefDictKey_IncludePasswd ] )
          attrString = [ [ NSAttributedString alloc ] initWithString:
-                           [ NSString stringWithFormat:@"%@\t%@\t%@\t%@\t",
-                              nextName, acctString, passwdString, urlString ] ];
+                           [ NSString stringWithFormat:@"%@\t%@\t%@\t%@\t%@\t",
+                              nextName, acctString, passwdString, urlString,
+                              categoryString ] ];
       else
          attrString = [ [ NSAttributedString alloc ] initWithString:
-                           [ NSString stringWithFormat:@"%@\t%@\t%@\t",
-                              nextName, acctString, urlString ] ];
+                           [ NSString stringWithFormat:@"%@\t%@\t%@\t%@\t",
+                              nextName, acctString, urlString, categoryString ] ];
       [ rtfdStringRows appendAttributedString:attrString ];
       [ attrString release ];
       [ rtfdStringRows appendAttributedString:[ self RTFDStringNotesAtRow:row ] ];
@@ -408,6 +413,7 @@
                 account:[ entryDictionary objectForKey:CSDocModelKey_Acct ]
                 password:[ entryDictionary objectForKey:CSDocModelKey_Passwd ]
                 URL:[ entryDictionary objectForKey:CSDocModelKey_URL ]
+                category:[ entryDictionary objectForKey:CSDocModelKey_Category ]
                 notesRTFD:[ entryDictionary objectForKey:CSDocModelKey_Notes ] ];
       }
       [ [ self undoManager ] setActionName:undoName ];
@@ -415,6 +421,15 @@
    }
 
    return retval;
+}
+
+
+/*
+ * Category information
+ */
+- (NSArray *) categories
+{
+   return _currentCategories;
 }
 
 
@@ -536,12 +551,14 @@
          account:(NSString *)account
          password:(NSString *)password
          URL:(NSString *)url
+         category:(NSString *)category
          notesRTFD:(NSData *)notes
 {
    return [ [ self _model ] addEntryWithName:name
                             account:account
                             password:password
                             URL:url
+                            category:category
                             notesRTFD:notes ];
 }
 
@@ -554,6 +571,7 @@
          account:(NSString *)account
          password:(NSString *)password
          URL:(NSString *)url
+         category:(NSString *)category
          notesRTFD:(NSData *)notes
 {
    return [ [ self _model ] changeEntryWithName:name
@@ -561,6 +579,7 @@
                             account:account
                             password:password
                             URL:url
+                            category:category
                             notesRTFD:notes ];
 }
 
@@ -682,6 +701,7 @@
                    selector:@selector( _updateViewForNotification: )
                    name:CSDocModelDidRemoveEntryNotification
                    object:_docModel ];
+   [ self _updateCategoryList ];
    [ _mainWindowController refreshWindow ];
 }
 
@@ -695,6 +715,7 @@
    int index;
    CSWinCtrlChange *changeController;
 
+   [ self _updateCategoryList ];
    /*
     * Need to keep change windows synchronized on changes and remove them
     * on deletes, as undo/redo will change them outside our control
@@ -728,6 +749,37 @@
    }
 
    [ _mainWindowController refreshWindow ];
+}
+
+
+/*
+ * Update our list of categories
+ */
+- (void) _updateCategoryList
+{
+   int index;
+   NSString *category;
+
+   [ _currentCategories release ];
+NSLog( @"general is \"%@\"", CSDocModelCategory_General );
+   _currentCategories = [ NSMutableArray arrayWithObjects:
+                                            CSDocModelCategory_General,
+                                            CSDocModelCategory_Banking,
+                                            CSDocModelCategory_Forum,
+                                            CSDocModelCategory_Retail,
+                                            CSDocModelCategory_OtherWeb,
+                                            nil ];
+   for( index = 0; index < [ [ self _model ] entryCount ]; index++ )
+   {
+      category = [ [ self _model ] stringForKey:CSDocModelKey_Category
+                                   atRow:index ];
+      if( category != nil && ( [ category length ] > 0 ) &&
+          ![ _currentCategories containsObject:category ] )
+         [ _currentCategories addObject:category ];
+   }
+   _currentCategories = [ [ _currentCategories sortedArrayUsingSelector:
+                                            @selector( caseInsensitiveCompare: ) ]
+                          retain ];
 }
 
 

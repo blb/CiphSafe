@@ -34,6 +34,7 @@
 /* CSWinCtrlAdd.m */
 
 #import "CSWinCtrlAdd.h"
+#import "CSDocModel.h"
 #import "CSDocument.h"
 #import "CSAppController.h"
 
@@ -47,6 +48,16 @@
    self = [ super initWithWindowNibName:@"CSDocumentAdd" ];
 
    return self;
+}
+
+
+/*
+ * Setup the window
+ */
+- (void) awakeFromNib
+{
+   [ super awakeFromNib ];
+   [ self doClear:self ];
 }
 
 
@@ -70,6 +81,7 @@
    [ _accountText setStringValue:@"" ];
    [ _passwordText setStringValue:@"" ];
    [ _urlText setStringValue:@"" ];
+   [ _category setStringValue:CSDocModelCategory_General ];
    [ _notes setString:@"" ];
    [ [ _notes undoManager ] removeAllActions ];
    [ _mainButton setEnabled:NO ];
@@ -89,6 +101,7 @@
                            account:[ _accountText stringValue ]
                            password:[ _passwordText stringValue ]
                            URL:[ _urlText stringValue ]
+                           category:[ _category stringValue ]
                            notesRTFD:[ _notes RTFDFromRange:fullNotesRange ] ] )
    {
       [ self doClear:self ];
@@ -135,6 +148,12 @@
 - (BOOL) urlChanged
 {
    return ( [ [ _urlText stringValue ] length ] > 0 );
+}
+
+- (BOOL) categoryChanged
+{
+   return ![ [ _category stringValue ]
+             isEqualToString:CSDocModelCategory_General ];
 }
 
 - (BOOL) notesChanged
