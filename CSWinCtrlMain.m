@@ -377,15 +377,6 @@
 
 
 /*
- * Cleanup
- */
-- (void) dealloc
-{
-   [ super dealloc ];
-}
-
-
-/*
  * Called when the "really delete" sheet is done
  */
 - (void) _deleteSheetDidEnd:(NSWindow *)sheet
@@ -410,7 +401,7 @@
    else
       [ documentView setIndicatorImage:[ NSImage imageNamed:@"sortArrowDown" ]
                      inTableColumn:tableColumn ];
-   if( previouslySelectedColumn != tableColumn )
+   if( ![ previouslySelectedColumn isEqual:tableColumn ] )
       [ documentView setIndicatorImage:nil
                      inTableColumn:previouslySelectedColumn ];
    previouslySelectedColumn = tableColumn;
