@@ -68,7 +68,7 @@
            performSelector:@selector( makeFirstResponder: )
            target:[ self window ]
            argument:nameText
-           order:1
+           order:9999
            modes:[ NSArray arrayWithObject:NSDefaultRunLoopMode ] ];
       }
       else
