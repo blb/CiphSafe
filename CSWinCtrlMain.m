@@ -36,7 +36,6 @@
 #import "CSAppController.h"
 #import "CSDocument.h"
 #import "CSDocModel.h"
-#import "BLBMenuCornerView.h"
 #import "BLBTextField.h"
 
 // Format strings for window and table view information saved in user defaults
@@ -149,8 +148,6 @@ static NSArray *columnSelectionArray;
  */
 - (void) awakeFromNib
 {
-   BLBMenuCornerView *cornerView;
-
    if( [ [ self document ] fileName ] != nil )
    {
       [ self _loadSavedWindowState ];
@@ -180,12 +177,8 @@ static NSArray *columnSelectionArray;
    [ [ self window ] makeFirstResponder:_documentView ];
    [ _documentView registerForDraggedTypes:
                       [ NSArray arrayWithObject:CSDocumentPboardType ] ];
-   cornerView = [ [ [ BLBMenuCornerView alloc ]
-                    initWithFrame:[ [ _documentView cornerView ] frame ] ]
-                  autorelease ];
-   [ cornerView setMenuToDisplay:_cornerMenu ];
-   [ _documentView setCornerView:cornerView ];
-   [ [ _documentView headerView ] setMenu:_cornerMenu ];
+   [ [ _documentView cornerView ] setMenu:_cmmTableHeader ];
+   [ [ _documentView headerView ] setMenu:_cmmTableHeader ];
    [ self _setTableViewSpacing ];
    [ _documentSearch setObjectValue:defaultSearchString ];
    [ self refreshWindow ];
@@ -831,9 +824,9 @@ static NSArray *columnSelectionArray;
       if( [ _documentView columnWithIdentifier:
                              [ columnSelectionArray objectAtIndex:index ] ]
           >= 0 )
-         [ [ _cornerMenu itemWithTag:index ] setState:NSOnState ];
+         [ [ _cmmTableHeader itemWithTag:index ] setState:NSOnState ];
       else
-         [ [ _cornerMenu itemWithTag:index ] setState:NSOffState ];
+         [ [ _cmmTableHeader itemWithTag:index ] setState:NSOffState ];
    }
 }
 

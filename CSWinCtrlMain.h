@@ -49,7 +49,7 @@
    IBOutlet NSTextField *_documentStatus;
    IBOutlet BLBTextField *_documentSearch;
    IBOutlet NSMenu *_contextualMenu;
-   IBOutlet NSMenu *_cornerMenu;
+   IBOutlet NSMenu *_cmmTableHeader;
 }
 
 // Actions from the main window
