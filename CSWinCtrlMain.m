@@ -54,7 +54,7 @@
    [ documentView setDrawsGrid:YES ];
    [ documentView setStripeColor:[ NSColor colorWithCalibratedRed:0.93
                                      green:0.95 blue:1.0 alpha:1.0 ] ];
-   [ documentView setDoubleAction:@selector( docViewEntry: ) ];
+   [ documentView setDoubleAction:@selector( doViewEntry: ) ];
    previouslySelectedColumn = [ documentView tableColumnWithIdentifier:
                                                 [ [ self document ] sortKey ] ];
    [ documentView setHighlightedTableColumn:previouslySelectedColumn ];
