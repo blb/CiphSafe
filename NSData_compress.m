@@ -205,7 +205,8 @@ static BOOL compressLoggingEnabled = YES;
    if( compressLoggingEnabled )
    {
       va_start( args, format );
-      NSLogv( [ NSString stringWithFormat:@"NSData_compress: %@", format ], args );
+      NSLogv( [ NSString stringWithFormat:@"NSData_compress: %@\n", format ],
+              args );
       va_end( args );
    }
 }

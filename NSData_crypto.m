@@ -248,7 +248,7 @@ static BOOL cryptoLoggingEnabled = YES;
    if( cryptoLoggingEnabled )
    {
       va_start( args, format );
-      NSLogv( [ NSString stringWithFormat:@"NSData_crypto: %@", format ], args );
+      NSLogv( [ NSString stringWithFormat:@"NSData_crypto: %@\n", format ], args );
       va_end( args );
    }
 }
