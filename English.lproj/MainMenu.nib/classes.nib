@@ -7,6 +7,7 @@
                 prefsAutoOpenClicked = id; 
                 prefsAutoOpenSelectPath = id; 
                 prefsCancel = id; 
+                prefsCloseAfterTimeoutClicked = id; 
                 prefsSave = id; 
             }; 
             CLASS = CSAppController; 
@@ -18,12 +19,14 @@
                 "_prefsAutoOpenSelect" = NSButton; 
                 "_prefsClearClipboard" = NSButton; 
                 "_prefsCloseAdd" = NSButton; 
+                "_prefsCloseAfterTimeout" = NSButton; 
                 "_prefsCloseEdit" = NSButton; 
                 "_prefsConfirmDelete" = NSButton; 
                 "_prefsCreateNew" = NSButton; 
                 "_prefsGenSize" = NSTextField; 
                 "_prefsIncludePasswd" = NSButton; 
                 "_prefsKeepBackup" = NSButton; 
+                "_prefsTimeout" = NSTextField; 
                 "_prefsWarnShort" = NSButton; 
                 "_prefsWindow" = NSWindow; 
             }; 
