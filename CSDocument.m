@@ -17,11 +17,15 @@
 
 #define CSDOCUMENT_NAME @"CiphSafe Document"
 
-#define CSDOCUMENT_GETKEYSTATE_NONE   0
-#define CSDOCUMENT_GETKEYSTATE_SAVE   1
-#define CSDOCUMENT_GETKEYSTATE_SAVEAS 2
-#define CSDOCUMENT_GETKEYSTATE_SAVETO 3
-#define CSDOCUMENT_GETKEYSTATE_CHANGE 4
+#define CSDOCUMENT_SAVETOFILE_FILENAME @"CSDOCUMENT_SAVETOFILE_FILENAME"
+#define CSDOCUMENT_SAVETOFILE_SAVEOP @"CSDOCUMENT_SAVETOFILE_SAVEOP"
+#define CSDOCUMENT_SAVETOFILE_DELEGATE @"CSDOCUMENT_SAVETOFILE_DELEGATE"
+#define CSDOCUMENT_SAVETOFILE_SELECTOR @"CSDOCUMENT_SAVETOFILE_SELECTOR"
+#define CSDOCUMENT_SAVETOFILE_CONTEXTINFO @"CSDOCUMENT_SAVETOFILE_CONTEXTINFO"
+
+#define CSDOCUMENT_GETKEYSTATE_NONE       0
+#define CSDOCUMENT_GETKEYSTATE_SAVETOFILE 1
+#define CSDOCUMENT_GETKEYSTATE_CHANGE     2
 
 @interface CSDocument (InternalMethods)
 - (NSString *) _uniqueNameForName:(NSString *)name;
@@ -30,11 +34,25 @@
 - (void) _updateViewForNotification:(NSNotification *)notification;
 - (void) _beginPassphraseSheetForState:(int)state note:(NSString *)note;
 - (void) _getKeyResult:(NSMutableData *)newKey;
-- (CSWinCtrlPassphrase *) _passphraseWindowController;
 - (void) _setBFKey:(NSMutableData *)newKey;
 @end
 
 @implementation CSDocument
+
+- (id) init
+{
+   self = [ super init ];
+   if( self != nil )
+   {
+      getKeyState = CSDOCUMENT_GETKEYSTATE_NONE;
+      saveToFileInfo = [ [ NSMutableDictionary alloc ] initWithCapacity:5 ];
+      // Note this window controller is NOT added to NSDocument's list
+      passphraseWindowController = [ [ CSWinCtrlPassphrase alloc ] init ];
+   }
+
+   return self;
+}
+
 
 /*
  * We need our own window controller...
@@ -44,33 +62,39 @@
    mainWindowController = [ [ CSWinCtrlMain alloc ] init ];
    [ self addWindowController:mainWindowController ];
    [ mainWindowController release ];
-   getKeyState = CSDOCUMENT_GETKEYSTATE_NONE;
 }
 
 
 /*
- * Override the saveDocument...: methods so we can request the passphrase
- * prior to save;
+ * Override this to allow us to get a passphrase when needed
  */
-- (IBAction) saveDocument:(id)sender
+- (void) saveToFile:(NSString *)fileName
+         saveOperation:(NSSaveOperationType)saveOperation
+         delegate:(id)delegate didSaveSelector:(SEL)didSaveSelector
+         contextInfo:(void *)contextInfo
 {
-   if( bfKey == nil )
-      [ self _beginPassphraseSheetForState:CSDOCUMENT_GETKEYSTATE_SAVE
+   // If a filename was given and we don't yet have a key, or we're doing a save as
+   if( fileName != nil &&
+       ( bfKey == nil || ![ fileName isEqualToString:[ self fileName ] ] ) )
+   {
+      // Save the parameters
+      [ saveToFileInfo setObject:fileName forKey:CSDOCUMENT_SAVETOFILE_FILENAME ];
+      [ saveToFileInfo setObject:[ NSNumber numberWithInt:saveOperation ]
+                       forKey:CSDOCUMENT_SAVETOFILE_SAVEOP ];
+      if( delegate != nil )
+         [ saveToFileInfo setObject:delegate
+                          forKey:CSDOCUMENT_SAVETOFILE_DELEGATE ];
+      if( didSaveSelector != nil )
+         [ saveToFileInfo setObject:NSStringFromSelector( didSaveSelector )
+                          forKey:CSDOCUMENT_SAVETOFILE_SELECTOR ];
+      [ saveToFileInfo setObject:[ NSValue valueWithPointer:contextInfo ]
+                       forKey:CSDOCUMENT_SAVETOFILE_CONTEXTINFO ];
+      [ self _beginPassphraseSheetForState:CSDOCUMENT_GETKEYSTATE_SAVETOFILE
              note:CSPassphraseNote_Save ];
+   }
    else
-      [ super saveDocument:sender ];
-}
-
-- (IBAction) saveDocumentAs:(id)sender
-{
-   [ self _beginPassphraseSheetForState:CSDOCUMENT_GETKEYSTATE_SAVEAS
-          note:CSPassphraseNote_Save ];
-}
-
-- (IBAction) saveDocumentTo:(id)sender
-{
-   [ self _beginPassphraseSheetForState:CSDOCUMENT_GETKEYSTATE_SAVETO
-          note:CSPassphraseNote_Save ];
+      [ super saveToFile:fileName saveOperation:saveOperation delegate:delegate
+              didSaveSelector:didSaveSelector contextInfo:contextInfo ];
 }
 
 
@@ -108,9 +132,9 @@
    while( docModel == nil )
    {
       if( !inRevert )
-         [ self _setBFKey:[ [ self _passphraseWindowController ]
-                            getEncryptionKeyWithNote:CSPassphraseNote_Load
-                            forDocumentNamed:[ self displayName ] ] ];
+         [ self _setBFKey:[ passphraseWindowController
+                               getEncryptionKeyWithNote:CSPassphraseNote_Load
+                               forDocumentNamed:[ self displayName ] ] ];
 
       if( bfKey != nil )
       {
@@ -216,7 +240,7 @@
 
 /*
  * Copy the given rows to the given pasteboard (rows must be an array of
- * objects which respond to unsignedIntValue for the row number)
+ * entry names)
  */
 - (BOOL) copyNames:(NSArray *)names toPasteboard:(NSPasteboard *)pboard
 {
@@ -464,6 +488,7 @@
 - (void) dealloc
 {
    [ self _setBFKey:nil ];
+   [ saveToFileInfo release ];
    [ passphraseWindowController release ];
    [ docModel release ];
    [ super dealloc ];
@@ -583,11 +608,10 @@
 - (void) _beginPassphraseSheetForState:(int)state note:(NSString *)note
 {
    getKeyState = state;
-   [ [ self _passphraseWindowController ]
-     getEncryptionKeyWithNote:note
-     inWindow:[ mainWindowController window ]
-     modalDelegate:self
-     sendToSelector:@selector( _getKeyResult:) ];
+   [ passphraseWindowController getEncryptionKeyWithNote:note
+                                inWindow:[ mainWindowController window ]
+                                modalDelegate:self
+                                sendToSelector:@selector( _getKeyResult:) ];
 }
 
 
@@ -605,16 +629,12 @@
       [ self _setBFKey:newKey ];
       switch( getKeyState )
       {
-         case CSDOCUMENT_GETKEYSTATE_SAVE:
-            [ super saveDocument:self ];
-            break;
-
-         case CSDOCUMENT_GETKEYSTATE_SAVEAS:
-            [ super saveDocumentAs:self ];
-            break;
-
-         case CSDOCUMENT_GETKEYSTATE_SAVETO:
-            [ super saveDocumentTo:self ];
+         case CSDOCUMENT_GETKEYSTATE_SAVETOFILE:
+            [ super saveToFile:[ saveToFileInfo objectForKey:CSDOCUMENT_SAVETOFILE_FILENAME ]
+                    saveOperation:[ [ saveToFileInfo objectForKey:CSDOCUMENT_SAVETOFILE_SAVEOP ] intValue ]
+                    delegate:[ saveToFileInfo objectForKey:CSDOCUMENT_SAVETOFILE_DELEGATE ]
+                    didSaveSelector:NSSelectorFromString( [ saveToFileInfo objectForKey:CSDOCUMENT_SAVETOFILE_SELECTOR ] )
+                    contextInfo:[ [ saveToFileInfo objectForKey:CSDOCUMENT_SAVETOFILE_CONTEXTINFO ] pointerValue ] ];
             break;
 
          case CSDOCUMENT_GETKEYSTATE_CHANGE:
@@ -622,23 +642,8 @@
             break;
       }
    }
+
    getKeyState = CSDOCUMENT_GETKEYSTATE_NONE;
-}
-
-
-/*
- * Return (creating if necessary) passphrase window controller
- */
-- (CSWinCtrlPassphrase *) _passphraseWindowController
-{
-   /*
-    * We don't add passphraseWindowController to NSDocument' list so we
-    * can keep it around, but hidden, when necessary
-    */
-   if( passphraseWindowController == nil )
-      passphraseWindowController = [ [ CSWinCtrlPassphrase alloc ] init ];
-
-   return passphraseWindowController;
 }
 
 
@@ -651,7 +656,7 @@
     * Normally, we could just retain, release, and set, but since we clear, we
     * have to check stuff first
    */
-   if( newKey != bfKey && ![ newKey isEqual:bfKey ] )
+   if( ![ newKey isEqual:bfKey ] )
    {
       [ newKey retain ];
       [ bfKey clearOutData ];

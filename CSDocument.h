@@ -13,6 +13,7 @@
    CSWinCtrlMain *mainWindowController;
    CSWinCtrlPassphrase *passphraseWindowController;
    int getKeyState;
+   NSMutableDictionary *saveToFileInfo;
 }
 
 // Actions from the menu
