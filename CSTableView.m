@@ -18,6 +18,20 @@ static NSColor *tableViewAltBGColor;
 
 
 /*
+ * Set the cells to not draw a background, so the striping works nicely
+ */
+- (void) awakeFromNib
+{
+   NSArray *tableColumns;
+   int index;
+
+   tableColumns = [ self tableColumns ];
+   for( index = 0; index < [ tableColumns count ]; index++ )
+      [ [ [ tableColumns objectAtIndex:index ] dataCell ] setDrawsBackground:NO ];
+}
+
+
+/*
  * Allow dragging into other Cocoa apps
  */
 - (NSDragOperation) draggingSourceOperationMaskForLocal:(BOOL)flag
