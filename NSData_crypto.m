@@ -115,13 +115,14 @@ static BOOL cryptoLoggingEnabled = YES;
          {
             if( EVP_EncryptInit( &cipherContext, NULL, [ key bytes ], NULL ) )
             {
-               encLen = [ self length ] + 7;   // Make sure we have enough space
+               encLen = [ self length ] + 8;   // Make sure we have enough space
                encryptedData = [ NSMutableData dataWithLength:encLen ];
                if( EVP_EncryptUpdate( &cipherContext,
                                       [ encryptedData mutableBytes ], &encLen,
                                       [ self bytes ], [ self length ] ) )
                {
                   finalLen = encLen;
+                  encLen = [ encryptedData length ] - finalLen;
                   if( EVP_EncryptFinal( &cipherContext,
                                        [ encryptedData mutableBytes ] + finalLen,
                                        &encLen ) )
@@ -180,6 +181,7 @@ static BOOL cryptoLoggingEnabled = YES;
                                       &decLen, [ self bytes ], [ self length ] ) )
                {
                   finalLen = decLen;
+                  decLen = [ plainData length ] - finalLen;
                   if( EVP_DecryptFinal( &cipherContext,
                                         [ plainData mutableBytes ] + finalLen,
                                         &decLen ) )
