@@ -222,7 +222,7 @@
  */
 - (void) viewEntries:(NSArray *)namesArray
 {
-   int index;
+   unsigned index;
    CSWinCtrlChange *winController;
 
    for( index = 0; index < [ namesArray count ]; index++ )
@@ -395,7 +395,7 @@
 {
    BOOL retval;
    NSArray *entryArray;
-   int index;
+   unsigned index;
    NSDictionary *entryDictionary;
 
    retval = NO;
@@ -610,7 +610,7 @@
 /*
  * Delete all entries with the given names
  */
-- (int) deleteEntriesWithNamesInArray:(NSArray *)nameArray
+- (unsigned) deleteEntriesWithNamesInArray:(NSArray *)nameArray
 {
    return [ [ self _model ] deleteEntriesWithNamesInArray:nameArray ];
 }
@@ -734,7 +734,7 @@
 - (void) _updateViewForNotification:(NSNotification *)notification
 {
    NSArray *namesArray;
-   int index;
+   unsigned index;
    CSWinCtrlChange *changeController;
 
    /*

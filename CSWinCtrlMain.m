@@ -509,7 +509,7 @@ static NSArray *searchWhatArray;
    NSString *category;
    NSArray *selectedNamesArray;
    CSDocument *document;
-   int index;
+   unsigned index;
 
    categoriesMenu = [ [ [ NSApp delegate ] editMenuSetCategoryMenuItem ]
                       submenu ];
@@ -625,7 +625,7 @@ static NSArray *searchWhatArray;
  */
 - (IBAction) cornerSelectField:(id)sender
 {
-   int index;
+   unsigned index;
    BOOL enabled;
 
    if( [ sender tag ] == 0 )   // Show all columns
@@ -790,7 +790,8 @@ static NSArray *searchWhatArray;
    BOOL retval;
    NSString *tableInfoString, *colName;
    NSArray *partsArray;
-   int index, currentColIndex;
+   unsigned index;
+   int currentColIndex;
    NSTableColumn *tableColumn;
 
    retval = NO;
@@ -826,7 +827,7 @@ static NSArray *searchWhatArray;
 {
    NSArray *tableColumns;
    NSMutableString *infoString;
-   int index;
+   unsigned index;
    NSTableColumn *tableColumn;
 
    tableColumns = [ _documentView tableColumns ];
@@ -906,7 +907,7 @@ static NSArray *searchWhatArray;
  */
 - (void) _updateCornerMenu
 {
-   int index;
+   unsigned index;
 
    for( index = 1; index < [ columnSelectionArray count ]; index++ )
    {
@@ -1084,7 +1085,7 @@ static NSArray *searchWhatArray;
  */
 - (int) _filteredRowForRow:(int)row
 {
-   int index;
+   unsigned index;
 
    if( _searchResultList != nil )
    {

@@ -91,7 +91,7 @@
          URL:(NSString *)url
          category:(NSString *)category
          notesRTFD:(NSData *)notes;
-- (int) deleteEntriesWithNamesInArray:(NSArray *)nameArray;
+- (unsigned) deleteEntriesWithNamesInArray:(NSArray *)nameArray;
 - (NSNumber *) firstRowBeginningWithString:(NSString *)findMe
                ignoreCase:(BOOL)ignoreCase
                forKey:(NSString *)key;

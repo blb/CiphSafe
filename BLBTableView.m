@@ -46,7 +46,7 @@
 - (void) awakeFromNib
 {
    NSArray *tableColumns;
-   int index;
+   unsigned index;
 
    tableColumns = [ self tableColumns ];
    for( index = 0; index < [ tableColumns count ]; index++ )
