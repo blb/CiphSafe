@@ -108,7 +108,7 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
    else   // As a sheet
    {
       [ NSApp endSheet:[ self window ] ];
-      [ [ self window ] close ];
+      [ [ self window ] orderOut:self ];
       if( ![ self _doPassphrasesMatch ] )
       {
          // Ask for direction if the passphrases don't match
@@ -147,7 +147,7 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
    else   // Sheet
    {
       [ NSApp endSheet:[ self window ] ];
-      [ [ self window ] close ];
+      [ [ self window ] orderOut:self ];
       [ [ self _genKeyForConfirm:YES ] clearOutData ];
       [ modalDelegate performSelector:sheetEndSelector withObject:nil ];
    }
@@ -225,9 +225,9 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
 
    passphraseData = [ passphrase dataUsingEncoding:NSUnicodeStringEncoding ];
    /*
-    * XXX At this point, passphrase (and possibly confirmPhrase) should be cleared,
-    * however, there is no way, that I've yet found, to do that...here's hoping
-    * it gets released and the memory reused soon...
+    * XXX At this point, passphrase should be cleared, however, there is no way,
+    * that I've yet found, to do that...here's hoping it gets released and the
+    * memory reused soon...
     */
    passphrase = nil;
 
