@@ -61,6 +61,7 @@ extern NSString * const CSApplicationDidChangePrefs;
 {
    int _lastPBChangeCount;
 
+   IBOutlet NSMenuItem *_editMenuSetCategory;
    // Preferences window
    IBOutlet NSWindow *_prefsWindow;
    // Interface tab
@@ -86,6 +87,9 @@ extern NSString * const CSApplicationDidChangePrefs;
 
 // Note the general pasteboard's current change count
 - (void) notePBChangeCount;
+
+// Give out the Set Category menu item
+- (id <NSMenuItem>) editMenuSetCategoryMenuItem;
 
 // Actions for the prefs window
 - (IBAction) openPrefs:(id)sender;

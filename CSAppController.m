@@ -221,6 +221,15 @@ static NSString *MENUSPACE = @"   ";
 
 
 /*
+ * Give out the Set Category menu item
+ */
+- (id <NSMenuItem>) editMenuSetCategoryMenuItem
+{
+   return _editMenuSetCategory;
+}
+
+
+/*
  * Preferences-related methods
  */
 /*
