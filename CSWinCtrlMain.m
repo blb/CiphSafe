@@ -22,6 +22,7 @@
 @interface CSWinCtrlMain (InternalMethods)
 - (void) _setSortingImageForColumn:(NSTableColumn *)tableColumn;
 - (NSArray *) _getSelectedNames;
+- (NSArray *) _namesFromRows:(NSArray *)rows;
 - (void) _copyEntryString:(NSString *)columnName;
 @end
 
@@ -137,7 +138,7 @@
 - (IBAction) cut:(id)sender
 {
    [ [ self document ]
-     copyRows:[ [ documentView selectedRowEnumerator ] allObjects ]
+     copyNames:[ self _getSelectedNames ]
      toPasteboard:[ NSPasteboard generalPasteboard ] ];
    [ [ self document ] deleteEntriesWithNamesInArray:[ self _getSelectedNames ] ];
    [ [ [ self document ] undoManager ] setActionName:CSWINCTRLMAIN_LOC_CUT ];
@@ -150,7 +151,7 @@
 - (IBAction) copy:(id)sender
 {
    [ [ self document ]
-     copyRows:[ [ documentView selectedRowEnumerator ] allObjects ]
+     copyNames:[ self _getSelectedNames ]
      toPasteboard:[ NSPasteboard generalPasteboard ] ];
 }
 
@@ -160,7 +161,8 @@
  */
 - (IBAction) paste:(id)sender
 {
-   [ [ self document ] retrieveRowsFromPasteboard:[ NSPasteboard generalPasteboard ]
+   [ [ self document ] retrieveEntriesFromPasteboard:
+                          [ NSPasteboard generalPasteboard ]
                        undoName:CSWINCTRLMAIN_LOC_PASTE ];
 }
 
@@ -265,7 +267,8 @@
 - (BOOL) tableView:(NSTableView *)tv writeRows:(NSArray *)rows
          toPasteboard:(NSPasteboard *)pboard
 {
-   return [ [ self document ] copyRows:rows toPasteboard:pboard ];
+   return [ [ self document ] copyNames:[ self _namesFromRows:rows ]
+                              toPasteboard:pboard ];
 }
 
 
@@ -287,7 +290,8 @@
 - (BOOL) tableView:(NSTableView*)tv acceptDrop:(id <NSDraggingInfo>)info
          row:(int)row dropOperation:(NSTableViewDropOperation)op
 {
-   return [ [ self document ] retrieveRowsFromPasteboard:[ info draggingPasteboard ]
+   return [ [ self document ] retrieveEntriesFromPasteboard:
+                                 [ info draggingPasteboard ]
                               undoName:CSWINCTRLMAIN_LOC_DROP ];
 }
 
@@ -399,20 +403,28 @@
  */
 - (NSArray *) _getSelectedNames
 {
-   NSMutableArray *selectedNames;
+   return [ self _namesFromRows:[ [ documentView selectedRowEnumerator ]
+                                  allObjects ] ];
+}
+
+
+/*
+ * Convert an array of row numbers to an array of names
+ */
+- (NSArray *) _namesFromRows:(NSArray *)rows
+{
+   NSMutableArray *nameArray;
    NSEnumerator *rowEnumerator;
-   NSNumber *rowNumber;
+   id nextRow;
 
-   selectedNames = [ NSMutableArray arrayWithCapacity:10 ];
-   rowEnumerator = [ documentView selectedRowEnumerator ];
-   while( ( rowNumber = [ rowEnumerator nextObject ] ) != nil )
-   {
-      [ selectedNames addObject:[ [ self document ]
-                                  stringForKey:CSDocModelKey_Name
-                                  atRow:[ rowNumber unsignedIntValue ] ] ];
-   }
+   nameArray = [ NSMutableArray arrayWithCapacity:[ rows count ] ];
+   rowEnumerator = [ rows objectEnumerator ];
+   while( ( nextRow = [ rowEnumerator nextObject ] ) != nil )
+      [ nameArray addObject:[ [ self document ]
+                              stringForKey:CSDocModelKey_Name
+                              atRow:[ nextRow unsignedIntValue ] ] ];
 
-   return selectedNames;
+   return nameArray;
 }
 
 
