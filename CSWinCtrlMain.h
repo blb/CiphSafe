@@ -57,6 +57,7 @@
 - (IBAction) cmmCopyURL:(id)sender;
 - (IBAction) cmmCopyName:(id)sender;
 - (IBAction) cmmCopyNotes:(id)sender;
+- (IBAction) cmmOpenURL:(id)sender;
 
 // Refresh the window and contents
 - (void) refreshWindow;

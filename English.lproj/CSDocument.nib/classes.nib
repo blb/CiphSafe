@@ -8,6 +8,7 @@
                 cmmCopyNotes = id; 
                 cmmCopyPassword = id; 
                 cmmCopyURL = id; 
+                cmmOpenURL = id; 
                 doAddEntry = id; 
                 doDeleteEntry = id; 
                 doViewEntry = id; 

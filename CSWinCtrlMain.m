@@ -39,8 +39,8 @@
 
 // Localized strings
 #define CSWINCTRLMAIN_LOC_SUREDELROWS \
-        NSLocalizedString( @"Are you sure you want to delete the selected rows?", \
-                           @"" )
+        NSLocalizedString( @"Are you sure you want to delete the selected " \
+                           @"rows?", @"" )
 #define CSWINCTRLMAIN_LOC_SUREDELONEROW \
         NSLocalizedString( @"Are you sure you want to delete the selected row?", \
                            @"" )
@@ -52,6 +52,9 @@
 #define CSWINCTRLMAIN_LOC_CUT NSLocalizedString( @"Cut", @"" )
 #define CSWINCTRLMAIN_LOC_ONEENTRY NSLocalizedString( @"1 entry", @"" )
 #define CSWINCTRLMAIN_LOC_NUMENTRIES NSLocalizedString( @"%d entries", @"" )
+#define CSWINCTRLMAIN_LOC_INVALIDURL NSLocalizedString( @"Invalid URL", @"" )
+#define CSWINCTRLMAIN_LOC_URLNOTVALID \
+        NSLocalizedString( @"The URL entered is not a valid URL", @"" )
 
 @interface CSWinCtrlMain (InternalMethods)
 - (void) _deleteSheetDidEnd:(NSWindow *)sheet
@@ -270,7 +273,8 @@
 
    // If the current sorting column is clicked, we reverse the order
    if( [ [ [ self document ] sortKey ] isEqualToString:tableID ] )
-      [ [ self document ] setSortAscending:![ [ self document ] isSortAscending ] ];
+      [ [ self document ] setSortAscending:![ [ self document ]
+                                              isSortAscending ] ];
    else   // Otherwise, set new sort key
       [ [ self document ] setSortKey:tableID ascending:YES ];
 
@@ -408,6 +412,28 @@
                                  RTFNotesAtRow:[ documentView selectedRow ] ]
                        forType:NSRTFPboardType ];
    [ [ NSApp delegate ] notePBChangeCount ];
+}
+
+
+/*
+ * Open the URL from the selected row
+ */
+- (IBAction) cmmOpenURL:(id)sender
+{
+   BOOL urlIsInvalid;
+   NSURL *theURL;
+
+   urlIsInvalid = YES;
+   theURL = [ NSURL URLWithString:[ [ self document ]
+                                    stringForKey:CSDocModelKey_URL
+                                    atRow:[ documentView selectedRow ] ] ];
+   if( theURL != nil && [ [ NSWorkspace sharedWorkspace ] openURL:theURL ] )
+      urlIsInvalid = NO;
+
+   if( urlIsInvalid )
+      NSBeginInformationalAlertSheet( CSWINCTRLMAIN_LOC_INVALIDURL,
+                                      nil, nil, nil, [ self window ], nil, nil,
+                                      nil, nil, CSWINCTRLMAIN_LOC_URLNOTVALID );
 }
 
 
