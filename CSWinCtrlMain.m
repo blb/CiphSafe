@@ -144,6 +144,7 @@
      toPasteboard:[ NSPasteboard generalPasteboard ] ];
    [ [ self document ] deleteEntriesWithNamesInArray:[ self _getSelectedNames ] ];
    [ [ [ self document ] undoManager ] setActionName:CSWINCTRLMAIN_LOC_CUT ];
+   [ [ NSApp delegate ] notePBChangeCount ];
 }
 
 
@@ -155,6 +156,7 @@
    [ [ self document ]
      copyNames:[ self _getSelectedNames ]
      toPasteboard:[ NSPasteboard generalPasteboard ] ];
+   [ [ NSApp delegate ] notePBChangeCount ];
 }
 
 
@@ -373,6 +375,7 @@
    [ generalPasteboard setData:[ [ self document ]
                                  RTFNotesAtRow:[ documentView selectedRow ] ]
                        forType:NSRTFPboardType ];
+   [ [ NSApp delegate ] notePBChangeCount ];
 }
 
 
@@ -451,6 +454,7 @@
    [ generalPB setString:[ [ self document ] stringForKey:columnName
                                              atRow:[ documentView selectedRow ] ]
                forType:NSStringPboardType ];
+   [ [ NSApp delegate ] notePBChangeCount ];
 }
 
 @end
