@@ -741,7 +741,11 @@ int sortEntries( id dict1, id dict2, void *context )
       value1 = [ dictFirst objectForKey:sortKey ];
       value2 = [ dictSecond objectForKey:sortKey ];
    }
-      
+   if( value1 == nil )
+      value1 = @"";
+   if( value2 == nil )
+      value2 = @"";
+
    return [ value1 caseInsensitiveCompare:value2 ];
 }
 
