@@ -22,6 +22,7 @@
                 "_documentStatus" = NSTextField; 
                 "_documentView" = BLBTableView; 
                 "_documentViewButton" = NSButton; 
+                "_searchWhat" = NSPopUpButton; 
             }; 
             SUPERCLASS = NSWindowController; 
         }, 
