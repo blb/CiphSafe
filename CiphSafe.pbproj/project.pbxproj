@@ -318,6 +318,8 @@
 			<array>
 				<string>csd</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>CiphSafe.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>CiphSafe Document</string>
 			<key>CFBundleTypeOSTypes</key>
