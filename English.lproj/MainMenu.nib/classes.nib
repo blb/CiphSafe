@@ -2,6 +2,7 @@
     IBClasses = (
         {
             ACTIONS = {
+                closeAll = id; 
                 openPrefs = id; 
                 prefsAutoOpenClicked = id; 
                 prefsAutoOpenSelectPath = id; 
