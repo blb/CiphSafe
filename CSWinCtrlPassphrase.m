@@ -102,7 +102,7 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
 
 
 /*
- * Passphrase was accepted; warn if it's pretty short
+ * Passphrase was accepted
  */
 - (IBAction) passphraseAccept:(id)sender
 {
@@ -110,6 +110,7 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
       [ NSApp stopModal ];
    else   // As a sheet
    {
+      // Remove the sheet before starting a new one
       [ NSApp endSheet:[ self window ] ];
       [ [ self window ] orderOut:self ];
       if( ![ self _doPassphrasesMatch ] )
@@ -207,7 +208,7 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
 
 
 /*
- * Generate the key from the passphrae in the window; this does not verify
+ * Generate the key from the passphrase in the window; this does not verify
  * passphrases match on the confirm tab
  */
 - (NSMutableData *) _genKeyForConfirm:(BOOL)useConfirmTab
