@@ -1,5 +1,6 @@
 {
     IBClasses = (
+        {CLASS = CSTableView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }, 
         {
             ACTIONS = {
                 cmmCopyAccount = id; 
@@ -8,11 +9,10 @@
                 cmmCopyPassword = id; 
                 cmmCopyURL = id; 
                 docAddEntry = id; 
-                docChangePassphrase = id; 
                 docDeleteEntry = id; 
                 docViewEntry = id; 
             }; 
-            CLASS = CSDocument; 
+            CLASS = CSWinCtrlMain; 
             LANGUAGE = ObjC; 
             OUTLETS = {
                 contextualMenu = NSMenu; 
@@ -20,9 +20,8 @@
                 documentView = NSTableView; 
                 documentViewButton = NSButton; 
             }; 
-            SUPERCLASS = NSDocument; 
+            SUPERCLASS = NSWindowController; 
         }, 
-        {CLASS = CSTableView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }, 
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
     ); 
     IBVersion = 1; 
