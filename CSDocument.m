@@ -6,6 +6,7 @@
 #import "CSWinCtrlAdd.h"
 #import "CSWinCtrlChange.h"
 #import "CSWinCtrlMain.h"
+#import "CSWinCtrlPassphrase.h"
 #import "NSArray_FOOC.h"
 #import "NSAttributedString_RWDA.h"
 #import "NSData_clear.h"
@@ -16,12 +17,20 @@
 
 #define CSDOCUMENT_NAME @"CiphSafe Document"
 
+#define CSDOCUMENT_GETKEYSTATE_NONE   0
+#define CSDOCUMENT_GETKEYSTATE_SAVE   1
+#define CSDOCUMENT_GETKEYSTATE_SAVEAS 2
+#define CSDOCUMENT_GETKEYSTATE_SAVETO 3
+#define CSDOCUMENT_GETKEYSTATE_CHANGE 4
+
 @interface CSDocument (InternalMethods)
 - (NSString *) _uniqueNameForName:(NSString *)name;
 - (CSDocModel *) _model;
 - (void) _setupModel;
 - (void) _updateViewForNotification:(NSNotification *)notification;
-- (NSMutableData *) _getEncryptionKeyWithNote:(NSString *)note warn:(BOOL)warn;
+- (void) _beginPassphraseSheetForState:(int)state note:(NSString *)note;
+- (void) _getKeyResult:(NSMutableData *)newKey;
+- (CSWinCtrlPassphrase *) _passphraseWindowController;
 - (void) _setBFKey:(NSMutableData *)newKey;
 @end
 
@@ -45,28 +54,27 @@
 - (IBAction) saveDocument:(id)sender
 {
    if( bfKey == nil )
-      [ self _setBFKey:[ self _getEncryptionKeyWithNote:CSPassphraseNote_Save
-                              warn:[ [ NSUserDefaults standardUserDefaults ]
-                                     boolForKey:CSPrefDictKey_WarnShort ] ] ];
-   if( bfKey != nil )
+      [ self _beginPassphraseSheetForState:CSDOCUMENT_GETKEYSTATE_SAVE
+             note:CSPassphraseNote_Save ];
+   else
       [ super saveDocument:sender ];
 }
 
 - (IBAction) saveDocumentAs:(id)sender
 {
-   [ self _setBFKey:[ self _getEncryptionKeyWithNote:CSPassphraseNote_Save
-                           warn:[ [ NSUserDefaults standardUserDefaults ]
-                                  boolForKey:CSPrefDictKey_WarnShort ] ] ];
-   if( bfKey != nil )
+   if( bfKey == nil )
+      [ self _beginPassphraseSheetForState:CSDOCUMENT_GETKEYSTATE_SAVEAS
+             note:CSPassphraseNote_Save ];
+   else
       [ super saveDocumentAs:sender ];
 }
 
 - (IBAction) saveDocumentTo:(id)sender
 {
-   [ self _setBFKey:[ self _getEncryptionKeyWithNote:CSPassphraseNote_Save
-                           warn:[ [ NSUserDefaults standardUserDefaults ]
-                                  boolForKey:CSPrefDictKey_WarnShort ] ] ];
-   if( bfKey != nil )
+   if( bfKey == nil )
+      [ self _beginPassphraseSheetForState:CSDOCUMENT_GETKEYSTATE_SAVETO
+             note:CSPassphraseNote_Save ];
+   else
       [ super saveDocumentTo:sender ];
 }
 
@@ -105,8 +113,9 @@
    while( docModel == nil )
    {
       if( !inRevert )
-         [ self _setBFKey:[ self _getEncryptionKeyWithNote:CSPassphraseNote_Load
-                                 warn:NO ] ];
+         [ self _setBFKey:[ [ self _passphraseWindowController ]
+                            getEncryptionKeyWithNote:CSPassphraseNote_Load
+                            forDocumentNamed:[ self displayName ] ] ];
 
       if( bfKey != nil )
       {
@@ -184,16 +193,8 @@
  */
 - (IBAction) docChangePassphrase:(id)sender
 {
-   NSMutableData *newKey;
-
-   newKey = [ self _getEncryptionKeyWithNote:CSPassphraseNote_Change
-                   warn:[ [ NSUserDefaults standardUserDefaults ]
-                          boolForKey:CSPrefDictKey_WarnShort ] ];
-   if( newKey != nil )
-   {
-      [ self _setBFKey:newKey ];
-      [ self saveDocument:self ];
-   }
+   [ self _beginPassphraseSheetForState:CSDOCUMENT_GETKEYSTATE_CHANGE
+          note:CSPassphraseNote_Change ];
 }
 
 
@@ -468,6 +469,7 @@
 - (void) dealloc
 {
    [ self _setBFKey:nil ];
+   [ passphraseWindowController release ];
    [ docModel release ];
    [ super dealloc ];
 }
@@ -581,13 +583,67 @@
 
 
 /*
- * Call out to the passphrase window controller to prompt for a passphrase
+ * Run the passphrase sheet for the given state and note
  */
-- (NSMutableData *) _getEncryptionKeyWithNote:(NSString *)note warn:(BOOL)warn
+- (void) _beginPassphraseSheetForState:(int)state note:(NSString *)note
 {
-   return [ [ NSApp delegate ] 
-            getEncryptionKeyWithNote:note warnOnShortPassphrase:warn
-            forDocumentNamed:[ self displayName ] ];
+   getKeyState = state;
+   [ [ self _passphraseWindowController ]
+     getEncryptionKeyWithNote:note
+     inWindow:[ mainWindowController window ]
+     modalDelegate:self
+     sendToSelector:@selector( _getKeyResult:) ];
+}
+
+
+/*
+ * Callback for the passphrase controller, when run document-modally (is
+ * modally a word?)
+ */
+- (void) _getKeyResult:(NSMutableData *)newKey
+{
+   NSAssert( getKeyState != CSDOCUMENT_GETKEYSTATE_NONE,
+             @"getKeyState is none, but our callback has been called" );
+
+   if( newKey != nil )
+   {
+      [ self _setBFKey:newKey ];
+      switch( getKeyState )
+      {
+         case CSDOCUMENT_GETKEYSTATE_SAVE:
+            [ super saveDocument:self ];
+            break;
+
+         case CSDOCUMENT_GETKEYSTATE_SAVEAS:
+            [ super saveDocumentAs:self ];
+            break;
+
+         case CSDOCUMENT_GETKEYSTATE_SAVETO:
+            [ super saveDocumentTo:self ];
+            break;
+
+         case CSDOCUMENT_GETKEYSTATE_CHANGE:
+            [ super saveDocument:self ];
+            break;
+      }
+   }
+   getKeyState = CSDOCUMENT_GETKEYSTATE_NONE;
+}
+
+
+/*
+ * Return (creating if necessary) passphrase window controller
+ */
+- (CSWinCtrlPassphrase *) _passphraseWindowController
+{
+   /*
+    * We don't add passphraseWindowController to NSDocument' list so we
+    * can keep it around, but hidden, when necessary
+    */
+   if( passphraseWindowController == nil )
+      passphraseWindowController = [ [ CSWinCtrlPassphrase alloc ] init ];
+
+   return passphraseWindowController;
 }
 
 

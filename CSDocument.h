@@ -4,12 +4,15 @@
 
 @class CSDocModel;
 @class CSWinCtrlMain;
+@class CSWinCtrlPassphrase;
 
 @interface CSDocument : NSDocument 
 {
    CSDocModel *docModel;
    NSMutableData *bfKey;
    CSWinCtrlMain *mainWindowController;
+   CSWinCtrlPassphrase *passphraseWindowController;
+   int getKeyState;
 }
 
 // Actions from the menu
