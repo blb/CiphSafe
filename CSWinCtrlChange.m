@@ -72,7 +72,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
                       inDocument:(NSDocument *)document
 {
    NSArray *arrayForDocument;
-   int index;
+   unsigned index;
    CSWinCtrlChange *curController;
 
    arrayForDocument = [ controllerList objectForKey:
@@ -204,7 +204,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
            target:[ self window ]
            argument:_nameText
            order:9999
-           modes:[ NSArray arrayWithObject:NSDefaultRunLoopMode ] ];
+           modes:[ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ] ];
       }
       else
          [ [ self window ] performClose:self ];
