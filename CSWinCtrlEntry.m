@@ -29,10 +29,15 @@
 
 @implementation CSWinCtrlEntry
 
-// Character strings for password generation
-static const char *genAlphanum = "abcdefghijklmnopqrstuvwxyz"
-                                 "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-static const char *genOther    = "`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
+/*
+ * Character strings for password generation; the extra characters in genAll
+ * are doubled to help propagate them further
+ */
+static const char *genAlphanum = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW"
+                                 "xXyYzZ0123456789";
+static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW"
+                                 "xXyYzZ0123456789~!@#$%^&*()_+`-=[]\\{}|;':\",."
+                                 "/<>?~!@#$%^&*()_+`-=[]\\{}|;':\",./<>?";
 
 - (id) initWithWindowNibName:(NSString *)windowNibName
 {
@@ -70,7 +75,8 @@ static const char *genOther    = "`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
  */
 - (IBAction) doGenerate:(id)sender
 {
-   NSString *genString;
+   const char *genString;
+   int genStringLength;
    int genSize;
    NSMutableString *randomString;
    NSMutableData *randomData;
@@ -79,9 +85,10 @@ static const char *genOther    = "`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
 
    if( [ [ NSUserDefaults standardUserDefaults ]
          boolForKey:CSPrefDictKey_AlphanumOnly ] )
-      genString = [ NSString stringWithCString:genAlphanum ];
+      genString = genAlphanum;
    else
-      genString = [ NSString stringWithFormat:@"%s%s", genAlphanum, genOther ];
+      genString = genAll;
+   genStringLength = strlen( genString );
 
    genSize = [ [ NSUserDefaults standardUserDefaults ]
                integerForKey:CSPrefDictKey_GenSize ];
@@ -90,8 +97,7 @@ static const char *genOther    = "`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
    randomBytes = [ randomData mutableBytes ];
    for( index = 0; index < genSize; index++ )
       [ randomString appendFormat:@"%c",
-                        [ genString characterAtIndex:( randomBytes[ index ] %
-                                                       [ genString length ] ) ] ];
+                        genString[ randomBytes[ index ] % genStringLength ] ];
    [ passwordText setStringValue:randomString ];
    [ randomData clearOutData ];
    /*
