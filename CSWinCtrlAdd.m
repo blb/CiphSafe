@@ -59,10 +59,10 @@
                            URL:[ urlText stringValue ]
                            notesRTFD:[ notes RTFDFromRange:fullNotesRange ] ] )
    {
+      [ self doClear:self ];
       if( ![ [ NSUserDefaults standardUserDefaults ] 
              boolForKey:CSPrefDictKey_CloseAdd ] )
       {
-         [ self doClear:self ];
          // We queue it here as doing it immediately won't work
          [ [ NSRunLoop currentRunLoop ]
            performSelector:@selector( makeFirstResponder: )
