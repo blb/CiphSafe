@@ -1,3 +1,4 @@
+// Interesting security issues are noted with XXX in comments
 /* CSDocument.m */
 
 #import "CSDocument.h"
@@ -77,17 +78,16 @@
       mySelector = @selector( _saveToFile:saveOperation:delegate:didSaveSelector:
                               contextInfo: );
       mySelSig = [ CSDocument instanceMethodSignatureForSelector:mySelector ];
-      saveToFileInvocation = [ NSInvocation invocationWithMethodSignature:
-                                               mySelSig ];
-      [ saveToFileInvocation setTarget:self ];
-      [ saveToFileInvocation setSelector:mySelector ];
-      [ saveToFileInvocation retainArguments ];
-      [ saveToFileInvocation setArgument:&fileName atIndex:2 ];
-      [ saveToFileInvocation setArgument:&saveOperation atIndex:3 ];
-      [ saveToFileInvocation setArgument:&delegate atIndex:4 ];
-      [ saveToFileInvocation setArgument:&didSaveSelector atIndex:5 ];
-      [ saveToFileInvocation setArgument:&contextInfo atIndex:6 ];
-      [ saveToFileInvocation retain ];
+      getKeyInvocation = [ NSInvocation invocationWithMethodSignature:mySelSig ];
+      [ getKeyInvocation setTarget:self ];
+      [ getKeyInvocation setSelector:mySelector ];
+      [ getKeyInvocation retainArguments ];
+      [ getKeyInvocation setArgument:&fileName atIndex:2 ];
+      [ getKeyInvocation setArgument:&saveOperation atIndex:3 ];
+      [ getKeyInvocation setArgument:&delegate atIndex:4 ];
+      [ getKeyInvocation setArgument:&didSaveSelector atIndex:5 ];
+      [ getKeyInvocation setArgument:&contextInfo atIndex:6 ];
+      [ getKeyInvocation retain ];
       [ passphraseWindowController getEncryptionKeyWithNote:CSPassphraseNote_Save
                                    inWindow:[ mainWindowController window ]
                                    modalDelegate:self
@@ -218,11 +218,11 @@
    // Setup to call [ self saveDocument:self ] on successful passphrase request
    mySelector = @selector( saveDocument: );
    mySelSig = [ CSDocument instanceMethodSignatureForSelector:mySelector ];
-   saveToFileInvocation = [ NSInvocation invocationWithMethodSignature:mySelSig ];
-   [ saveToFileInvocation setTarget:self ];
-   [ saveToFileInvocation setSelector:mySelector ];
-   [ saveToFileInvocation setArgument:&self atIndex:2 ];
-   [ saveToFileInvocation retain ];
+   getKeyInvocation = [ NSInvocation invocationWithMethodSignature:mySelSig ];
+   [ getKeyInvocation setTarget:self ];
+   [ getKeyInvocation setSelector:mySelector ];
+   [ getKeyInvocation setArgument:&self atIndex:2 ];
+   [ getKeyInvocation retain ];
    [ passphraseWindowController getEncryptionKeyWithNote:CSPassphraseNote_Change
                                 inWindow:[ mainWindowController window ]
                                 modalDelegate:self
@@ -254,6 +254,10 @@
 /*
  * Copy the given rows to the given pasteboard (rows must be an array of
  * entry names)
+ *
+ * XXX Since these entries are being copied to a pasteboard (for drag/drop or
+ * copy/paste), there's really no point in worrying about clearing out any
+ * data, since it will become accessible to the system
  */
 - (BOOL) copyNames:(NSArray *)names toPasteboard:(NSPasteboard *)pboard
 {
@@ -440,7 +444,7 @@
 
 
 /*
- * Get the notes value for the given row
+ * Get the notes value (RTF version) for the given row
  */
 - (NSData *) RTFNotesAtRow:(unsigned)row
 {
@@ -449,6 +453,7 @@
 
 
 /*
+ * Get the RTFD attributed string version of the notes
  */
 - (NSAttributedString *) RTFDStringNotesAtRow:(unsigned)row
 {
@@ -457,6 +462,7 @@
 
 
 /*
+ * Get the RTF attributed string version of the notes
  */
 - (NSAttributedString *) RTFStringNotesAtRow:(unsigned)row
 {
@@ -534,6 +540,10 @@
  * Return a name which doesn't yet exist (eg, 'name' would result in 'name' if
  * 'name' didn't already exist, 'name copy' if it did, then 'name copy #' if
  * 'name copy', etc)
+ *
+ * XXX Minor security issue here, as the autoreleased strings should be cleared
+ * if they aren't used, but since this should really only be called when an
+ * entry is dropped or copied, it's moot
  */
 - (NSString *) _uniqueNameForName:(NSString *)name
 {
@@ -646,22 +656,21 @@
 
 
 /*
- * Callback for the passphrase controller, when run document-modally (is
- * modally a word?); simply invokes saveToFileInvocation is the user didn't
- * hit cancel 
+ * Callback for the passphrase controller, when run document-modally; simply
+ * invokes getKeyInvocation if the user didn't hit cancel 
  */
 - (void) _getKeyResult:(NSMutableData *)newKey
 {
-   NSAssert( saveToFileInvocation != nil, @"saveToFileInvocation is nil" );
+   NSAssert( getKeyInvocation != nil, @"getKeyInvocation is nil" );
 
    if( newKey != nil )
    {
       [ self _setBFKey:newKey ];
-      [ saveToFileInvocation invoke ];
+      [ getKeyInvocation invoke ];
    }
 
-   [ saveToFileInvocation release ];
-   saveToFileInvocation = nil;
+   [ getKeyInvocation release ];
+   getKeyInvocation = nil;
 }
 
 
