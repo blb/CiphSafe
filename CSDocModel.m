@@ -559,6 +559,7 @@ int sortEntries( id dict1, id dict2, void *context );
    unsigned compareOptions;
    NSMutableArray *retval;
    int index;
+   NSString *stringToSearch;
    NSRange searchResult;
 
    compareOptions = 0;
@@ -567,10 +568,14 @@ int sortEntries( id dict1, id dict2, void *context );
       compareOptions = NSCaseInsensitiveSearch;
    for( index = 0; index < [ _allEntries count ]; index++ )
    {
-      searchResult = [ [ [ _allEntries objectAtIndex:index ] objectForKey:key ]
-                       rangeOfString:findMe options:compareOptions ];
+      if( [ key isEqualToString:CSDocModelKey_Notes ] )
+         stringToSearch = [ [ self RTFDStringNotesAtRow:index ] string ];
+      else
+         stringToSearch = [ [ _allEntries objectAtIndex:index ]
+                            objectForKey:key ];
+      searchResult = [ stringToSearch rangeOfString:findMe
+                                      options:compareOptions ];
       if( searchResult.location != NSNotFound )
-
          [ retval addObject:[ NSNumber numberWithInt:index ] ];
 
    }
