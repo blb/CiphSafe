@@ -55,6 +55,16 @@
 
 
 /*
+ * Make sure the cell is setup right
+ */
+- (void) addTableColumn:(NSTableColumn *)aColumn
+{
+   [ super addTableColumn:aColumn ];
+   [ [ aColumn dataCell ] setDrawsBackground:NO ];
+}
+
+
+/*
  * Override so deselectAll: for a menu item is only enabled when something
  * is selected
  */
