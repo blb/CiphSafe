@@ -138,25 +138,6 @@
 
 
 /*
- * Set autosave names with the given name
- */
-- (void) setAutosaveNames:(NSString *)autosaveName
-{
-NSLog( @"windowFrameAutosaveName is %@\n",[ self windowFrameAutosaveName ] );
-NSLog( @"autosaveName is %@\n", [ documentView autosaveName ] );
-   if( [ self windowFrameAutosaveName ] == nil )
-   {
-NSLog( @"attempted to set to %@\n", autosaveName );
-      [ self setWindowFrameAutosaveName:autosaveName ];
-      [ documentView setAutosaveName:autosaveName ];
-      [ documentView setAutosaveTableColumns:YES ];
-   }
-NSLog( @"windowFrameAutosaveName is %@\n",[ self windowFrameAutosaveName ] );
-NSLog( @"autosaveName is %@\n", [ documentView autosaveName ] );
-}
-
-
-/*
  * Cut selected rows
  */
 - (IBAction) cut:(id)sender

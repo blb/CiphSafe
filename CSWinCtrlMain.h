@@ -28,7 +28,7 @@
 - (IBAction) cmmCopyName:(id)sender;
 - (IBAction) cmmCopyNotes:(id)sender;
 
+// Refresh the window and contents
 - (void) refreshWindow;
-- (void) setAutosaveNames:(NSString *)autosaveName;
 
 @end

@@ -126,16 +126,6 @@
 
 
 /*
- * Set autosave name for the table view and window
- */
-- (void) setFileName:(NSString *)fileName
-{
-   [ super setFileName:fileName ];
-   [ mainWindowController setAutosaveNames:[ fileName lastPathComponent ] ];
-}
-
-
-/*
  * Whether or not to keep a backup file (determined by user pref)
  */
 - (BOOL) keepBackupFile
