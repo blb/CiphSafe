@@ -127,6 +127,7 @@ static NSAttributedString *defaultSearchString;
    {
       [ self _loadSavedWindowState ];
       [ self _loadSavedTableState ];
+      [ self setShouldCascadeWindows:NO ];
    }
 
    [ _documentView setDrawsGrid:NO ];
