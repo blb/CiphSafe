@@ -701,6 +701,15 @@ static NSArray *searchWhatArray;
 
 
 /*
+ * Update set category menu when we are key (since it now applies to us)
+ */
+- (void) windowDidBecomeKey:(NSNotification *)aNotification
+{
+   [ self _updateSetCategoryMenu ];
+}
+
+
+/*
  * Cleanup
  */
 - (void) windowWillClose:(NSNotification *)notification
@@ -714,6 +723,7 @@ static NSArray *searchWhatArray;
  */
 - (void) _prefsDidChange:(NSNotification *)aNotification
 {
+   [ self _updateSetCategoryMenu ];
    [ self _setTableViewSpacing ];
 }
 
@@ -920,20 +930,24 @@ static NSArray *searchWhatArray;
    id oldItem;
    NSString *newItem;
 
-   categoriesMenu = [ [ [ NSApp delegate ] editMenuSetCategoryMenuItem ]
-                      submenu ];
-   oldItemsEnum = [ [ categoriesMenu itemArray ] objectEnumerator ];
-   while( ( oldItem = [ oldItemsEnum nextObject ] ) != nil )
-      [ categoriesMenu removeItem:oldItem ];
-   currentCategoriesEnum = [ [ [ self document ] categories ] objectEnumerator ];
-   while( ( newItem = [ currentCategoriesEnum nextObject ] ) != nil )
-      [ categoriesMenu addItemWithTitle:newItem
+   if( [ [ self window ] isKeyWindow ] )
+   {
+      categoriesMenu = [ [ [ NSApp delegate ] editMenuSetCategoryMenuItem ]
+                         submenu ];
+      oldItemsEnum = [ [ categoriesMenu itemArray ] objectEnumerator ];
+      while( ( oldItem = [ oldItemsEnum nextObject ] ) != nil )
+         [ categoriesMenu removeItem:oldItem ];
+      currentCategoriesEnum = [ [ [ self document ] categories ]
+                                objectEnumerator ];
+      while( ( newItem = [ currentCategoriesEnum nextObject ] ) != nil )
+         [ categoriesMenu addItemWithTitle:newItem
+                          action:@selector( doSetCategory: )
+                          keyEquivalent:@"" ];
+      [ categoriesMenu addItem:[ NSMenuItem separatorItem ] ];
+      [ categoriesMenu addItemWithTitle:CSWINCTRLMAIN_LOC_NEWCATEGORY
                        action:@selector( doSetCategory: )
                        keyEquivalent:@"" ];
-   [ categoriesMenu addItem:[ NSMenuItem separatorItem ] ];
-   [ categoriesMenu addItemWithTitle:CSWINCTRLMAIN_LOC_NEWCATEGORY
-                    action:@selector( doSetCategory: )
-                    keyEquivalent:@"" ];
+   }
 }
 
 
