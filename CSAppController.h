@@ -45,6 +45,8 @@ extern NSString * const CSPrefDictKey_CreateNew;
 extern NSString * const CSPrefDictKey_GenSize;
 extern NSString * const CSPrefDictKey_AlphanumOnly;
 extern NSString * const CSPrefDictKey_IncludePasswd;
+extern NSString * const CSPrefDictKey_AutoOpen;
+extern NSString * const CSPrefDictKey_AutoOpenPath;
 
 // Name of our internal pasteboard type
 extern NSString * const CSDocumentPboardType;
@@ -62,6 +64,9 @@ extern NSString * const CSDocumentPboardType;
    IBOutlet NSButton *prefsWarnShort;
    IBOutlet NSButton *prefsCreateNew;
    IBOutlet NSButton *prefsIncludePasswd;
+   IBOutlet NSButton *prefsAutoOpen;
+   IBOutlet NSTextField *prefsAutoOpenName;
+   IBOutlet NSButton *prefsAutoOpenSelect;
    // Generated passwords tab
    IBOutlet NSTextField *prefsGenSize;
    IBOutlet NSButton *prefsAlphanumOnly;
@@ -77,5 +82,7 @@ extern NSString * const CSDocumentPboardType;
 - (IBAction) openPrefs:(id)sender;
 - (IBAction) prefsSave:(id)sender;
 - (IBAction) prefsCancel:(id)sender;
+- (IBAction) prefsAutoOpenClicked:(id)sender;
+- (IBAction) prefsAutoOpenSelectPath:(id)sender;
 
 @end

@@ -44,10 +44,13 @@ NSString * const CSPrefDictKey_CreateNew = @"CSPrefDictKey_CreateNew";
 NSString * const CSPrefDictKey_GenSize = @"CSPrefDictKey_GenSize";
 NSString * const CSPrefDictKey_AlphanumOnly = @"CSPrefDictKey_AlphanumOnly";
 NSString * const CSPrefDictKey_IncludePasswd = @"CSPrefDictKey_IncludePasswd";
+NSString * const CSPrefDictKey_AutoOpen = @"CSPrefDictKey_AutoOpen";
+NSString * const CSPrefDictKey_AutoOpenPath = @"CSPrefDictKey_AutoOpenPath";
 
 NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 
 @interface CSAppController (InternalMethods)
+- (void) _configureAutoOpenControls;
 - (void) _setStateOfButton:(NSButton *)button fromKey:(NSString *)key;
 - (void) _setPrefKey:(NSString *)key fromButton:(NSButton *)button;
 @end
@@ -73,6 +76,7 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
                                    @"8", CSPrefDictKey_GenSize,
                                    @"NO", CSPrefDictKey_AlphanumOnly,
                                    @"NO", CSPrefDictKey_IncludePasswd,
+                                   @"NO", CSPrefDictKey_AutoOpen,
                                    nil ];
    userDefaults = [ NSUserDefaults standardUserDefaults ];
    [ userDefaults registerDefaults:appDefaults ];
@@ -89,6 +93,14 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
  */
 - (void) applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+   NSUserDefaults *userDefaults;
+
+   userDefaults = [ NSUserDefaults standardUserDefaults ];
+   if( [ userDefaults boolForKey:CSPrefDictKey_AutoOpen ] )
+      [ [ NSDocumentController sharedDocumentController ]
+        openDocumentWithContentsOfFile:
+           [ userDefaults objectForKey:CSPrefDictKey_AutoOpenPath ]
+        display:YES ];
    lastPBChangeCount = [ [ NSPasteboard generalPasteboard ] changeCount ] - 1;
 }
 
@@ -99,8 +111,18 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
  */
 - (BOOL) applicationShouldOpenUntitledFile:(NSApplication *)sender
 {
-   return [ [ NSUserDefaults standardUserDefaults ]
-            boolForKey:CSPrefDictKey_CreateNew ];
+   static BOOL initialShouldOpen = YES;
+   NSUserDefaults *userDefaults;
+
+   userDefaults = [ NSUserDefaults standardUserDefaults ];
+   if( initialShouldOpen )
+   {
+      initialShouldOpen = NO;
+      return ( [ userDefaults boolForKey:CSPrefDictKey_CreateNew ] &&
+               ![ userDefaults boolForKey:CSPrefDictKey_AutoOpen ] );
+   }
+   else
+      return [ userDefaults boolForKey:CSPrefDictKey_CreateNew ];
 }
 
 
@@ -125,7 +147,8 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 
 
 /*
- * Note current change count, so we know if we need to clear the pasteboard on exit
+ * Note current change count, so we know if we need to clear the pasteboard on
+ * exit
  */
 - (void) notePBChangeCount
 {
@@ -141,21 +164,34 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
  */
 - (IBAction) openPrefs:(id)sender
 {
-   [ self _setStateOfButton:prefsKeepBackup fromKey:CSPrefDictKey_SaveBackup ];
+   NSUserDefaults *userDefaults;
+   NSString *autoOpenPath;
+
+   userDefaults = [ NSUserDefaults standardUserDefaults ];
+   // Interface tab
    [ self _setStateOfButton:prefsCloseAdd fromKey:CSPrefDictKey_CloseAdd ];
    [ self _setStateOfButton:prefsCloseEdit fromKey:CSPrefDictKey_CloseEdit ];
    [ self _setStateOfButton:prefsConfirmDelete 
           fromKey:CSPrefDictKey_ConfirmDelete ];
-   [ self _setStateOfButton:prefsClearClipboard
-          fromKey:CSPrefDictKey_ClearClipboard ];
    [ self _setStateOfButton:prefsWarnShort fromKey:CSPrefDictKey_WarnShort ];
    [ self _setStateOfButton:prefsCreateNew fromKey:CSPrefDictKey_CreateNew ];
-   [ self _setStateOfButton:prefsAlphanumOnly
-          fromKey:CSPrefDictKey_AlphanumOnly ];
    [ self _setStateOfButton:prefsIncludePasswd
           fromKey:CSPrefDictKey_IncludePasswd ];
-   [ prefsGenSize setIntValue:[ [ NSUserDefaults standardUserDefaults ]
-                                integerForKey:CSPrefDictKey_GenSize ] ];
+   [ self _setStateOfButton:prefsAutoOpen fromKey:CSPrefDictKey_AutoOpen ];
+   autoOpenPath = [ userDefaults stringForKey:CSPrefDictKey_AutoOpenPath ];
+   if( autoOpenPath != nil )
+      [ prefsAutoOpenName setStringValue:autoOpenPath ];
+   [ self _configureAutoOpenControls ];
+   // Password tab
+   [ prefsGenSize setIntValue:
+                     [ userDefaults integerForKey:CSPrefDictKey_GenSize ] ];
+   [ self _setStateOfButton:prefsAlphanumOnly
+          fromKey:CSPrefDictKey_AlphanumOnly ];
+   // Misc tab
+   [ self _setStateOfButton:prefsKeepBackup fromKey:CSPrefDictKey_SaveBackup ];
+   [ self _setStateOfButton:prefsClearClipboard
+          fromKey:CSPrefDictKey_ClearClipboard ];
+
    [ prefsWindow makeKeyAndOrderFront:self ];
 }
 
@@ -165,23 +201,44 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
  */
 - (IBAction) prefsSave:(id)sender
 {
+   NSUserDefaults *userDefaults;
+   NSString *autoOpenPath;
+
    [ prefsGenSize validateEditing ];
    if( [ prefsGenSize intValue ] != 0 )
    {
-      [ self _setPrefKey:CSPrefDictKey_SaveBackup fromButton:prefsKeepBackup ];
+      userDefaults = [ NSUserDefaults standardUserDefaults ];
+      // Interface tab
       [ self _setPrefKey:CSPrefDictKey_CloseAdd fromButton:prefsCloseAdd ];
       [ self _setPrefKey:CSPrefDictKey_CloseEdit fromButton:prefsCloseEdit ];
       [ self _setPrefKey:CSPrefDictKey_ConfirmDelete
              fromButton:prefsConfirmDelete ];
-      [ self _setPrefKey:CSPrefDictKey_ClearClipboard
-             fromButton:prefsClearClipboard ];
       [ self _setPrefKey:CSPrefDictKey_WarnShort fromButton:prefsWarnShort ];
       [ self _setPrefKey:CSPrefDictKey_CreateNew fromButton:prefsCreateNew ];
-      [ self _setPrefKey:CSPrefDictKey_AlphanumOnly fromButton:prefsAlphanumOnly ];
       [ self _setPrefKey:CSPrefDictKey_IncludePasswd
              fromButton:prefsIncludePasswd ];
-      [ [ NSUserDefaults standardUserDefaults ] setInteger:[ prefsGenSize intValue ]
-                                                forKey:CSPrefDictKey_GenSize ];
+      autoOpenPath = [ prefsAutoOpenName stringValue ];
+      if( autoOpenPath == nil || [ autoOpenPath length ] == 0 )
+      {
+         [ userDefaults setBool:NO forKey:CSPrefDictKey_AutoOpen ];
+         [ userDefaults setObject:nil forKey:CSPrefDictKey_AutoOpenPath ];
+      }
+      else
+      {
+         [ self _setPrefKey:CSPrefDictKey_AutoOpen fromButton:prefsAutoOpen ];
+         [ userDefaults setObject:autoOpenPath
+                        forKey:CSPrefDictKey_AutoOpenPath ];
+      }
+      // Password tab
+      [ userDefaults setInteger:[ prefsGenSize intValue ]
+                     forKey:CSPrefDictKey_GenSize ];
+      [ self _setPrefKey:CSPrefDictKey_AlphanumOnly
+             fromButton:prefsAlphanumOnly ];
+      // Misc tab
+      [ self _setPrefKey:CSPrefDictKey_SaveBackup fromButton:prefsKeepBackup ];
+      [ self _setPrefKey:CSPrefDictKey_ClearClipboard
+             fromButton:prefsClearClipboard ];
+
       [ prefsWindow orderOut:self ];
    }
    else
@@ -195,6 +252,68 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 - (IBAction) prefsCancel:(id)sender
 {
    [ prefsWindow orderOut:self ];
+}
+
+
+/*
+ * Checkbox to autoopen a document was clicked, so either enable or disable
+ * its associated controls
+ */
+- (IBAction) prefsAutoOpenClicked:(id)sender
+{
+   [ self _configureAutoOpenControls ];
+}
+
+
+/*
+ * Create a sheet to allow user to select a file to automatically open on
+ * program launch
+ */
+- (IBAction) prefsAutoOpenSelectPath:(id)sender
+{
+   NSOpenPanel *openPanel;
+   SEL didEndSel;
+
+   didEndSel = @selector( selectPathSheetDidEnd:returnCode:contextInfo: );
+   openPanel = [ NSOpenPanel openPanel ];
+   [ openPanel setCanChooseFiles:YES ];
+   [ openPanel setCanChooseDirectories:NO ];
+   [ openPanel setAllowsMultipleSelection:NO ];
+   [ openPanel beginSheetForDirectory:nil
+               file:[ prefsAutoOpenName stringValue ]
+               types:[ NSArray arrayWithObject:@"csd" ]
+               modalForWindow:prefsWindow
+               modalDelegate:self
+               didEndSelector:didEndSel
+               contextInfo:NULL ];
+}
+
+
+/*
+ * Open panel to select an autoopen file ended
+ */
+- (void) selectPathSheetDidEnd:(NSOpenPanel *)sheet
+         returnCode:(int)returnCode
+         contextInfo:(void  *)contextInfo
+{
+   if( returnCode == NSOKButton )
+      [ prefsAutoOpenName setStringValue:[ [ sheet filenames ]
+                                           objectAtIndex:0 ] ];
+}
+
+
+/*
+ * Enable/disable autoopen controls, as appropriate
+ */
+- (void) _configureAutoOpenControls
+{
+   BOOL enableLinkedControls;
+
+   enableLinkedControls = NO;
+   if( [ prefsAutoOpen state ] == NSOnState )
+      enableLinkedControls = YES;
+   [ prefsAutoOpenName setEnabled:enableLinkedControls ];
+   [ prefsAutoOpenSelect setEnabled:enableLinkedControls ];
 }
 
 
