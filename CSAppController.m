@@ -33,6 +33,9 @@
 /* CSAppController.m */
 
 #import "CSAppController.h"
+#import "CSDocument.h"
+#import "CSWinCtrlEntry.h"
+#import "CSWinCtrlMain.h"
 
 NSString * const CSPrefDictKey_SaveBackup = @"CSPrefDictKey_SaveBackup";
 NSString * const CSPrefDictKey_CloseAdd = @"CSPrefDictKey_CloseAdd";
@@ -50,15 +53,20 @@ NSString * const CSPrefDictKey_AutoOpenPath = @"CSPrefDictKey_AutoOpenPath";
 NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 
 @interface CSAppController (InternalMethods)
+- (void) _windowsMenuDidUpdate:(NSNotification *)aNotification;
+- (void) _rearrangeWindowMenu:(id)unused;
+- (BOOL) _isMenuItem:(id)menuItem forWindowControllerClass:(Class)theClass;
 - (void) _selectPathSheetDidEnd:(NSOpenPanel *)sheet
          returnCode:(int)returnCode
-         contextInfo:(void  *)contextInfo;
+         contextInfo:(void *)contextInfo;
 - (void) _configureAutoOpenControls;
 - (void) _setStateOfButton:(NSButton *)button fromKey:(NSString *)key;
 - (void) _setPrefKey:(NSString *)key fromButton:(NSButton *)button;
 @end
 
 @implementation CSAppController
+
+static NSString *MENUSPACE = @"   ";
 
 /*
  * Setup up default defaults
@@ -102,13 +110,19 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 
 
 /*
- * Record current pasteboard changecount, but one less since we haven't
+ * Listen for additions to the window menu (to rearrange it), and record
+ * the current pasteboard changecount, but one less since we haven't
  * touched it yet
  */
 - (void) applicationDidFinishLaunching:(NSNotification *)aNotification
 {
    NSUserDefaults *userDefaults;
 
+   [ [ NSNotificationCenter defaultCenter ]
+     addObserver:self
+     selector:@selector( _windowsMenuDidUpdate: )
+     name:NSMenuDidAddItemNotification
+     object:[ NSApp windowsMenu ] ];
    userDefaults = [ NSUserDefaults standardUserDefaults ];
    if( [ userDefaults boolForKey:CSPrefDictKey_AutoOpen ] )
       [ [ NSDocumentController sharedDocumentController ]
@@ -304,11 +318,117 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 
 
 /*
+ * We get here when a menu item is added to the window menu
+ */
+- (void) _windowsMenuDidUpdate:(NSNotification *)aNotification
+{
+   /*
+    * using performSelector:...afterDelay: allows us to only rearrange
+    * occasionally, as opposed to every time the menu is updated; the
+    * cancelPrevious... keeps from queueing them all up
+    */
+   [ [ self class ] cancelPreviousPerformRequestsWithTarget:self
+                    selector:@selector( _rearrangeWindowMenu: )
+                    object:nil ];
+   [ self performSelector:@selector( _rearrangeWindowMenu: )
+          withObject:nil
+          afterDelay:0.1 ];
+}
+
+
+/*
+ * Rearrange the window menu so secondary windows are spaced and underneath
+ * their respective parent window menu entries (like PB)
+ */
+- (void) _rearrangeWindowMenu:(id)unused
+{
+   NSMenu *windowMenu;
+   NSMutableArray *windowMenuSecondaryItems;
+   NSEnumerator *itemEnumerator;
+   id menuItem;
+   int parentItemIndex;
+
+   windowMenu = [ NSApp windowsMenu ];
+   windowMenuSecondaryItems = [ NSMutableArray arrayWithCapacity:25 ];
+   itemEnumerator = [ [ windowMenu itemArray ] objectEnumerator ];
+   // First, remove all secondary items which we want to rearrange
+   while( ( menuItem = [ itemEnumerator nextObject ] ) != nil )
+   {
+      // We only rearrange windows owned by CSWinCtrlEntry subclasses
+      if( [ self _isMenuItem:menuItem
+                 forWindowControllerClass:[ CSWinCtrlEntry class ] ] )
+      {
+         // If it is already prefixed by spaces, we've already handled it
+         if( [ [ menuItem title ] characterAtIndex:0 ] != ' ' )
+         {
+            [ menuItem setTitle:[ MENUSPACE stringByAppendingString:
+                                               [ menuItem title ] ] ];
+            [ windowMenuSecondaryItems addObject:menuItem ];
+            [ windowMenu removeItem:menuItem ];
+         }
+      }
+   }
+   // Now put them in proper order
+   if( [ windowMenuSecondaryItems count ] > 0 )
+   {
+      itemEnumerator = [ windowMenuSecondaryItems reverseObjectEnumerator ];
+      while( ( menuItem = [ itemEnumerator nextObject ] ) != nil )
+      {
+         /*
+          * This looks ugly at first, but: from the menu item, get the target
+          * (which is the NSWindow to bring front), get the controller from that
+          * window, then the document from the controller (which we already know
+          * is some form of CSWinCtrlEntry class); the document is called upon to
+          * give up its mainWindowController (a CSWinCtrlMain class), and finally,
+          * from that, we can get the parent window.  The newly-added menu item
+          * goes after that window's menu item.
+          */
+         parentItemIndex = [ windowMenu indexOfItemWithTarget:
+                                           [ [ [ [ [ menuItem target ]
+                                                   windowController ]
+                                                 document ]
+                                               mainWindowController ]
+                                             window ]
+                                        andAction:
+                                           @selector( makeKeyAndOrderFront: ) ];
+         NSAssert( parentItemIndex >= 0, @"No parent window menu item" );
+         if( parentItemIndex == [ windowMenu numberOfItems ] - 1 )
+            [ windowMenu addItem:menuItem ];
+         else
+            [ windowMenu insertItem:menuItem atIndex:( parentItemIndex + 1 ) ];
+      }
+   }
+}
+
+
+/*
+ * Return if the given menu item represents a window owned bya CSWinCtrlEntry
+ * controller
+ */
+- (BOOL) _isMenuItem:(id)menuItem forWindowControllerClass:(Class)theClass
+{
+   id target;
+   NSWindowController *winController;
+
+   target = [ menuItem target ];
+   // Only windows may have window controllers
+   if( [ target isKindOfClass:[ NSWindow class ] ] )
+   {
+      winController = [ target windowController ];
+      if( [ winController isKindOfClass:[ theClass class ] ] )
+         return YES;
+   }
+
+   return NO;
+}
+
+
+/*
  * Open panel to select an autoopen file ended
  */
 - (void) _selectPathSheetDidEnd:(NSOpenPanel *)sheet
          returnCode:(int)returnCode
-         contextInfo:(void  *)contextInfo
+         contextInfo:(void *)contextInfo
 {
    if( returnCode == NSOKButton )
       [ _prefsAutoOpenName setStringValue:[ [ sheet filenames ]
