@@ -6,9 +6,6 @@
 @interface CSWinCtrlMain : NSWindowController <CSTableView_CMM>
 {
    NSTableColumn *previouslySelectedColumn;
-   NSTextStorage *textStorage;
-   NSLayoutManager *layoutManager;
-   NSTextContainer *textContainer;
 
    IBOutlet NSTableView *documentView;
    IBOutlet NSMenu *contextualMenu;

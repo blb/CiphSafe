@@ -33,14 +33,6 @@
    if( self != nil )
    {
       [ self setShouldCloseDocument:YES ];
-      // These are used to add É in any cell too small to display its data
-      textStorage = [ [ NSTextStorage alloc ] init ];
-      layoutManager = [ [ NSLayoutManager alloc ] init ];
-      textContainer = [ [ NSTextContainer alloc ] init ];
-      [ layoutManager addTextContainer:textContainer ];
-      [ textContainer release ];
-      [ textStorage addLayoutManager:layoutManager ];
-      [ layoutManager release ];
    }
 
    return self;
@@ -248,43 +240,6 @@
 
 
 /*
- * Denote if a string is too long to be shown completely
- */
-- (void) tableView:(NSTableView *)tableView willDisplayCell:(id)theCell
-         forTableColumn:(NSTableColumn *)tableColumn row:(int)rowIndex
-{
-   NSAttributedString *cellAttrString;
-   float cellWidth;
-   int lastGlyph;
-   NSRange glyphRange, characterRange;
-   NSMutableAttributedString *newString;
-
-   cellAttrString = [ theCell attributedStringValue ];
-   cellWidth = [ tableColumn width ];
-   // Use an ellipsis to denote strings longer than the cell can show when needed
-   if( [ cellAttrString size ].width > cellWidth )
-   {
-      [ textStorage setAttributedString:cellAttrString ];
-      lastGlyph = [ layoutManager glyphIndexForPoint:NSMakePoint( cellWidth, 0 )
-                                  inTextContainer:textContainer ];
-      glyphRange = NSMakeRange( 0, lastGlyph - 1 );
-      characterRange = [ layoutManager characterRangeForGlyphRange:glyphRange
-                                       actualGlyphRange:NULL ];
-      newString = [ [ NSMutableAttributedString alloc ]
-                    initWithAttributedString:
-                       [ cellAttrString attributedSubstringFromRange:
-                                           characterRange ] ];
-      [ [ newString mutableString ] appendString:@"É" ];
-      // Remove the foreground color, otherwise it seems to get out of sync
-      [ newString removeAttribute:NSForegroundColorAttributeName
-                  range:NSMakeRange( 0, [ [ newString string ] length ] ) ];
-      [ theCell setAttributedStringValue:newString ];
-      [ newString release ];
-   }
-}
-
-
-/*
  * Enable/disable delete and view buttons depending on whether something
  * is selected
  */
@@ -338,7 +293,6 @@
 /*
  * Contextual menu methods
  */
-
 /*
  * Provide the contextual menu for the table view; select the view for good
  * visual feedback
@@ -415,7 +369,6 @@
  */
 - (void) dealloc
 {
-   [ textStorage release ];
    [ super dealloc ];
 }
 
