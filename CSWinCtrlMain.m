@@ -18,6 +18,8 @@
 #define CSWINCTRLMAIN_LOC_DROP NSLocalizedString( @"Drop", @"" )
 #define CSWINCTRLMAIN_LOC_PASTE NSLocalizedString( @"Paste", @"" )
 #define CSWINCTRLMAIN_LOC_CUT NSLocalizedString( @"Cut", @"" )
+#define CSWINCTRLMAIN_LOC_ONEENTRY NSLocalizedString( @"1 entry", @"" )
+#define CSWINCTRLMAIN_LOC_NUMENTRIES NSLocalizedString( @"%d entries", @"" )
 
 @interface CSWinCtrlMain (InternalMethods)
 - (void) _deleteSheetDidEnd:(NSWindow *)sheet
@@ -62,7 +64,7 @@
     * this anyway
     */
    [ [ self window ] makeFirstResponder:documentView ];
-   [ documentView reloadData ];
+   [ self refreshWindow ];
    [ documentView registerForDraggedTypes:
                      [ NSArray arrayWithObject:CSDocumentPboardType ] ];
 }
@@ -118,8 +120,17 @@
  */
 - (void) refreshWindow
 {
+   int entryCount;
+
    [ documentView reloadData ];
    [ documentView deselectAll:self ];
+   entryCount = [ [ self document ] entryCount ];
+   if( entryCount == 1 )
+      [ documentStatus setStringValue:CSWINCTRLMAIN_LOC_ONEENTRY ];
+   else
+      [ documentStatus setStringValue:[ NSString stringWithFormat:
+                                                    CSWINCTRLMAIN_LOC_NUMENTRIES,
+                                                    entryCount ] ];
 }
 
 

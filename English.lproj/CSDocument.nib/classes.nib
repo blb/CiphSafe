@@ -17,6 +17,7 @@
             OUTLETS = {
                 contextualMenu = NSMenu; 
                 documentDeleteButton = NSButton; 
+                documentStatus = NSTextField; 
                 documentView = CSTableView; 
                 documentViewButton = NSButton; 
             }; 

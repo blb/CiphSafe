@@ -8,9 +8,10 @@
    NSTableColumn *previouslySelectedColumn;
 
    IBOutlet CSTableView *documentView;
-   IBOutlet NSMenu *contextualMenu;
    IBOutlet NSButton *documentDeleteButton;
    IBOutlet NSButton *documentViewButton;
+   IBOutlet NSTextField *documentStatus;
+   IBOutlet NSMenu *contextualMenu;
 }
 
 // Actions from the main window
