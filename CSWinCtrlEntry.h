@@ -22,9 +22,19 @@
    IBOutlet NSButton *mainButton;
 }
 
+// Gererate an random password
 - (IBAction) doGenerate:(id)sender;
+
+// Open the URL from the URL field
 - (IBAction) doOpenURL:(id)sender;
+
+// Our implementation of whether the data is dirty
 - (void) updateDocumentEditedStatus;
+
+/*
+ * Used by updateDocumentEditedStatus to determine if data is dirty; overridden
+ * in subclasses
+ */
 - (BOOL) nameChanged;
 - (BOOL) accountChanged;
 - (BOOL) passwordChanged;
