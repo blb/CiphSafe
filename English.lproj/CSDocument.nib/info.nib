@@ -6,6 +6,8 @@
 	<string>29 51 356 240 0 0 1280 1002 </string>
 	<key>IBEditorPositions</key>
 	<dict>
+		<key>122</key>
+		<string>622 219 95 138 0 0 1280 1002 </string>
 		<key>25</key>
 		<string>622 358 131 138 0 0 1280 1002 </string>
 	</dict>
@@ -13,10 +15,11 @@
 	<string>291.0</string>
 	<key>IBOpenObjects</key>
 	<array>
+		<integer>122</integer>
 		<integer>25</integer>
 		<integer>5</integer>
 	</array>
 	<key>IBSystem Version</key>
-	<string>6I32</string>
+	<string>6L29</string>
 </dict>
 </plist>

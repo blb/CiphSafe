@@ -4,12 +4,9 @@
         {CLASS = BLBTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
         {
             ACTIONS = {
-                cmmCopyAccount = id; 
-                cmmCopyName = id; 
-                cmmCopyNotes = id; 
-                cmmCopyPassword = id; 
-                cmmCopyURL = id; 
+                cmmCopyField = id; 
                 cmmOpenURL = id; 
+                cornerSelectField = id; 
                 doAddEntry = id; 
                 doDeleteEntry = id; 
                 doResetSearch = id; 
@@ -19,8 +16,9 @@
             LANGUAGE = ObjC; 
             OUTLETS = {
                 "_contextualMenu" = NSMenu; 
+                "_cornerMenu" = NSMenu; 
                 "_documentDeleteButton" = NSButton; 
-                "_documentSearch" = NSTextField; 
+                "_documentSearch" = BLBTextField; 
                 "_documentStatus" = NSTextField; 
                 "_documentView" = BLBTableView; 
                 "_documentViewButton" = NSButton; 
