@@ -128,9 +128,9 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
       [ self _setPrefKey:CSPrefDictKey_AlphanumOnly fromButton:prefsAlphanumOnly ];
       [ self _setPrefKey:CSPrefDictKey_IncludePasswd
              fromButton:prefsIncludePasswd ];
-      [ [ NSUserDefaults standardUserDefaults ]
-        setInteger:[ prefsGenSize intValue ] forKey:CSPrefDictKey_GenSize ];
-      [ prefsWindow performClose:self ];
+      [ [ NSUserDefaults standardUserDefaults ] setInteger:[ prefsGenSize intValue ]
+                                                forKey:CSPrefDictKey_GenSize ];
+      [ prefsWindow orderOut:self ];
    }
    else
       NSBeep();
@@ -142,7 +142,7 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
  */
 - (IBAction) prefsCancel:(id)sender
 {
-   [ prefsWindow performClose:self ];
+   [ prefsWindow orderOut:self ];
 }
 
 
