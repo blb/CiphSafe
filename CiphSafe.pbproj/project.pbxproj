@@ -221,11 +221,11 @@
 		2A37F4B8FDCFA73011CA2CEA = {
 			children = (
 				F4C2EC0203C9375B01A8070A,
-				2A37F4B6FDCFA73011CA2CEA,
 				2A37F4B4FDCFA73011CA2CEA,
 				F4EA37BD0349833201A8070A,
 				F4709C4E0347B66901A8070A,
 				F45C2DA203BD0DCD01A8070A,
+				2A37F4B6FDCFA73011CA2CEA,
 				089C165FFE840EACC02AAC07,
 				F46463FE0353C9B801A8070A,
 				F4EA37B903494DDD01A8070A,
@@ -288,6 +288,8 @@
 <!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
 <plist version=\"1.0\">
 <dict>
+	<key>BLBAboutURL</key>
+	<string>http://www.withay.com/</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDocumentTypes</key>
@@ -314,7 +316,7 @@
 	<key>CFBundleExecutable</key>
 	<string>CiphSafe</string>
 	<key>CFBundleGetInfoString</key>
-	<string>1.0.0, Copyright © 2002 Bryan L Blackburn</string>
+	<string>1.0.0, Copyright © 2003 Bryan L Blackburn</string>
 	<key>CFBundleHelpBookFolder</key>
 	<string>CiphSafe Help</string>
 	<key>CFBundleHelpBookName</key>
