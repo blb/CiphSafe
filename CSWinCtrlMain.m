@@ -36,6 +36,7 @@
 #import "CSAppController.h"
 #import "CSDocument.h"
 #import "CSDocModel.h"
+#import "BLBMenuCornerView.h"
 #import "BLBTextField.h"
 
 // Format strings for window and table view information saved in user defaults
@@ -67,14 +68,23 @@
            NSLocalizedString( @"The URL entered is not a valid URL", @"" )
 #define CSWINCTRLMAIN_LOC_SEARCH NSLocalizedString( @"search", @"" )
 #define CSWINCTRLMAIN_LOC_FILTERED NSLocalizedString( @"filtered", @"" )
+#define CSWINCTRLMAIN_LOC_NEEDCOL \
+           NSLocalizedString( @"Need at least one column", @"" )
+#define CSWINCTRLMAIN_LOC_NEEDCOLTEXT \
+           NSLocalizedString( @"At least one column is needed in order to " \
+           @"be useful", @"" )
 
 @interface CSWinCtrlMain (InternalMethods)
 - (void) _loadSavedWindowState;
 - (void) _saveWindowState;
-- (void) _loadSavedTableState;
+- (BOOL) _loadSavedTableState;
 - (void) _saveTableState;
-- (void) _setSearchResultList:(NSArray *)newList;
+- (void) _setupDefaultTableViewColumns;
+- (void) _setDisplayOfColumnID:(NSString *)colID enabled:(BOOL)enabled;
+- (void) _addTableColumnWithID:(NSString *)colID;
+- (void) _updateCornerMenu;
 - (void) _filterView;
+- (void) _setSearchResultList:(NSArray *)newList;
 - (void) _updateStatusField;
 - (void) _deleteSheetDidEnd:(NSWindow *)sheet
          returnCode:(int)returnCode
@@ -90,6 +100,7 @@
 
 static NSArray *cmmCopyFields;
 static NSAttributedString *defaultSearchString;
+static NSArray *columnSelectionArray;
 
 + (void) initialize
 {
@@ -107,6 +118,15 @@ static NSAttributedString *defaultSearchString;
                                                 [ NSColor grayColor ],
                                                    NSForegroundColorAttributeName,
                                                 nil ] ];
+   // Mapping from corner menu tags to field names
+   columnSelectionArray = [ [ NSArray alloc ] initWithObjects:
+                                                 @"allColumns",
+                                                 CSDocModelKey_Name,
+                                                 CSDocModelKey_Acct,
+                                                 CSDocModelKey_Passwd,
+                                                 CSDocModelKey_URL,
+                                                 CSDocModelKey_Notes,
+                                                 nil ];
 }
 
 
@@ -128,13 +148,19 @@ static NSAttributedString *defaultSearchString;
  */
 - (void) awakeFromNib
 {
+   BLBMenuCornerView *cornerView;
+
    if( [ [ self document ] fileName ] != nil )
    {
       [ self _loadSavedWindowState ];
-      [ self _loadSavedTableState ];
+      if( ![ self _loadSavedTableState ] )
+         [ self _setupDefaultTableViewColumns ];
       [ self setShouldCascadeWindows:NO ];
    }
+   else
+      [ self _setupDefaultTableViewColumns ];
 
+   [ self _updateCornerMenu ];
    [ _documentView setDrawsGrid:NO ];
    [ _documentView setDrawsGrid:YES ];
    [ _documentView setStripeColor:[ NSColor colorWithCalibratedRed:0.93
@@ -153,6 +179,11 @@ static NSAttributedString *defaultSearchString;
    [ [ self window ] makeFirstResponder:_documentView ];
    [ _documentView registerForDraggedTypes:
                       [ NSArray arrayWithObject:CSDocumentPboardType ] ];
+   cornerView = [ [ [ BLBMenuCornerView alloc ]
+                    initWithFrame:[ [ _documentView cornerView ] frame ] ]
+                  autorelease ];
+   [ cornerView setMenuToDisplay:_cornerMenu ];
+   [ _documentView setCornerView:cornerView ];
    [ _documentSearch setObjectValue:defaultSearchString ];
    [ self refreshWindow ];
 }
@@ -327,18 +358,15 @@ static NSAttributedString *defaultSearchString;
 - (void) tableView:(NSTableView*)tableView
          didClickTableColumn:(NSTableColumn *)tableColumn;
 {
-   NSString *tableID;
+   NSString *colID;
 
-   tableID = [ tableColumn identifier ];
-   if( [ tableID isEqualToString:CSDocModelKey_Notes ] )
-      return;   // Don't sort on notes
-
+   colID = [ tableColumn identifier ];
    // If the current sorting column is clicked, we reverse the order
-   if( [ [ [ self document ] sortKey ] isEqualToString:tableID ] )
+   if( [ [ [ self document ] sortKey ] isEqualToString:colID ] )
       [ [ self document ] setSortAscending:![ [ self document ]
                                               isSortAscending ] ];
    else   // Otherwise, set new sort key
-      [ [ self document ] setSortKey:tableID ascending:YES ];
+      [ [ self document ] setSortKey:colID ascending:YES ];
 
    [ _documentView setHighlightedTableColumn:tableColumn ];
    [ self _setSortingImageForColumn:tableColumn ];
@@ -513,6 +541,36 @@ static NSAttributedString *defaultSearchString;
 
 
 /*
+ * Select/unselect a column for display (we determine which from the sender)
+ */
+- (IBAction) cornerSelectField:(id)sender
+{
+   int index;
+   BOOL enabled;
+
+   if( [ sender tag ] == 0 )   // Show all columns
+   {
+      for( index = 1; index < [ columnSelectionArray count ]; index++ )
+         [ self _setDisplayOfColumnID:[ columnSelectionArray objectAtIndex:index ]
+                enabled:YES ];
+   }
+   else
+   {
+      enabled = !( [ sender state ] == NSOnState );
+      if( [ [ _documentView tableColumns ] count ] > 1 || enabled )
+         [ self _setDisplayOfColumnID:
+                   [ columnSelectionArray objectAtIndex:[ sender tag ] ]
+                enabled:enabled ];
+      else
+         NSBeginCriticalAlertSheet( CSWINCTRLMAIN_LOC_NEEDCOL, nil, nil, nil,
+                                    [ self window ], nil, nil, nil, NULL,
+                                    CSWINCTRLMAIN_LOC_NEEDCOLTEXT );
+   }
+   [ self _updateCornerMenu ];
+}
+
+
+/*
  * This happens when the search text field is focused; we simply clear the
  * search field if it hasn't been modified yet (clearing the gray "search")
  */
@@ -602,31 +660,37 @@ static NSAttributedString *defaultSearchString;
 /*
  * Load previously-saved table layout information, if any
  */
-- (void) _loadSavedTableState
+- (BOOL) _loadSavedTableState
 {
+   BOOL retval;
    NSString *tableInfoString, *colName;
    NSArray *partsArray;
    int index, currentColIndex;
    NSTableColumn *tableColumn;
 
+   retval = NO;
    tableInfoString = [ [ NSUserDefaults standardUserDefaults ]
                       stringForKey:[ NSString stringWithFormat:
                                             CSWINCTRLMAIN_PREF_TABLE,
                                             [ [ self document ] displayName ] ] ];
    // Loop through rearranging columns and setting each column's size
-   if( tableInfoString != nil )
+   if( tableInfoString != nil && [ tableInfoString length ] > 0 )
    {
       partsArray = [ tableInfoString componentsSeparatedByString:@" " ];
       for( index = 0; index < [ partsArray count ]; index += 2 )
       {
          colName = [ partsArray objectAtIndex:index ];
+         [ self _addTableColumnWithID:colName ];
          currentColIndex = [ _documentView columnWithIdentifier:colName ];
          [ _documentView moveColumn:currentColIndex toColumn:( index / 2 ) ];
          tableColumn = [ _documentView tableColumnWithIdentifier:colName ];
          [ tableColumn setWidth:[ [ partsArray objectAtIndex:( index + 1 ) ]
                                   floatValue ] ];
       }
+      retval = YES;
    }
+
+   return retval;
 }
 
 
@@ -656,6 +720,78 @@ static NSAttributedString *defaultSearchString;
      setObject:infoString
      forKey:[ NSString stringWithFormat:CSWINCTRLMAIN_PREF_TABLE,
                                            [ [ self document ] displayName ] ] ];
+}
+
+
+/*
+ * Default layout for new documents
+ */
+- (void) _setupDefaultTableViewColumns
+{
+   [ self _setDisplayOfColumnID:@"name" enabled:YES ];
+   [ self _setDisplayOfColumnID:@"account" enabled:YES ];
+   [ self _setDisplayOfColumnID:@"url" enabled:YES ];
+   [ self _setDisplayOfColumnID:@"notes" enabled:YES ];
+}
+
+
+/*
+ * Show or hide the given column
+ */
+- (void) _setDisplayOfColumnID:(NSString *)colID enabled:(BOOL)enabled
+{
+   NSTableColumn *colToRemove;
+
+   if( enabled )
+      [ self _addTableColumnWithID:colID ];
+   else
+   {
+      colToRemove = [ [ _documentView tableColumnWithIdentifier:colID ] retain ];
+      [ _documentView removeTableColumn:colToRemove ];
+      if( [ _previouslySelectedColumn isEqual:colToRemove ] )
+         [ self tableView:_documentView
+                didClickTableColumn:[ [ _documentView tableColumns ]
+                                      objectAtIndex:0 ] ];
+      [ colToRemove release ];
+   }
+   [ _documentView sizeToFit ];
+}
+
+
+/*
+ * Add a table column for the given column, if it isn't already there
+ */
+- (void) _addTableColumnWithID:(NSString *)colID
+{
+   NSTableColumn *newColumn;
+
+   if( [ _documentView columnWithIdentifier:colID ] == -1 )
+   {
+      newColumn = [ [ NSTableColumn alloc ] initWithIdentifier:colID ];
+      [ newColumn setEditable:NO ];
+      [ newColumn setResizable:YES ];
+      [ [ newColumn headerCell ] setStringValue:NSLocalizedString( colID, @"" ) ];
+      [ _documentView addTableColumn:[ newColumn autorelease ] ];
+   }
+}
+
+
+/*
+ * Set menu state for the column selections
+ */
+- (void) _updateCornerMenu
+{
+   int index;
+
+   for( index = 1; index < [ columnSelectionArray count ]; index++ )
+   {
+      if( [ _documentView columnWithIdentifier:
+                             [ columnSelectionArray objectAtIndex:index ] ]
+          >= 0 )
+         [ [ _cornerMenu itemWithTag:index ] setState:NSOnState ];
+      else
+         [ [ _cornerMenu itemWithTag:index ] setState:NSOffState ];
+   }
 }
 
 

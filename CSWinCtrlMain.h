@@ -49,6 +49,7 @@
    IBOutlet NSTextField *_documentStatus;
    IBOutlet BLBTextField *_documentSearch;
    IBOutlet NSMenu *_contextualMenu;
+   IBOutlet NSMenu *_cornerMenu;
 }
 
 // Actions from the main window
@@ -60,6 +61,9 @@
 // Actions from the contextual menu
 - (IBAction) cmmCopyField:(id)sender;
 - (IBAction) cmmOpenURL:(id)sender;
+
+// Action from the corner view menu
+- (IBAction) cornerSelectField:(id)sender;
 
 // Refresh the window and contents
 - (void) refreshWindow;
