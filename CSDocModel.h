@@ -36,13 +36,21 @@
 
 /*
  * Identifiers for the table columns as well as keys for each entry;
- * Name, Acct, Passwd, and URL are NSStrings, Notes is NSData
+ * Name, Acct, Passwd, URL, and Category are NSStrings, Notes is NSData
  */
 extern NSString * const CSDocModelKey_Name;
 extern NSString * const CSDocModelKey_Acct;
 extern NSString * const CSDocModelKey_Passwd;
 extern NSString * const CSDocModelKey_URL;
+extern NSString * const CSDocModelKey_Category;
 extern NSString * const CSDocModelKey_Notes;
+
+// Builtin categories (General is default)
+extern NSString *CSDocModelCategory_General;
+extern NSString *CSDocModelCategory_Banking;
+extern NSString *CSDocModelCategory_Forum;
+extern NSString *CSDocModelCategory_Retail;
+extern NSString *CSDocModelCategory_OtherWeb;
 
 // Notifications
 extern NSString * const CSDocModelDidChangeSortNotification;
@@ -99,12 +107,14 @@ extern NSString * const CSDocModelNotificationInfoKey_DeletedNames;
          account:(NSString *)account
          password:(NSString *)password
          URL:(NSString *)url
+         category:(NSString *)category
          notesRTFD:(NSData *)notes;
 - (BOOL) changeEntryWithName:(NSString *)name
          newName:(NSString *)newName
          account:(NSString *)account
          password:(NSString *)password
          URL:(NSString *)url
+         category:(NSString *)category
          notesRTFD:(NSData *)notes;
 - (int) deleteEntriesWithNamesInArray:(NSArray *)nameArray;
 - (BOOL) deleteEntryWithName:(NSString *)name;

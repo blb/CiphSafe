@@ -44,7 +44,14 @@ NSString * const CSDocModelKey_Name = @"name";
 NSString * const CSDocModelKey_Acct = @"account";
 NSString * const CSDocModelKey_Passwd = @"password";
 NSString * const CSDocModelKey_URL = @"url";
+NSString * const CSDocModelKey_Category = @"category";
 NSString * const CSDocModelKey_Notes = @"notes";
+
+NSString *CSDocModelCategory_General;
+NSString *CSDocModelCategory_Banking;
+NSString *CSDocModelCategory_Forum;
+NSString *CSDocModelCategory_Retail;
+NSString *CSDocModelCategory_OtherWeb;
 
 NSString * const CSDocModelDidChangeSortNotification =
    @"CSDocModelDidChangeSortNotification";
@@ -67,6 +74,11 @@ NSString * const CSDocModelNotificationInfoKey_DeletedNames =
 #define CSDOCMODEL_LOC_ADD NSLocalizedString( @"Add", @"" )
 #define CSDOCMODEL_LOC_CHANGE NSLocalizedString( @"Change", @"" )
 #define CSDOCMODEL_LOC_DELETE NSLocalizedString( @"Delete", @"" )
+#define CSDOCMODEL_LOC_CATGENERAL NSLocalizedString( @"General", @"" )
+#define CSDOCMODEL_LOC_CATBANKING NSLocalizedString( @"Banking", @"" )
+#define CSDOCMODEL_LOC_CATFORUM NSLocalizedString( @"Forum", @"" )
+#define CSDOCMODEL_LOC_CATRETAIL NSLocalizedString( @"Retail", @"" )
+#define CSDOCMODEL_LOC_CATOTHERWEB NSLocalizedString( @"Other Web", @"" )
 
 // Used to sort the array
 int sortEntries( id dict1, id dict2, void *context );
@@ -74,9 +86,20 @@ int sortEntries( id dict1, id dict2, void *context );
 @interface CSDocModel (InternalMethods)
 - (NSMutableDictionary *) _findEntryWithName:(NSString *)name;
 - (void) _setupSelf;
+- (NSString *) _stringFrom:(NSDictionary *)dict forKey:(NSString *)key;
+- (NSData *) _dataFrom:(NSDictionary *)dict forKey:(NSString *)key;
 @end
 
 @implementation CSDocModel
+
++ (void) initialize
+{
+   CSDocModelCategory_General = CSDOCMODEL_LOC_CATGENERAL;
+   CSDocModelCategory_Banking = CSDOCMODEL_LOC_CATBANKING;
+   CSDocModelCategory_Forum = CSDOCMODEL_LOC_CATFORUM;
+   CSDocModelCategory_Retail = CSDOCMODEL_LOC_CATRETAIL;
+   CSDocModelCategory_OtherWeb = CSDOCMODEL_LOC_CATOTHERWEB;
+}
 
 /*
  * Initialize an empty document
@@ -252,7 +275,16 @@ int sortEntries( id dict1, id dict2, void *context );
  */
 - (NSString *) stringForKey:(NSString *)key atRow:(int)row
 {
-   return [ [ _allEntries objectAtIndex:row ] objectForKey:key ];
+   NSString *result;
+
+   if( [ key isEqualToString:CSDocModelKey_Notes ] )
+      result = [ [ self RTFDStringNotesAtRow:row ] string ];
+   else
+      result = [ [ _allEntries objectAtIndex:row ] objectForKey:key ];
+   if( result == nil )
+      result = @"";
+
+   return result;
 }
 
 
@@ -327,10 +359,9 @@ int sortEntries( id dict1, id dict2, void *context );
    int rowNum;
 
    rowNum = -1;
-   for( index = 0; index < [ _allEntries count ] && rowNum == -1; index++ )
+   for( index = 0; index < [ self entryCount ] && rowNum == -1; index++ )
    {
-      if( [ [ [ _allEntries objectAtIndex:index ]
-              objectForKey:CSDocModelKey_Name ]
+      if( [ [ self stringForKey:CSDocModelKey_Name atRow:index ]
             isEqualToString:name ] )
          rowNum = index;
    }
@@ -350,6 +381,7 @@ int sortEntries( id dict1, id dict2, void *context );
          account:(NSString *)account
          password:(NSString *)password
          URL:(NSString *)url
+         category:(NSString *)category
          notesRTFD:(NSData *)notes
 {
    // If it already exists, we're outta here
@@ -365,6 +397,8 @@ int sortEntries( id dict1, id dict2, void *context );
                                                        CSDocModelKey_Passwd,
                                                     url,
                                                        CSDocModelKey_URL,
+                                                    category,
+                                                       CSDocModelKey_Category,
                                                     notes,
                                                        CSDocModelKey_Notes,
                                                     nil ] ];
@@ -402,6 +436,7 @@ int sortEntries( id dict1, id dict2, void *context );
          account:(NSString *)account
          password:(NSString *)password
          URL:(NSString *)url
+         category:(NSString *)category
          notesRTFD:(NSData *)notes
 {
    NSMutableDictionary *theEntry;
@@ -425,10 +460,11 @@ int sortEntries( id dict1, id dict2, void *context );
       [ [ _undoManager prepareWithInvocationTarget:self ]
         changeEntryWithName:realNewName
         newName:name
-        account:[ theEntry objectForKey:CSDocModelKey_Acct ]
-        password:[ theEntry objectForKey:CSDocModelKey_Passwd ]
-        URL:[ theEntry objectForKey:CSDocModelKey_URL ]
-        notesRTFD:[ theEntry objectForKey:CSDocModelKey_Notes ] ];
+        account:[ self _stringFrom:theEntry forKey:CSDocModelKey_Acct ]
+        password:[ self _stringFrom:theEntry forKey:CSDocModelKey_Passwd ]
+        URL:[ self _stringFrom:theEntry forKey:CSDocModelKey_URL ]
+        category:[ self _stringFrom:theEntry forKey:CSDocModelKey_Category ]
+        notesRTFD:[ self _dataFrom:theEntry forKey:CSDocModelKey_Notes ] ];
       if( ![ _undoManager isUndoing ] && ![ _undoManager isRedoing ] )
          [ _undoManager setActionName:CSDOCMODEL_LOC_CHANGE ];
    }
@@ -441,6 +477,8 @@ int sortEntries( id dict1, id dict2, void *context );
       [ theEntry setObject:password forKey:CSDocModelKey_Passwd ];
    if( url != nil )
       [ theEntry setObject:url forKey:CSDocModelKey_URL ];
+   if( category != nil )
+      [ theEntry setObject:category forKey:CSDocModelKey_Category ];
    if( notes != nil )
       [ theEntry setObject:notes forKey:CSDocModelKey_Notes ];
 
@@ -487,6 +525,7 @@ int sortEntries( id dict1, id dict2, void *context );
               account:[ theEntry objectForKey:CSDocModelKey_Acct ]
               password:[ theEntry objectForKey:CSDocModelKey_Passwd ]
               URL:[ theEntry objectForKey:CSDocModelKey_URL ]
+              category:[ theEntry objectForKey:CSDocModelKey_Category ]
               notesRTFD:[ theEntry objectForKey:CSDocModelKey_Notes ] ];
             if( ![ _undoManager isUndoing ] && ![ _undoManager isRedoing ] )
                [ _undoManager setActionName:CSDOCMODEL_LOC_DELETE ];
@@ -536,10 +575,12 @@ int sortEntries( id dict1, id dict2, void *context );
    searchRange = NSMakeRange( 0, [ findMe length ] );
    if( ignoreCase )
       compareOptions = NSCaseInsensitiveSearch;
-   for( index = 0; index < [ _allEntries count ] && retval == nil; index++ )
+   for( index = 0; index < [ self entryCount ] && retval == nil; index++ )
    {
-      if( [ [ [ _allEntries objectAtIndex:index ] objectForKey:key ]
-            compare:findMe options:compareOptions range:searchRange ]
+      if( [ [ self stringForKey:key atRow:index ]
+            compare:findMe
+            options:compareOptions
+            range:searchRange ]
           == NSOrderedSame )
          retval = [ NSNumber numberWithInt:index ];
    }
@@ -559,22 +600,16 @@ int sortEntries( id dict1, id dict2, void *context );
    unsigned compareOptions;
    NSMutableArray *retval;
    int index;
-   NSString *stringToSearch;
    NSRange searchResult;
 
    compareOptions = 0;
    retval = [ NSMutableArray arrayWithCapacity:10 ];
    if( ignoreCase )
       compareOptions = NSCaseInsensitiveSearch;
-   for( index = 0; index < [ _allEntries count ]; index++ )
+   for( index = 0; index < [ self entryCount ]; index++ )
    {
-      if( [ key isEqualToString:CSDocModelKey_Notes ] )
-         stringToSearch = [ [ self RTFDStringNotesAtRow:index ] string ];
-      else
-         stringToSearch = [ [ _allEntries objectAtIndex:index ]
-                            objectForKey:key ];
-      searchResult = [ stringToSearch rangeOfString:findMe
-                                      options:compareOptions ];
+      searchResult = [ [ self stringForKey:key atRow:index ]
+                       rangeOfString:findMe options:compareOptions ];
       if( searchResult.location != NSNotFound )
          [ retval addObject:[ NSNumber numberWithInt:index ] ];
 
@@ -631,6 +666,36 @@ int sortEntries( id dict1, id dict2, void *context );
    [ NSData setCompressLogging:NO ];
    [ NSData setCryptoLogging:NO ];
 #endif
+}
+
+
+/*
+ * Return a valid string (empty, @"", if necessary)
+ */
+- (NSString *) _stringFrom:(NSDictionary *)dict forKey:(NSString *)key
+{
+   NSString *result;
+
+   result = [ dict objectForKey:key ];
+   if( result == nil )
+      result = @"";
+
+   return result;
+}
+
+
+/*
+ * Return valid data (empty if necessary)
+ */
+- (NSData *) _dataFrom:(NSDictionary *)dict forKey:(NSString *)key
+{
+   NSData *result;
+
+   result = [ dict objectForKey:key ];
+   if( result == nil )
+      result = [ NSData data ];
+
+   return result;
 }
 
 
