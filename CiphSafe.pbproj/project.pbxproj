@@ -153,8 +153,6 @@
 		};
 		2A37F4ABFDCFA73011CA2CEA = {
 			children = (
-				64B957100454DD8100A8070A,
-				64B957110454DD8100A8070A,
 				F4638743039CA38001A8070A,
 				F4638744039CA38001A8070A,
 				6424FAAC0436703600A8070A,
@@ -372,7 +370,6 @@
 				F43DBE7B03BA4DEB01A8070A,
 				F45C2DA003BD0B8301A8070A,
 				6424FAAE0436703600A8070A,
-				64B957120454DD8100A8070A,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -421,7 +418,6 @@
 				F43DBE7C03BA4DEB01A8070A,
 				F45C2DA103BD0B8301A8070A,
 				6424FAAF0436703600A8070A,
-				64B957130454DD8100A8070A,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -526,30 +522,6 @@
 		};
 		64A1B555043BA14900A8070A = {
 			fileRef = 64A1B554043BA14900A8070A;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		64B957100454DD8100A8070A = {
-			fileEncoding = 4;
-			isa = PBXFileReference;
-			path = BLBMenuCornerView.h;
-			refType = 4;
-		};
-		64B957110454DD8100A8070A = {
-			fileEncoding = 4;
-			isa = PBXFileReference;
-			path = BLBMenuCornerView.m;
-			refType = 4;
-		};
-		64B957120454DD8100A8070A = {
-			fileRef = 64B957100454DD8100A8070A;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		64B957130454DD8100A8070A = {
-			fileRef = 64B957110454DD8100A8070A;
 			isa = PBXBuildFile;
 			settings = {
 			};
