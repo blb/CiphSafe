@@ -76,7 +76,7 @@
 
 
 /*
- * The delegate must conform to the CSTableView_CMM protocol 
+ * The delegate must conform to the CSTableView_CMM protocol for this to work
  */
 - (NSMenu *) menuForEvent:(NSEvent *)theEvent
 {

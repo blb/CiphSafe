@@ -1,3 +1,4 @@
+// Interesting security issues are noted with XXX in comments
 /* CSWinCtrlAdd.m */
 
 #import "CSWinCtrlAdd.h"
@@ -32,7 +33,7 @@
  */
 - (IBAction) doClear:(id)sender
 {
-// XXX is there a way to clear out a control's data space?
+   // XXX If there's a way to clear out a control's data space, we'd do that here
    [ nameText setStringValue:@"" ];
    [ accountText setStringValue:@"" ];
    [ passwordText setStringValue:@"" ];
@@ -65,8 +66,10 @@
          // We queue it here as doing it immediately won't work
          [ [ NSRunLoop currentRunLoop ]
            performSelector:@selector( makeFirstResponder: )
-           target:[ self window ] argument:nameText
-           order:1 modes:[ NSArray arrayWithObject:NSDefaultRunLoopMode ] ];
+           target:[ self window ]
+           argument:nameText
+           order:1
+           modes:[ NSArray arrayWithObject:NSDefaultRunLoopMode ] ];
       }
       else
          [ [ self window ] performClose:self ];
