@@ -63,7 +63,7 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 
 
 /*
- * Clear the clipboard, if option is on
+ * Clear the pasteboard, if option is on
  */
 - (void) applicationWillTerminate:(NSNotification *)aNotification
 {
@@ -74,9 +74,8 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
          boolForKey:CSPrefDictKey_ClearClipboard ] )
    {
       generalPB = [ NSPasteboard generalPasteboard ];
-      [ generalPB declareTypes:[ NSArray arrayWithObject:NSStringPboardType ]
-                  owner:nil ];
-      [ generalPB setString:@"" forType:NSStringPboardType ];
+      [ generalPB declareTypes:[ NSArray arrayWithObject:@"" ] owner:nil ];
+      [ generalPB setString:@"" forType:@"" ];
    }
 }
 
