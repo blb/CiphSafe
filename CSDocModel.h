@@ -107,4 +107,13 @@ extern NSString * const CSDocModelNotificationInfoKey_DeletedNames;
 - (unsigned) deleteEntriesWithNamesInArray:(NSArray *)nameArray;
 - (BOOL) deleteEntryWithName:(NSString *)name;
 
+
+// Finding elements
+- (NSNumber *) firstRowBeginningWithString:(NSString *)findMe
+               ignoreCase:(BOOL)ignoreCase
+               forKey:(NSString *)key;
+- (NSArray *) rowsMatchingString:(NSString *)findMe
+              ignoreCase:(BOOL)ignoreCase
+              forKey:(NSString *)key;
+
 @end

@@ -491,6 +491,54 @@ int sortEntries( id dict1, id dict2, void *context );
 
 
 /*
+ * Return the row number of the first matching entry
+ */
+- (NSNumber *) firstRowBeginningWithString:(NSString *)findMe
+               ignoreCase:(BOOL)ignoreCase
+               forKey:(NSString *)key
+{
+   NSRange substringRange;
+   unsigned compareOptions;
+   BOOL matchFound;
+   unsigned index;
+   NSString *entryString;
+   NSString *entrySubstring;
+
+   substringRange = NSMakeRange( 0, [ findMe length ] );
+   if( ignoreCase )
+      compareOptions = NSCaseInsensitiveSearch;
+   else
+      compareOptions = 0;
+   matchFound = NO;
+   for( index = 0; index < [ _allEntries count ] && !matchFound; index++ )
+   {
+      entryString = [ [ _allEntries objectAtIndex:index ] objectForKey:key ];
+      entrySubstring = [ entryString substringWithRange:substringRange ];
+      if( [ entrySubstring compare:findMe options:compareOptions ]
+          == NSOrderedSame )
+         matchFound = YES;
+   }
+
+   if( matchFound )
+      return [ NSNumber numberWithUnsignedInt:index - 1 ];
+   else
+      return nil;
+}
+
+
+/*
+ * Return an array (of elements supporting unsignedIntValue message) of all
+ * matching entries
+ */
+- (NSArray *) rowsMatchingString:(NSString *)findMe
+              ignoreCase:(BOOL)ignoreCase
+              forKey:(NSString *)key
+{
+   return nil;
+}
+
+
+/*
  * Cleanup
  */
 - (void) dealloc
