@@ -7,7 +7,7 @@
 {
    NSTableColumn *previouslySelectedColumn;
 
-   IBOutlet NSTableView *documentView;
+   IBOutlet CSTableView *documentView;
    IBOutlet NSMenu *contextualMenu;
    IBOutlet NSButton *documentDeleteButton;
    IBOutlet NSButton *documentViewButton;

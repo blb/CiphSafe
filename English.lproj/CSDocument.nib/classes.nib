@@ -17,7 +17,7 @@
             OUTLETS = {
                 contextualMenu = NSMenu; 
                 documentDeleteButton = NSButton; 
-                documentView = NSTableView; 
+                documentView = CSTableView; 
                 documentViewButton = NSButton; 
             }; 
             SUPERCLASS = NSWindowController; 
