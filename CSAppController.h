@@ -49,9 +49,13 @@ extern NSString * const CSPrefDictKey_AutoOpen;
 extern NSString * const CSPrefDictKey_AutoOpenPath;
 extern NSString * const CSPrefDictKey_CloseAfterTimeout;
 extern NSString * const CSPrefDictKey_CloseTimeout;
+extern NSString * const CSPrefDictKey_CellSpacing;
 
 // Name of our internal pasteboard type
 extern NSString * const CSDocumentPboardType;
+
+// Notifications sent
+extern NSString * const CSApplicationDidChangePrefs;
 
 @interface CSAppController : NSObject
 {
@@ -71,6 +75,7 @@ extern NSString * const CSDocumentPboardType;
    IBOutlet NSButton *_prefsAutoOpenSelect;
    IBOutlet NSButton *_prefsCloseAfterTimeout;
    IBOutlet NSTextField *_prefsTimeout;
+   IBOutlet NSPopUpButton *_prefsCellSpacing;
    // Generated passwords tab
    IBOutlet NSTextField *_prefsGenSize;
    IBOutlet NSButton *_prefsAlphanumOnly;

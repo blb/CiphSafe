@@ -75,6 +75,7 @@
            @"be useful", @"" )
 
 @interface CSWinCtrlMain (InternalMethods)
+- (void) _setTableViewSpacing;
 - (void) _loadSavedWindowState;
 - (void) _saveWindowState;
 - (BOOL) _loadSavedTableState;
@@ -184,8 +185,14 @@ static NSArray *columnSelectionArray;
                   autorelease ];
    [ cornerView setMenuToDisplay:_cornerMenu ];
    [ _documentView setCornerView:cornerView ];
+   [ self _setTableViewSpacing ];
    [ _documentSearch setObjectValue:defaultSearchString ];
    [ self refreshWindow ];
+   [ [ NSNotificationCenter defaultCenter ]
+     addObserver:self
+     selector:@selector( _prefsDidChange: )
+     name:CSApplicationDidChangePrefs
+     object:nil ];
 }
 
 
@@ -626,6 +633,41 @@ static NSArray *columnSelectionArray;
 - (void) windowWillClose:(NSNotification *)notification
 {
    [ self _setSearchResultList:nil ];
+}
+
+
+/*
+ * When preferences change
+ */
+- (void) _prefsDidChange:(NSNotification *)aNotification
+{
+   [ self _setTableViewSpacing ];
+}
+
+
+/*
+ * Do like it says
+ */
+- (void) _setTableViewSpacing
+{
+   NSSize newSpacing;
+
+   switch( [ [ NSUserDefaults standardUserDefaults ]
+             integerForKey:CSPrefDictKey_CellSpacing ] )
+   {
+      case 0:   // Small
+         newSpacing = NSMakeSize( 4, 2 );
+         break;
+
+      case 1:   // Medium
+         newSpacing = NSMakeSize( 6, 2 );
+         break;
+
+      case 2:   // Large
+         newSpacing = NSMakeSize( 8, 3 );
+         break;
+   }
+   [ _documentView setIntercellSpacing:newSpacing ];
 }
 
 

@@ -52,8 +52,11 @@ NSString * const CSPrefDictKey_AutoOpenPath = @"CSPrefDictKey_AutoOpenPath";
 NSString * const CSPrefDictKey_CloseAfterTimeout =
    @"CSPrefDictKey_CloseAfterTimeout";
 NSString * const CSPrefDictKey_CloseTimeout = @"CSPrefDictKey_CloseTimeout";
+NSString * const CSPrefDictKey_CellSpacing = @"CSPrefDictKey_CellSpacing";
 
 NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
+
+NSString * const CSApplicationDidChangePrefs = @"CSApplicationDidChangePrefs";
 
 @interface CSAppController (InternalMethods)
 - (void) _queuePendingCloseAll;
@@ -109,6 +112,8 @@ static NSString *MENUSPACE = @"   ";
                                       CSPrefDictKey_CloseAfterTimeout,
                                    @"10",
                                       CSPrefDictKey_CloseTimeout,
+                                   @"0",
+                                      CSPrefDictKey_CellSpacing,
                                    nil ];
    userDefaults = [ NSUserDefaults standardUserDefaults ];
    [ userDefaults registerDefaults:appDefaults ];
@@ -234,25 +239,33 @@ static NSString *MENUSPACE = @"   ";
           fromKey:CSPrefDictKey_ConfirmDelete ];
    [ self _setStateOfButton:_prefsWarnShort fromKey:CSPrefDictKey_WarnShort ];
    [ self _setStateOfButton:_prefsCreateNew fromKey:CSPrefDictKey_CreateNew ];
-   [ self _setStateOfButton:_prefsIncludePasswd
-          fromKey:CSPrefDictKey_IncludePasswd ];
+
    [ self _setStateOfButton:_prefsAutoOpen fromKey:CSPrefDictKey_AutoOpen ];
    autoOpenPath = [ userDefaults stringForKey:CSPrefDictKey_AutoOpenPath ];
    if( autoOpenPath != nil )
       [ _prefsAutoOpenName setStringValue:autoOpenPath ];
    [ self _configureAutoOpenControls ];
+
+   [ _prefsCellSpacing selectItemAtIndex:
+                       [ userDefaults integerForKey:CSPrefDictKey_CellSpacing ] ];
+
+
+   [ self _setStateOfButton:_prefsKeepBackup fromKey:CSPrefDictKey_SaveBackup ];
+
+   // Security tab
+   [ self _setStateOfButton:_prefsIncludePasswd
+          fromKey:CSPrefDictKey_IncludePasswd ];
+
    [ self _setStateOfButton:_prefsCloseAfterTimeout
           fromKey:CSPrefDictKey_CloseAfterTimeout ];
    [ _prefsTimeout setIntValue:
                       [ userDefaults integerForKey:CSPrefDictKey_CloseTimeout ] ];
    [ self _configureTimeoutControls ];
-   // Password tab
+
    [ _prefsGenSize setIntValue:
                       [ userDefaults integerForKey:CSPrefDictKey_GenSize ] ];
    [ self _setStateOfButton:_prefsAlphanumOnly
           fromKey:CSPrefDictKey_AlphanumOnly ];
-   // Misc tab
-   [ self _setStateOfButton:_prefsKeepBackup fromKey:CSPrefDictKey_SaveBackup ];
    [ self _setStateOfButton:_prefsClearClipboard
           fromKey:CSPrefDictKey_ClearClipboard ];
 
@@ -279,8 +292,7 @@ static NSString *MENUSPACE = @"   ";
              fromButton:_prefsConfirmDelete ];
       [ self _setPrefKey:CSPrefDictKey_WarnShort fromButton:_prefsWarnShort ];
       [ self _setPrefKey:CSPrefDictKey_CreateNew fromButton:_prefsCreateNew ];
-      [ self _setPrefKey:CSPrefDictKey_IncludePasswd
-             fromButton:_prefsIncludePasswd ];
+
       autoOpenPath = [ _prefsAutoOpenName stringValue ];
       if( autoOpenPath == nil || [ autoOpenPath length ] == 0 )
       {
@@ -293,21 +305,28 @@ static NSString *MENUSPACE = @"   ";
          [ userDefaults setObject:autoOpenPath
                         forKey:CSPrefDictKey_AutoOpenPath ];
       }
+
+      [ userDefaults setInteger:[ _prefsCellSpacing indexOfSelectedItem ]
+                     forKey:CSPrefDictKey_CellSpacing ];
+      [ self _setPrefKey:CSPrefDictKey_SaveBackup fromButton:_prefsKeepBackup ];
+
+      // Security tab
+      [ self _setPrefKey:CSPrefDictKey_IncludePasswd
+             fromButton:_prefsIncludePasswd ];
       [ self _setPrefKey:CSPrefDictKey_CloseAfterTimeout
              fromButton:_prefsCloseAfterTimeout ];
       [ userDefaults setInteger:[ _prefsTimeout intValue ]
                      forKey:CSPrefDictKey_CloseTimeout ];
-      // Password tab
       [ userDefaults setInteger:[ _prefsGenSize intValue ]
                      forKey:CSPrefDictKey_GenSize ];
       [ self _setPrefKey:CSPrefDictKey_AlphanumOnly
              fromButton:_prefsAlphanumOnly ];
-      // Misc tab
-      [ self _setPrefKey:CSPrefDictKey_SaveBackup fromButton:_prefsKeepBackup ];
       [ self _setPrefKey:CSPrefDictKey_ClearClipboard
              fromButton:_prefsClearClipboard ];
 
       [ _prefsWindow orderOut:self ];
+      [ [ NSNotificationCenter defaultCenter ]
+        postNotificationName:CSApplicationDidChangePrefs object:self ];
    }
    else
       NSBeep();
