@@ -6,18 +6,18 @@
 #import "CSDocModel.h"
 
 // Localized strings
-#define CSDOCUMENT_LOC_SUREDELROWS \
+#define CSWINCTRLMAIN_LOC_SUREDELROWS \
         NSLocalizedString( @"Are you sure you want to delete the selected rows?", \
                            @"" )
-#define CSDOCUMENT_LOC_SUREDELONEROW \
+#define CSWINCTRLMAIN_LOC_SUREDELONEROW \
         NSLocalizedString( @"Are you sure you want to delete the selected row?", \
                            @"" )
-#define CSDOCUMENT_LOC_SURE NSLocalizedString( @"Are You Sure?", @"" )
-#define CSDOCUMENT_LOC_DELETE NSLocalizedString( @"Delete", @"" )
-#define CSDOCUMENT_LOC_CANCEL NSLocalizedString( @"Cancel", @"" )
-#define CSDOCUMENT_LOC_DROP NSLocalizedString( @"Drop", @"" )
-#define CSDOCUMENT_LOC_PASTE NSLocalizedString( @"Paste", @"" )
-#define CSDOCUMENT_LOC_CUT NSLocalizedString( @"Cut", @"" )
+#define CSWINCTRLMAIN_LOC_SURE NSLocalizedString( @"Are You Sure?", @"" )
+#define CSWINCTRLMAIN_LOC_DELETE NSLocalizedString( @"Delete", @"" )
+#define CSWINCTRLMAIN_LOC_CANCEL NSLocalizedString( @"Cancel", @"" )
+#define CSWINCTRLMAIN_LOC_DROP NSLocalizedString( @"Drop", @"" )
+#define CSWINCTRLMAIN_LOC_PASTE NSLocalizedString( @"Paste", @"" )
+#define CSWINCTRLMAIN_LOC_CUT NSLocalizedString( @"Cut", @"" )
 
 @interface CSWinCtrlMain (InternalMethods)
 - (void) _setSortingImageForColumn:(NSTableColumn *)tableColumn;
@@ -100,12 +100,12 @@
          boolForKey:CSPrefDictKey_ConfirmDelete ] )
    {
       if( [ documentView numberOfSelectedRows ] > 1 )
-         sheetQuestion = CSDOCUMENT_LOC_SUREDELROWS;
+         sheetQuestion = CSWINCTRLMAIN_LOC_SUREDELROWS;
       else
-         sheetQuestion = CSDOCUMENT_LOC_SUREDELONEROW;
+         sheetQuestion = CSWINCTRLMAIN_LOC_SUREDELONEROW;
       delSelector = @selector( deleteSheetDidEnd:returnCode:contextInfo: );
-      NSBeginCriticalAlertSheet( CSDOCUMENT_LOC_SURE, CSDOCUMENT_LOC_DELETE,
-                                 CSDOCUMENT_LOC_CANCEL, nil,
+      NSBeginCriticalAlertSheet( CSWINCTRLMAIN_LOC_SURE, CSWINCTRLMAIN_LOC_DELETE,
+                                 CSWINCTRLMAIN_LOC_CANCEL, nil,
                                  [ self window ], self, delSelector, nil,
                                  NULL, sheetQuestion );
    }
@@ -146,7 +146,7 @@
      copyRows:[ [ documentView selectedRowEnumerator ] allObjects ]
      toPasteboard:[ NSPasteboard generalPasteboard ] ];
    [ [ self document ] deleteEntriesWithNamesInArray:[ self _getSelectedNames ] ];
-   [ [ [ self document ] undoManager ] setActionName:CSDOCUMENT_LOC_CUT ];
+   [ [ [ self document ] undoManager ] setActionName:CSWINCTRLMAIN_LOC_CUT ];
 }
 
 
@@ -167,7 +167,7 @@
 - (IBAction) paste:(id)sender
 {
    [ [ self document ] retrieveRowsFromPasteboard:[ NSPasteboard generalPasteboard ]
-                       undoName:CSDOCUMENT_LOC_PASTE ];
+                       undoName:CSWINCTRLMAIN_LOC_PASTE ];
 }
 
 
@@ -334,7 +334,7 @@
          row:(int)row dropOperation:(NSTableViewDropOperation)op
 {
    return [ [ self document ] retrieveRowsFromPasteboard:[ info draggingPasteboard ]
-                              undoName:CSDOCUMENT_LOC_DROP ];
+                              undoName:CSWINCTRLMAIN_LOC_DROP ];
 }
 
 
