@@ -5,6 +5,9 @@
 #import "CSDocModel.h"
 #import "CSAppController.h"
 
+// Defines for localized strings
+#define CSWINCTRLCHANGE_LOC_VIEW NSLocalizedString( @"View/Change %@ in %@", @"" )
+
 @interface CSWinCtrlChange (InternalMethods)
 + (void) _addController:(CSWinCtrlChange *)newController
          forDocument:(NSDocument *)document;
@@ -13,9 +16,6 @@
 + (NSNumber *) _numberForDocument:(NSDocument *)document;
 - (void) _updateFields;
 @end
-
-// Defines for localized strings
-#define CSWINCTRLCHANGE_LOC_VIEW NSLocalizedString( @"View/Change %@ in %@", @"" )
 
 @implementation CSWinCtrlChange
 
