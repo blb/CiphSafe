@@ -55,7 +55,7 @@
 - (CSDocModel *) _model;
 - (void) _setupModel;
 - (void) _updateViewForNotification:(NSNotification *)notification;
-- (void) _updateCategoryList;
+- (void) _updateCategoryList:(id)unused;
 - (void) _getKeyResult:(NSMutableData *)newKey;
 - (void) _saveToFile:(NSString *)fileName
          saveOperation:(NSSaveOperationType)saveOperation
@@ -701,7 +701,11 @@
                    selector:@selector( _updateViewForNotification: )
                    name:CSDocModelDidRemoveEntryNotification
                    object:_docModel ];
-   [ self _updateCategoryList ];
+   [ defaultCenter addObserver:self
+                   selector:@selector( _updateCategoryList: )
+                   name:CSApplicationDidChangePrefs
+                   object:nil ];
+   [ self _updateCategoryList:nil ];
    [ _mainWindowController refreshWindow ];
 }
 
@@ -715,7 +719,7 @@
    int index;
    CSWinCtrlChange *changeController;
 
-   [ self _updateCategoryList ];
+   [ self _updateCategoryList:nil ];
    /*
     * Need to keep change windows synchronized on changes and remove them
     * on deletes, as undo/redo will change them outside our control
@@ -755,7 +759,7 @@
 /*
  * Update our list of categories
  */
-- (void) _updateCategoryList
+- (void) _updateCategoryList:(id)unused
 {
    int index;
    NSString *category;
