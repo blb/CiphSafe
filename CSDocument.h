@@ -12,7 +12,7 @@
    NSMutableData *bfKey;
    CSWinCtrlMain *mainWindowController;
    CSWinCtrlPassphrase *passphraseWindowController;
-   NSInvocation *saveToFileInvocation;
+   NSInvocation *getKeyInvocation;
 }
 
 // Actions from the menu
