@@ -562,16 +562,28 @@ static NSAttributedString *defaultSearchString;
 
 
 /*
- * Cleanup
+ * Only reliable way to know when we're going away and we still have a
+ * reference to the document (sometimes [ self document ] works in
+ * windowWillClose:, sometimes it doesn't)
  */
-- (void) windowWillClose:(NSNotification *)notification
+- (void) setDocument:(NSDocument *)document
 {
-   if( [ [ self document ] fileName ] != nil )
+   if( [ self document ] != nil && document == nil &&
+       [ [ self document ] fileName ] != nil )
    {
       [ self _saveWindowState ];
       [ self _saveTableState ];
       [ [ NSUserDefaults standardUserDefaults ] synchronize ];
    }
+   [ super setDocument:document ];
+}
+
+
+/*
+ * Cleanup
+ */
+- (void) windowWillClose:(NSNotification *)notification
+{
    [ self _setSearchResultList:nil ];
 }
 
@@ -609,27 +621,26 @@ static NSAttributedString *defaultSearchString;
  */
 - (void) _loadSavedTableState
 {
-   NSArray *tableInfoArray, *colName;
+   NSString *tableInfoString, *colName;
+   NSArray *partsArray;
    int index, currentColIndex;
-   NSDictionary *columnInfoDict;
    NSTableColumn *tableColumn;
 
-   tableInfoArray = [ [ NSUserDefaults standardUserDefaults ]
-                      objectForKey:[ NSString stringWithFormat:
+   tableInfoString = [ [ NSUserDefaults standardUserDefaults ]
+                      stringForKey:[ NSString stringWithFormat:
                                             CSWINCTRLMAIN_PREF_TABLE,
                                             [ [ self document ] displayName ] ] ];
    // Loop through rearranging columns and setting each column's size
-   if( tableInfoArray != nil )
+   if( tableInfoString != nil )
    {
-      for( index = 0; index < [ tableInfoArray count ]; index++ )
+      partsArray = [ tableInfoString componentsSeparatedByString:@" " ];
+      for( index = 0; index < [ partsArray count ]; index += 2 )
       {
-         columnInfoDict = [ tableInfoArray objectAtIndex:index ];
-         colName = [ columnInfoDict objectForKey:CSWINCTRLMAIN_PREF_TABLE_NAME  ];
+         colName = [ partsArray objectAtIndex:index ];
          currentColIndex = [ _documentView columnWithIdentifier:colName ];
-         [ _documentView moveColumn:currentColIndex toColumn:index ];
+         [ _documentView moveColumn:currentColIndex toColumn:( index / 2 ) ];
          tableColumn = [ _documentView tableColumnWithIdentifier:colName ];
-         [ tableColumn setWidth:[ [ columnInfoDict objectForKey:
-                                                  CSWINCTRLMAIN_PREF_TABLE_WIDTH ]
+         [ tableColumn setWidth:[ [ partsArray objectAtIndex:( index + 1 ) ]
                                   floatValue ] ];
       }
    }
@@ -642,24 +653,24 @@ static NSAttributedString *defaultSearchString;
 - (void) _saveTableState
 {
    NSArray *tableColumns;
-   NSMutableArray *colArray;
+   NSMutableString *infoString;
    int index;
    NSTableColumn *tableColumn;
 
    tableColumns = [ _documentView tableColumns ];
-   colArray = [ NSMutableArray arrayWithCapacity:[ tableColumns count ] ];
+   infoString = [ NSMutableString stringWithCapacity:70 ];
    for( index = 0; index < [ tableColumns count ]; index++ )
    {
       tableColumn = [ tableColumns objectAtIndex:index ];
-      [ colArray addObject:[ NSDictionary dictionaryWithObjectsAndKeys:
-                               [ tableColumn identifier ],
-                                  CSWINCTRLMAIN_PREF_TABLE_NAME,
-                               [ NSNumber numberWithFloat:[ tableColumn width ] ],
-                                  CSWINCTRLMAIN_PREF_TABLE_WIDTH,
-                               nil ] ];
+      if( index == 0 )
+         [ infoString appendFormat:@"%@ %f", [ tableColumn identifier ],
+                                             [ tableColumn width ] ];
+      else
+         [ infoString appendFormat:@" %@ %f", [ tableColumn identifier ],
+                                              [ tableColumn width ] ];
    }
    [ [ NSUserDefaults standardUserDefaults ]
-     setObject:colArray
+     setObject:infoString
      forKey:[ NSString stringWithFormat:CSWINCTRLMAIN_PREF_TABLE,
                                            [ [ self document ] displayName ] ] ];
 }
