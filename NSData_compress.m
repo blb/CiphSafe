@@ -138,7 +138,7 @@ static BOOL compressLoggingEnabled = YES;
 {
    NSMutableData *newData;
    unsigned originalSize;
-   long outSize;
+   unsigned long outSize;
    int zlibError;
 
    newData = nil;
