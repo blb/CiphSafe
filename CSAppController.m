@@ -52,6 +52,16 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 
 
 /*
+ * Record current pasteboard changecount, but one less since we haven't
+ * touched it yet
+ */
+- (void) applicationDidFinishLaunching:(NSNotification *)aNotification
+{
+   lastPBChangeCount = [ [ NSPasteboard generalPasteboard ] changeCount ] - 1;
+}
+
+
+/*
  * Do we open a new document on start, or when the icon is clicked in the
  * Dock while we have no document open?
  */
@@ -63,20 +73,31 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 
 
 /*
- * Clear the pasteboard, if option is on
+ * Clear the pasteboard, if option is on and we were the last to put something
+ * there
  */
 - (void) applicationWillTerminate:(NSNotification *)aNotification
 {
    NSPasteboard *generalPB;
-
+   
    [ [ NSUserDefaults standardUserDefaults ] synchronize ];
+   generalPB = [ NSPasteboard generalPasteboard ];
    if( [ [ NSUserDefaults standardUserDefaults ]
-         boolForKey:CSPrefDictKey_ClearClipboard ] )
+         boolForKey:CSPrefDictKey_ClearClipboard ] &&
+       [ generalPB changeCount ] == lastPBChangeCount )
    {
-      generalPB = [ NSPasteboard generalPasteboard ];
       [ generalPB declareTypes:[ NSArray arrayWithObject:@"" ] owner:nil ];
       [ generalPB setString:@"" forType:@"" ];
    }
+}
+
+
+/*
+ * Note current change count, so we know if we need to clear the pasteboard on exit
+ */
+- (void) notePBChangeCount
+{
+   lastPBChangeCount = [ [ NSPasteboard generalPasteboard ] changeCount ];
 }
 
 
