@@ -53,6 +53,8 @@ NSString * const CSPrefDictKey_CloseAfterTimeout =
    @"CSPrefDictKey_CloseAfterTimeout";
 NSString * const CSPrefDictKey_CloseTimeout = @"CSPrefDictKey_CloseTimeout";
 NSString * const CSPrefDictKey_CellSpacing = @"CSPrefDictKey_CellSpacing";
+NSString * const CSPrefDictKey_IncludeDefaultCategories =
+   @"CSPrefDictKey_IncludeDefaultCategories";
 
 NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 
@@ -114,6 +116,8 @@ static NSString *MENUSPACE = @"   ";
                                       CSPrefDictKey_CloseTimeout,
                                    @"0",
                                       CSPrefDictKey_CellSpacing,
+                                   @"YES",
+                                      CSPrefDictKey_IncludeDefaultCategories,
                                    nil ];
    userDefaults = [ NSUserDefaults standardUserDefaults ];
    [ userDefaults registerDefaults:appDefaults ];
@@ -260,6 +264,8 @@ static NSString *MENUSPACE = @"   ";
 
 
    [ self _setStateOfButton:_prefsKeepBackup fromKey:CSPrefDictKey_SaveBackup ];
+   [ self _setStateOfButton:_prefsIncludeDefaultCategories
+          fromKey:CSPrefDictKey_IncludeDefaultCategories ];
 
    // Security tab
    [ self _setStateOfButton:_prefsIncludePasswd
@@ -318,6 +324,8 @@ static NSString *MENUSPACE = @"   ";
       [ userDefaults setInteger:[ _prefsCellSpacing indexOfSelectedItem ]
                      forKey:CSPrefDictKey_CellSpacing ];
       [ self _setPrefKey:CSPrefDictKey_SaveBackup fromButton:_prefsKeepBackup ];
+      [ self _setPrefKey:CSPrefDictKey_IncludeDefaultCategories
+             fromButton:_prefsIncludeDefaultCategories ];
 
       // Security tab
       [ self _setPrefKey:CSPrefDictKey_IncludePasswd

@@ -50,6 +50,7 @@ extern NSString * const CSPrefDictKey_AutoOpenPath;
 extern NSString * const CSPrefDictKey_CloseAfterTimeout;
 extern NSString * const CSPrefDictKey_CloseTimeout;
 extern NSString * const CSPrefDictKey_CellSpacing;
+extern NSString * const CSPrefDictKey_IncludeDefaultCategories;
 
 // Name of our internal pasteboard type
 extern NSString * const CSDocumentPboardType;
@@ -70,18 +71,18 @@ extern NSString * const CSApplicationDidChangePrefs;
    IBOutlet NSButton *_prefsConfirmDelete;
    IBOutlet NSButton *_prefsWarnShort;
    IBOutlet NSButton *_prefsCreateNew;
-   IBOutlet NSButton *_prefsIncludePasswd;
    IBOutlet NSButton *_prefsAutoOpen;
    IBOutlet NSTextField *_prefsAutoOpenName;
    IBOutlet NSButton *_prefsAutoOpenSelect;
+   IBOutlet NSPopUpButton *_prefsCellSpacing;
+   IBOutlet NSButton *_prefsKeepBackup;
+   IBOutlet NSButton *_prefsIncludeDefaultCategories;
+   // Security tab
+   IBOutlet NSButton *_prefsIncludePasswd;
    IBOutlet NSButton *_prefsCloseAfterTimeout;
    IBOutlet NSTextField *_prefsTimeout;
-   IBOutlet NSPopUpButton *_prefsCellSpacing;
-   // Generated passwords tab
    IBOutlet NSTextField *_prefsGenSize;
    IBOutlet NSButton *_prefsAlphanumOnly;
-   // Miscellaneous tab
-   IBOutlet NSButton *_prefsKeepBackup;
    IBOutlet NSButton *_prefsClearClipboard;
 }
 
