@@ -48,7 +48,7 @@
  * Added methods for the delegate
  *
  * implement contextualMenuForTableView:row:column: to add a contextual menu for
- * the given row
+ * the given row and column
  * implement tableView:didReceiveKeyDownEvent: to handle key presses in the table
  */
 @interface NSObject (BLBTableViewDelegate)
