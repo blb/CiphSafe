@@ -1,6 +1,6 @@
 /* CSDocModel.h */
 
-#import <AppKit/AppKit.h>
+#import <Foundation/Foundation.h>
 
 /*
  * Identifiers for the table columns as well as keys for each entry;
