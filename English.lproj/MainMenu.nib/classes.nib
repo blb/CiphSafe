@@ -20,7 +20,7 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {docAddEntry = id; docChangePassphrase = id; }; 
+            ACTIONS = {doAddEntry = id; doChangePassphrase = id; }; 
             CLASS = FirstResponder; 
             LANGUAGE = ObjC; 
             SUPERCLASS = NSObject; 

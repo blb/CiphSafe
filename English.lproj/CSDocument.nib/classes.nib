@@ -8,9 +8,9 @@
                 cmmCopyNotes = id; 
                 cmmCopyPassword = id; 
                 cmmCopyURL = id; 
-                docAddEntry = id; 
-                docDeleteEntry = id; 
-                docViewEntry = id; 
+                doAddEntry = id; 
+                doDeleteEntry = id; 
+                doViewEntry = id; 
             }; 
             CLASS = CSWinCtrlMain; 
             LANGUAGE = ObjC; 

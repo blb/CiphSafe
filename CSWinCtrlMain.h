@@ -14,9 +14,9 @@
 }
 
 // Actions from the main window
-- (IBAction) docAddEntry:(id)sender;
-- (IBAction) docViewEntry:(id)sender;
-- (IBAction) docDeleteEntry:(id)sender;
+- (IBAction) doAddEntry:(id)sender;
+- (IBAction) doViewEntry:(id)sender;
+- (IBAction) doDeleteEntry:(id)sender;
 
 // Actions from the contextual menu
 - (IBAction) cmmCopyAccount:(id)sender;

@@ -68,7 +68,7 @@
 /*
  * Tell the document to do whatever to allow for a new entry
  */
-- (IBAction) docAddEntry:(id)sender
+- (IBAction) doAddEntry:(id)sender
 {
    [ [ self document ] openAddEntryWindow ];
 }
@@ -77,7 +77,7 @@
 /*
  * Tell the document to view the certain entries
  */
-- (IBAction) docViewEntry:(id)sender
+- (IBAction) doViewEntry:(id)sender
 {
    [ [ self document ] viewEntries:[ self _getSelectedNames ] ];
 }
@@ -86,7 +86,7 @@
 /*
  * Tell the document to delete certain entries
  */
-- (IBAction) docDeleteEntry:(id)sender
+- (IBAction) doDeleteEntry:(id)sender
 {
    NSString *sheetQuestion;
    SEL delSelector;

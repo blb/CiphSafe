@@ -16,7 +16,7 @@
 }
 
 // Actions from the menu
-- (IBAction) docChangePassphrase:(id)sender;
+- (IBAction) doChangePassphrase:(id)sender;
 
 // Creating new windows
 - (void) openAddEntryWindow;
