@@ -1,3 +1,4 @@
+// Interesting security issues are noted with XXX in comments
 /* CSWinCtrlPassphrase.m */
 
 #import "CSWinCtrlPassphrase.h"
@@ -12,6 +13,9 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
 // What's considered short
 #define CSWINCTRLPASSPHRASE_SHORT_PASSPHRASE 8
 
+#define CSWINCTRLPASSPHRASE_TABVIEW_NOCONFIRM @"noconfirm"
+#define CSWINCTRLPASSPHRASE_TABVIEW_CONFIRM @"confirm"
+
 // Defines for localized strings
 #define CSWINCTRLPASSPHRASE_LOC_SHORTPHRASE \
         NSLocalizedString( @"Short Passphrase", "short passphrase" )
@@ -22,9 +26,16 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
 #define CSWINCTRLPASSPHRASE_LOC_ENTERAGAIN NSLocalizedString( @"Enter Again", @"" )
 #define CSWINCTRLPASSPHRASE_LOC_WINTITLE \
         NSLocalizedString( @"Enter passphrase for %@", @"" )
+#define CSWINCTRLPASSPHRASE_LOC_DONTMATCH \
+        NSLocalizedString( @"Passphrases Don't Match", @"" )
+#define CSWINCTRLPASSPHRASE_LOC_NOMATCH \
+        NSLocalizedString( @"The passphrases do not match; do you wish to enter " \
+                           @"again or cancel?", @"" )
+#define CSWINCTRLPASSPHRASE_LOC_CANCEL NSLocalizedString( @"Cancel", @"" )
 
 @interface CSWinCtrlPassphrase (InternalMethods)
-- (NSMutableData *) _genKey;
+- (BOOL) _doPassphrasesMatch;
+- (NSMutableData *) _genKeyForConfirm:(BOOL)useConfirmTab;
 @end
 
 @implementation CSWinCtrlPassphrase
@@ -50,11 +61,13 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
    [ [ self window ] setTitle:[ NSString stringWithFormat:
                                             CSWINCTRLPASSPHRASE_LOC_WINTITLE,
                                             docName ] ];
-   [ passphraseNote setStringValue:NSLocalizedString( noteType, nil ) ];
+   [ passphraseNote1 setStringValue:NSLocalizedString( noteType, nil ) ];
+   [ tabView selectTabViewItemWithIdentifier:
+                CSWINCTRLPASSPHRASE_TABVIEW_NOCONFIRM ];
    parentWindow = nil;
    windowReturn = [ NSApp runModalForWindow:[ self window ] ];
    [ [ self window ] orderOut:self ];
-   keyData = [ self _genKey ];
+   keyData = [ self _genKeyForConfirm:NO ];
    if( windowReturn == NSRunAbortedResponse )
    {
       [ keyData clearOutData ];
@@ -74,7 +87,9 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
          modalDelegate:(id)delegate
          sendToSelector:(SEL)selector
 {
-   [ passphraseNote setStringValue:NSLocalizedString( noteType, nil ) ];
+   [ [ self window ] setTitle:@"" ];
+   [ passphraseNote2 setStringValue:NSLocalizedString( noteType, nil ) ];
+   [ tabView selectTabViewItemWithIdentifier:CSWINCTRLPASSPHRASE_TABVIEW_CONFIRM ];
    parentWindow = window;
    modalDelegate = delegate;
    sheetEndSelector = selector;
@@ -94,19 +109,30 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
    {
       [ NSApp endSheet:[ self window ] ];
       [ [ self window ] close ];
-      // Warn if it is short and the user pref is enabled
-      if( ( [ [ passphrasePhrase stringValue ] length ] <
-            CSWINCTRLPASSPHRASE_SHORT_PASSPHRASE ) &&
-          [ [ NSUserDefaults standardUserDefaults ]
-            boolForKey:CSPrefDictKey_WarnShort ] )
-         NSBeginInformationalAlertSheet( CSWINCTRLPASSPHRASE_LOC_SHORTPHRASE,
+      if( ![ self _doPassphrasesMatch ] )
+      {
+         // Ask for direction if the passphrases don't match
+         NSBeginAlertSheet( CSWINCTRLPASSPHRASE_LOC_DONTMATCH,
+            CSWINCTRLPASSPHRASE_LOC_ENTERAGAIN, CSWINCTRLPASSPHRASE_LOC_CANCEL,
+            nil, parentWindow, self, nil,
+            @selector( _noMatchSheetDidDismiss:returnCode:contextInfo: ),
+            NULL, CSWINCTRLPASSPHRASE_LOC_NOMATCH );
+      }
+      else if( ( [ [ passphrasePhrase2 stringValue ] length ] <
+                 CSWINCTRLPASSPHRASE_SHORT_PASSPHRASE ) &&
+               [ [ NSUserDefaults standardUserDefaults ]
+                 boolForKey:CSPrefDictKey_WarnShort ] )
+      {
+         // Warn if it is short and the user pref is enabled
+         NSBeginAlertSheet( CSWINCTRLPASSPHRASE_LOC_SHORTPHRASE,
             CSWINCTRLPASSPHRASE_LOC_USEIT, CSWINCTRLPASSPHRASE_LOC_ENTERAGAIN, nil,
             parentWindow, self, nil,
             @selector( _shortPPSheetDidDismiss:returnCode:contextInfo: ),
             NULL, CSWINCTRLPASSPHRASE_LOC_PHRASEISSHORT );
-      else
+      }
+      else   // All is well, send the key
          [ modalDelegate performSelector:sheetEndSelector
-                         withObject:[ self _genKey ] ];
+                         withObject:[ self _genKeyForConfirm:YES ] ];
    }
 }
 
@@ -122,7 +148,24 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
    {
       [ NSApp endSheet:[ self window ] ];
       [ [ self window ] close ];
-      [ [ self _genKey ] clearOutData ];
+      [ [ self _genKeyForConfirm:YES ] clearOutData ];
+      [ modalDelegate performSelector:sheetEndSelector withObject:nil ];
+   }
+}
+
+
+/*
+ * End of the "passphrases don't match" sheet
+ */
+- (void) _noMatchSheetDidDismiss:(NSWindow *)sheet returnCode:(int)returnCode
+         contextInfo:(void  *)contextInfo
+{
+   if( returnCode == NSAlertDefaultReturn )   // Enter again
+      [ NSApp beginSheet:[ self window ] modalForWindow:parentWindow
+              modalDelegate:self didEndSelector:nil contextInfo:NULL ];
+   else   // Cancel all together
+   {
+      [ [ self _genKeyForConfirm:YES ] clearOutData ];
       [ modalDelegate performSelector:sheetEndSelector withObject:nil ];
    }
 }
@@ -136,7 +179,7 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
 {
    if( returnCode == NSAlertDefaultReturn )   // Use it
       [ modalDelegate performSelector:sheetEndSelector
-                      withObject:[ self _genKey ] ];
+                      withObject:[ self _genKeyForConfirm:YES ] ];
    else   // Bring back the original sheet
       [ NSApp beginSheet:[ self window ] modalForWindow:parentWindow
               modalDelegate:self didEndSelector:nil contextInfo:NULL ];
@@ -144,27 +187,53 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
 
 
 /*
- * Generate the key from the passphrae in the window
+ * Return whether or not the passphrases match
  */
-- (NSMutableData *) _genKey
+- (BOOL) _doPassphrasesMatch
+{
+   // XXX This may leave stuff around, but there's no way around it
+   return [ [ passphrasePhrase2 stringValue ]
+            isEqualToString:
+               [ passphrasePhraseConfirm stringValue ] ];
+}
+
+
+/*
+ * Generate the key from the passphrae in the window; this does not verify
+ * passphrases match on the confirm tab
+ */
+- (NSMutableData *) _genKeyForConfirm:(BOOL)useConfirmTab
 {
    NSString *passphrase;
    NSData *passphraseData;
    NSMutableData *keyData;
 
-   passphrase = [ passphrasePhrase stringValue ];
-   // XXX Might setStringValue: leave any cruft around?
-   [ passphrasePhrase setStringValue:@"" ];
+   if( useConfirmTab )
+   {
+      passphrase = [ passphrasePhrase2 stringValue ];
+      // XXX Might setStringValue: leave any cruft around?
+      [ passphrasePhrase2 setStringValue:@"" ];
+      // XXX Again, anything left behind from setStringValue:?
+      [ passphrasePhraseConfirm setStringValue:@"" ];
+   }
+   else
+   {
+      passphrase = [ passphrasePhrase1 stringValue ];
+      // XXX And again, setStringValue:?
+      [ passphrasePhrase1 setStringValue:@"" ];
+   }
+
    passphraseData = [ passphrase dataUsingEncoding:NSUnicodeStringEncoding ];
+   /*
+    * XXX At this point, passphrase (and possibly confirmPhrase) should be cleared,
+    * however, there is no way, that I've yet found, to do that...here's hoping
+    * it gets released and the memory reused soon...
+    */
+   passphrase = nil;
+
    keyData = [ passphraseData SHA1Hash ];
    [ passphraseData clearOutData ];
    passphraseData = nil;
-   /*
-    * XXX At this point, passphrase should be cleared, however, there is no
-    * way, that I've yet found, to do that...here's hoping it gets released
-    * and cleared soon...
-    */
-   passphrase = nil;
 
    return keyData;
 }
