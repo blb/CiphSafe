@@ -39,24 +39,27 @@
 
 // Localized strings
 #define CSWINCTRLMAIN_LOC_SUREDELROWS \
-        NSLocalizedString( @"Are you sure you want to delete the selected " \
-                           @"rows?", @"" )
+           NSLocalizedString( @"Are you sure you want to delete the selected " \
+                              @"rows?", @"" )
 #define CSWINCTRLMAIN_LOC_SUREDELONEROW \
-        NSLocalizedString( @"Are you sure you want to delete the selected row?", \
-                           @"" )
+           NSLocalizedString( @"Are you sure you want to delete the selected " \
+                              @"row?", @"" )
 #define CSWINCTRLMAIN_LOC_SURE NSLocalizedString( @"Are You Sure?", @"" )
 #define CSWINCTRLMAIN_LOC_DELETE NSLocalizedString( @"Delete", @"" )
 #define CSWINCTRLMAIN_LOC_CANCEL NSLocalizedString( @"Cancel", @"" )
 #define CSWINCTRLMAIN_LOC_DROP NSLocalizedString( @"Drop", @"" )
 #define CSWINCTRLMAIN_LOC_PASTE NSLocalizedString( @"Paste", @"" )
 #define CSWINCTRLMAIN_LOC_CUT NSLocalizedString( @"Cut", @"" )
-#define CSWINCTRLMAIN_LOC_ONEENTRY NSLocalizedString( @"1 entry", @"" )
-#define CSWINCTRLMAIN_LOC_NUMENTRIES NSLocalizedString( @"%d entries", @"" )
+#define CSWINCTRLMAIN_LOC_ONEENTRY \
+           NSLocalizedString( @"1 entry, %d selected", @"" )
+#define CSWINCTRLMAIN_LOC_NUMENTRIES \
+           NSLocalizedString( @"%d entries, %d selected", @"" )
 #define CSWINCTRLMAIN_LOC_INVALIDURL NSLocalizedString( @"Invalid URL", @"" )
 #define CSWINCTRLMAIN_LOC_URLNOTVALID \
-        NSLocalizedString( @"The URL entered is not a valid URL", @"" )
+           NSLocalizedString( @"The URL entered is not a valid URL", @"" )
 
 @interface CSWinCtrlMain (InternalMethods)
+- (void) _updateStatusField;
 - (void) _deleteSheetDidEnd:(NSWindow *)sheet
          returnCode:(int)returnCode
          contextInfo:(void *)contextInfo;
@@ -157,17 +160,9 @@
  */
 - (void) refreshWindow
 {
-   int entryCount;
-
    [ _documentView reloadData ];
    [ _documentView deselectAll:self ];
-   entryCount = [ [ self document ] entryCount ];
-   if( entryCount == 1 )
-      [ _documentStatus setStringValue:CSWINCTRLMAIN_LOC_ONEENTRY ];
-   else
-      [ _documentStatus setStringValue:[ NSString stringWithFormat:
-                                                     CSWINCTRLMAIN_LOC_NUMENTRIES,
-                                                     entryCount ] ];
+   [ self _updateStatusField ];
 }
 
 
@@ -300,6 +295,7 @@
 
    [ _documentDeleteButton setEnabled:enableState ];
    [ _documentViewButton setEnabled:enableState ];
+   [ self _updateStatusField ];
 }
 
 
@@ -436,6 +432,27 @@
       NSBeginInformationalAlertSheet( CSWINCTRLMAIN_LOC_INVALIDURL,
                                       nil, nil, nil, [ self window ], nil, nil,
                                       nil, nil, CSWINCTRLMAIN_LOC_URLNOTVALID );
+}
+
+
+/*
+ * Update the status field with current information
+ */
+- (void) _updateStatusField
+{
+   int entryCount, selectedCount;
+
+   entryCount = [ [ self document ] entryCount ];
+   selectedCount = [ _documentView numberOfSelectedRows ];
+   if( entryCount == 1 )
+      [ _documentStatus setStringValue:
+                           [ NSString stringWithFormat:CSWINCTRLMAIN_LOC_ONEENTRY,
+                                                       selectedCount ] ];
+   else
+      [ _documentStatus setStringValue:
+                           [ NSString stringWithFormat:
+                                         CSWINCTRLMAIN_LOC_NUMENTRIES,
+                                         entryCount, selectedCount ] ];
 }
 
 
