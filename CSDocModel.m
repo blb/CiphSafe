@@ -86,6 +86,7 @@ int sortEntries( id dict1, id dict2, void *context );
    if( ( self = [ super init ] ) )
    {
       _allEntries = [ [ NSMutableArray alloc ] initWithCapacity:25 ];
+      _entryASCache = [ [ NSMutableDictionary alloc ] initWithCapacity:25 ];
       [ self _setupSelf ];
    }
 
@@ -126,6 +127,8 @@ int sortEntries( id dict1, id dict2, void *context );
             if( _allEntries != nil )
             {
                [ _allEntries retain ];
+               _entryASCache = [ [ NSMutableDictionary alloc ]
+                                 initWithCapacity:[ _allEntries count ] ];
                [ self _setupSelf ];
                [ _allEntries sortUsingFunction:sortEntries context:self ];
             }
@@ -275,17 +278,29 @@ int sortEntries( id dict1, id dict2, void *context );
 
 
 /*
- * Return an attributed string with the RTFD notes on the given row
+ * Return an attributed string with the RTFD notes on the given row; this
+ * string is cached as it is quite popular...
  *
  * XXX Note this returns an autoreleased NSString with possibly sensitive
  * information
  */
 - (NSAttributedString *) RTFDStringNotesAtRow:(int)row
 {
-   return [ [ [ NSAttributedString alloc ]
-              initWithRTFD:[ self RTFDNotesAtRow:row ]
-              documentAttributes:NULL ]
-            autorelease ];
+   NSAttributedString *rtfdString;
+
+   rtfdString = [ _entryASCache objectForKey:
+                             [ self stringForKey:CSDocModelKey_Name atRow:row ] ];
+   if( rtfdString == nil )
+   {
+      rtfdString = [ [ NSAttributedString alloc ]
+                       initWithRTFD:[ self RTFDNotesAtRow:row ]
+                     documentAttributes:NULL ];
+      [ _entryASCache setObject:rtfdString
+                      forKey:[ self stringForKey:CSDocModelKey_Name atRow:row ] ];
+      [ rtfdString release ];
+   }
+
+   return rtfdString;
 }
 
 
@@ -403,6 +418,7 @@ int sortEntries( id dict1, id dict2, void *context );
          [ self rowForName:newName ] != -1 ) )
       return NO;
 
+   [ _entryASCache removeObjectForKey:name ];
    realNewName = ( newName != nil ? newName : name );
    if( _undoManager != nil )
    {
@@ -461,6 +477,7 @@ int sortEntries( id dict1, id dict2, void *context );
       if( theEntry != nil )
       {
          numDeleted++;
+         [ _entryASCache removeObjectForKey:[ nameArray objectAtIndex:index ] ];
          [ theEntry retain ];   // Hold for the undo manager
          [ _allEntries removeObject:theEntry ];
          if( _undoManager != nil )
@@ -575,6 +592,7 @@ int sortEntries( id dict1, id dict2, void *context );
     * clear it out.
     */
    [ _allEntries release ];
+   [ _entryASCache release ];
    [ _undoManager release ];
    [ super dealloc ];
 }
@@ -613,25 +631,47 @@ int sortEntries( id dict1, id dict2, void *context );
 
 /*
  * Return sort order based on proper key and ascending/descending; context
- * is the CSDocModel's self
+ * is the CSDocModel's self, the two ids are each an NSMutableDictionary
+ * (one entry)
  */
 int sortEntries( id dict1, id dict2, void *context )
 {
    CSDocModel *objSelf;
+   NSString *sortKey;
+   NSDictionary *dictFirst, *dictSecond;
    NSString *value1, *value2;
 
    objSelf = (CSDocModel *) context;
+   sortKey = [ objSelf sortKey ];
    if( [ objSelf isSortAscending ] )
    {
-      value1 = [ dict1 objectForKey:[ objSelf sortKey ] ];
-      value2 = [ dict2 objectForKey:[ objSelf sortKey ] ];
+      dictFirst = dict1;
+      dictSecond = dict2;
    }
    else
    {
-      value1 = [ dict2 objectForKey:[ objSelf sortKey ] ];
-      value2 = [ dict1 objectForKey:[ objSelf sortKey ] ];
+      dictFirst = dict2;
+      dictSecond = dict1;
    }
-
+   if( [ sortKey isEqualToString:CSDocModelKey_Notes ] )
+   {
+      value1 = [ [ objSelf RTFDStringNotesAtRow:
+                              [ objSelf rowForName:
+                                           [ dictFirst objectForKey:
+                                                          CSDocModelKey_Name ] ] ]
+                 string ];
+      value2 = [ [ objSelf RTFDStringNotesAtRow:
+                              [ objSelf rowForName:
+                                           [ dictSecond objectForKey:
+                                                          CSDocModelKey_Name ] ] ]
+                 string ];
+   }
+   else
+   {
+      value1 = [ dictFirst objectForKey:sortKey ];
+      value2 = [ dictSecond objectForKey:sortKey ];
+   }
+      
    return [ value1 caseInsensitiveCompare:value2 ];
 }
 
