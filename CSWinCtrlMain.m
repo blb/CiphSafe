@@ -36,6 +36,7 @@
 #import "CSAppController.h"
 #import "CSDocument.h"
 #import "CSDocModel.h"
+#import "BLBTextField.h"
 
 // Localized strings
 #define CSWINCTRLMAIN_LOC_SUREDELROWS \
@@ -57,8 +58,12 @@
 #define CSWINCTRLMAIN_LOC_INVALIDURL NSLocalizedString( @"Invalid URL", @"" )
 #define CSWINCTRLMAIN_LOC_URLNOTVALID \
            NSLocalizedString( @"The URL entered is not a valid URL", @"" )
+#define CSWINCTRLMAIN_LOC_SEARCH NSLocalizedString( @"search", @"" )
+#define CSWINCTRLMAIN_LOC_FILTERED NSLocalizedString( @"filtered", @"" )
 
 @interface CSWinCtrlMain (InternalMethods)
+- (void) _setSearchResultList:(NSArray *)newList;
+- (void) _filterView;
 - (void) _updateStatusField;
 - (void) _deleteSheetDidEnd:(NSWindow *)sheet
          returnCode:(int)returnCode
@@ -67,10 +72,29 @@
 - (NSArray *) _getSelectedNames;
 - (NSArray *) _namesFromRows:(NSArray *)rows;
 - (void) _copyEntryString:(NSString *)columnName;
+- (int) _rowForFilteredRow:(int)row;
+- (int) _filteredRowForRow:(int)row;
 @end
 
 @implementation CSWinCtrlMain
 
+static NSAttributedString *defaultSearchString;
+
++ (void) initialize
+{
+   defaultSearchString = [ [ NSAttributedString alloc ]
+                           initWithString:CSWINCTRLMAIN_LOC_SEARCH
+                           attributes:
+                              [ NSDictionary dictionaryWithObjectsAndKeys:
+                                                [ NSColor grayColor ],
+                                                NSForegroundColorAttributeName,
+                                                nil ] ];
+}
+
+
+/*
+ * Simple setup, load the NIB, make our controller the bigboy
+ */
 - (id) init
 {
    self = [ super initWithWindowNibName:@"CSDocument" ];
@@ -104,9 +128,10 @@
     * this anyway
     */
    [ [ self window ] makeFirstResponder:_documentView ];
-   [ self refreshWindow ];
    [ _documentView registerForDraggedTypes:
                       [ NSArray arrayWithObject:CSDocumentPboardType ] ];
+   [ _documentSearch setObjectValue:defaultSearchString ];
+   [ self refreshWindow ];
 }
 
 
@@ -156,10 +181,22 @@
 
 
 /*
+ * Reset the search field
+ */
+- (IBAction) doResetSearch:(id)sender
+{
+   _searchFieldModified = NO;
+   [ _documentSearch setStringValue:@"" ];
+   [ self refreshWindow ];
+}
+
+
+/*
  * Refresh all the views in the window
  */
 - (void) refreshWindow
 {
+   [ self _filterView ];
    [ _documentView reloadData ];
    [ _documentView deselectAll:self ];
    [ self _updateStatusField ];
@@ -235,7 +272,10 @@
  */
 - (int) numberOfRowsInTableView:(NSTableView *)aTableView
 {
-   return [ [ self document ] entryCount ];
+   if( _searchResultList != nil )
+      return [ _searchResultList count ];
+   else
+      return [ [ self document ] entryCount ];
 }
 
 
@@ -250,9 +290,11 @@
 
    colID = [ aTableColumn identifier ];
    if( [ colID isEqualToString:CSDocModelKey_Notes ] )
-      return [ [ self document ] RTFDStringNotesAtRow:rowIndex ];
+      return [ [ self document ]
+               RTFDStringNotesAtRow:[ self _rowForFilteredRow:rowIndex ] ];
    else
-      return [ [ self document ] stringForKey:colID atRow:rowIndex ];
+      return [ [ self document ]
+               stringForKey:colID atRow:[ self _rowForFilteredRow:rowIndex ] ];
 }
 
 
@@ -398,6 +440,7 @@
 - (IBAction) cmmCopyNotes:(id)sender
 {
    NSPasteboard *generalPasteboard;
+   int selectedRow;
 
    generalPasteboard = [ NSPasteboard generalPasteboard ];
    [ generalPasteboard declareTypes:[ NSArray arrayWithObjects:NSRTFDPboardType,
@@ -405,11 +448,10 @@
                                                                nil ]
      owner:nil ];
 
-   [ generalPasteboard setData:[ [ self document ]
-                                 RTFDNotesAtRow:[ _documentView selectedRow ] ]
+   selectedRow = [ self _rowForFilteredRow:[ _documentView selectedRow ] ];
+   [ generalPasteboard setData:[ [ self document ] RTFDNotesAtRow:selectedRow ]
                        forType:NSRTFDPboardType ];
-   [ generalPasteboard setData:[ [ self document ]
-                                 RTFNotesAtRow:[ _documentView selectedRow ] ]
+   [ generalPasteboard setData:[ [ self document ] RTFNotesAtRow:selectedRow ]
                        forType:NSRTFPboardType ];
    [ [ NSApp delegate ] notePBChangeCount ];
 }
@@ -421,12 +463,14 @@
 - (IBAction) cmmOpenURL:(id)sender
 {
    BOOL urlIsInvalid;
+   int selectedRow;
    NSURL *theURL;
 
    urlIsInvalid = YES;
+   selectedRow = [ self _rowForFilteredRow:[ _documentView selectedRow ] ];
    theURL = [ NSURL URLWithString:[ [ self document ]
                                     stringForKey:CSDocModelKey_URL
-                                    atRow:[ _documentView selectedRow ] ] ];
+                                    atRow:selectedRow ] ];
    if( theURL != nil && [ [ NSWorkspace sharedWorkspace ] openURL:theURL ] )
       urlIsInvalid = NO;
 
@@ -444,21 +488,97 @@
 - (BOOL) tableView:(BLBTableView *)tableView
          didReceiveKeyDownEvent:(NSEvent *)theEvent
 {
+   BOOL retval;
    NSNumber *rowForKey;
+   int filteredRow;
 
+   retval = NO;
    rowForKey = [ [ self document ]
                  firstRowBeginningWithString:[ theEvent characters ]
                  ignoreCase:YES
                  forKey:CSDocModelKey_Name ];
    if( rowForKey != nil )
    {
-      [ tableView selectRow:[ rowForKey unsignedIntValue ]
-                  byExtendingSelection:NO ];
-      [ tableView scrollRowToVisible:[ rowForKey unsignedIntValue ] ];
-      return YES;
+      filteredRow = [ self _filteredRowForRow:[ rowForKey intValue ] ];
+      if( filteredRow >= 0 )
+      {
+         [ tableView selectRow:filteredRow byExtendingSelection:NO ];
+         [ tableView scrollRowToVisible:filteredRow ];
+         retval = YES;
+      }
    }
+
+   return retval;
+}
+
+
+/*
+ * This happens when the search text field is focused; we simply clear the
+ * search field if it hasn't been modified yet (clearing the gray "search")
+ */
+- (void) textFieldDidBecomeFirstResponder:(BLBTextField *)textField
+{
+   if( [ textField isEqual:_documentSearch ] && !_searchFieldModified )
+      [ _documentSearch setStringValue:@"" ];
+}
+
+
+/*
+ * When the search field value is changed; set that the field is modified if
+ * it has, setup filtering, and refresh the view
+ */
+- (void) controlTextDidChange:(NSNotification *)aNotification
+{
+   NSString *searchString;
+
+   if( [ [ aNotification object ] isEqual:_documentSearch ] )
+   {
+      searchString = [ _documentSearch stringValue ];
+      if( searchString != nil && [ searchString length ] > 0 )
+         _searchFieldModified = YES;
+      else
+         _searchFieldModified = NO;
+      [ self _filterView ];
+      [ self refreshWindow ];
+   }
+}
+
+
+/*
+ * Cleanup
+ */
+- (void) windowWillClose:(NSNotification *)notification
+{
+   [ self _setSearchResultList:nil ];
+}
+
+
+/*
+ * Filter the view of the document based on the search string
+ */
+- (void) _filterView
+{
+   NSString *searchString;
+
+   searchString = [ _documentSearch stringValue ];
+   if( _searchFieldModified )
+      [ self _setSearchResultList:[ [ self document ]
+                                    rowsMatchingString:searchString
+                                    ignoreCase:YES
+                                    forKey:CSDocModelKey_Name ] ];
    else
-      return NO;
+      [ self _setSearchResultList:nil ];
+}
+
+
+/*
+ * Update the matching list for the search, and tell the table view to update
+ */
+- (void) _setSearchResultList:(NSArray *)newList
+{
+   [ newList retain ];
+   [ _searchResultList release ];
+   _searchResultList = newList;
 }
 
 
@@ -468,18 +588,20 @@
 - (void) _updateStatusField
 {
    int entryCount, selectedCount;
+   NSString *statusString;
 
-   entryCount = [ [ self document ] entryCount ];
+   entryCount = [ self numberOfRowsInTableView:_documentView ];
    selectedCount = [ _documentView numberOfSelectedRows ];
    if( entryCount == 1 )
-      [ _documentStatus setStringValue:
-                           [ NSString stringWithFormat:CSWINCTRLMAIN_LOC_ONEENTRY,
-                                                       selectedCount ] ];
+      statusString = [ NSString stringWithFormat:CSWINCTRLMAIN_LOC_ONEENTRY,
+                                                 selectedCount ];
    else
-      [ _documentStatus setStringValue:
-                           [ NSString stringWithFormat:
-                                         CSWINCTRLMAIN_LOC_NUMENTRIES,
-                                         entryCount, selectedCount ] ];
+      statusString = [ NSString stringWithFormat:CSWINCTRLMAIN_LOC_NUMENTRIES,
+                                                 entryCount, selectedCount ];
+   if( _searchFieldModified )
+      statusString = [ NSString stringWithFormat:@"%@ (%@)",
+                                   statusString, CSWINCTRLMAIN_LOC_FILTERED ];
+   [ _documentStatus setStringValue:statusString ];
 }
 
 
@@ -539,7 +661,8 @@
    while( ( nextRow = [ rowEnumerator nextObject ] ) != nil )
       [ nameArray addObject:[ [ self document ]
                               stringForKey:CSDocModelKey_Name
-                              atRow:[ nextRow unsignedIntValue ] ] ];
+                              atRow:[ self _rowForFilteredRow:
+                                              [ nextRow unsignedIntValue ] ] ] ];
 
    return nameArray;
 }
@@ -551,14 +674,49 @@
 - (void) _copyEntryString:(NSString *)columnName
 {
    NSPasteboard *generalPB;
+   int selectedRow;
 
    generalPB = [ NSPasteboard generalPasteboard ];
    [ generalPB declareTypes:[ NSArray arrayWithObject:NSStringPboardType ]
                owner:nil ];
+   selectedRow = [ self _rowForFilteredRow:[ _documentView selectedRow ] ];
    [ generalPB setString:[ [ self document ] stringForKey:columnName
-                                             atRow:[ _documentView selectedRow ] ]
+                                             atRow:selectedRow ]
                forType:NSStringPboardType ];
    [ [ NSApp delegate ] notePBChangeCount ];
+}
+
+
+/*
+ * Return the search-list row number for a given basic row number
+ */
+- (int) _rowForFilteredRow:(int)row
+{
+   if( _searchResultList != nil )
+      return [ [ _searchResultList objectAtIndex:row ] intValue ];
+   else
+      return row;
+}
+
+
+/*
+ * Return the original row number for a filtered row number
+ */
+- (int) _filteredRowForRow:(int)row
+{
+   int index;
+
+   if( _searchResultList != nil )
+   {
+      for( index = 0; index < [ _searchResultList count ]; index++ )
+      {
+         if( [ [ _searchResultList objectAtIndex:index ] intValue ] == row )
+            return index;
+      }
+      return -1;
+   }
+   else
+      return row;
 }
 
 @end

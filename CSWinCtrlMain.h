@@ -35,14 +35,19 @@
 #import <Cocoa/Cocoa.h>
 #import "BLBTableView.h"
 
+@class BLBTextField;
+
 @interface CSWinCtrlMain : NSWindowController
 {
    NSTableColumn *_previouslySelectedColumn;
+   BOOL _searchFieldModified;
+   NSArray *_searchResultList;
 
    IBOutlet BLBTableView *_documentView;
    IBOutlet NSButton *_documentDeleteButton;
    IBOutlet NSButton *_documentViewButton;
    IBOutlet NSTextField *_documentStatus;
+   IBOutlet BLBTextField *_documentSearch;
    IBOutlet NSMenu *_contextualMenu;
 }
 
@@ -50,6 +55,7 @@
 - (IBAction) doAddEntry:(id)sender;
 - (IBAction) doViewEntry:(id)sender;
 - (IBAction) doDeleteEntry:(id)sender;
+- (IBAction) doResetSearch:(id)sender;
 
 // Actions from the contextual menu
 - (IBAction) cmmCopyAccount:(id)sender;
