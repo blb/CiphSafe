@@ -137,9 +137,10 @@ static BOOL cryptoLoggingEnabled = YES;
 {
    EVP_CIPHER_CTX cipherContext;
    NSMutableData *encryptedData;
-   int encLen, finalLen;
+   unsigned encLen, finalLen;
 
    encryptedData = nil;
+   finalLen = 0;
    if( [ iv length ] == 8 )
    {
       if( EVP_EncryptInit( &cipherContext, EVP_bf_cbc(), NULL, [ iv bytes ] ) )
@@ -197,9 +198,10 @@ static BOOL cryptoLoggingEnabled = YES;
 {
    EVP_CIPHER_CTX cipherContext;
    NSMutableData *plainData;
-   int decLen, finalLen;
+   unsigned decLen, finalLen;
 
    plainData = nil;
+   finalLen = 0;
    if( [ iv length ] == 8 )
    {
       if( EVP_DecryptInit( &cipherContext, EVP_bf_cbc(), NULL, [ iv bytes ] ) )
