@@ -497,32 +497,25 @@ int sortEntries( id dict1, id dict2, void *context );
                ignoreCase:(BOOL)ignoreCase
                forKey:(NSString *)key
 {
-   NSRange substringRange;
    unsigned compareOptions;
-   BOOL matchFound;
+   NSNumber *retval;
+   NSRange searchRange;
    unsigned index;
-   NSString *entryString;
-   NSString *entrySubstring;
 
-   substringRange = NSMakeRange( 0, [ findMe length ] );
+   compareOptions = 0;
+   retval = nil;
+   searchRange = NSMakeRange( 0, [ findMe length ] );
    if( ignoreCase )
       compareOptions = NSCaseInsensitiveSearch;
-   else
-      compareOptions = 0;
-   matchFound = NO;
-   for( index = 0; index < [ _allEntries count ] && !matchFound; index++ )
+   for( index = 0; index < [ _allEntries count ] && retval == nil; index++ )
    {
-      entryString = [ [ _allEntries objectAtIndex:index ] objectForKey:key ];
-      entrySubstring = [ entryString substringWithRange:substringRange ];
-      if( [ entrySubstring compare:findMe options:compareOptions ]
+      if( [ [ [ _allEntries objectAtIndex:index ] objectForKey:key ]
+            compare:findMe options:compareOptions range:searchRange ]
           == NSOrderedSame )
-         matchFound = YES;
+         retval = [ NSNumber numberWithUnsignedInt:index ];
    }
 
-   if( matchFound )
-      return [ NSNumber numberWithUnsignedInt:index - 1 ];
-   else
-      return nil;
+   return retval;
 }
 
 
