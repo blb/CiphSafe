@@ -13,9 +13,9 @@
    id someObject;
 
    objectEnumerator = [ self objectEnumerator ];
-   while( ( someObject = [ objectEnumerator nextObject ] ) != nil )
-      if( [ someObject isKindOfClass:classToFind ] )
-         break;
+   while( ( someObject = [ objectEnumerator nextObject ] ) != nil &&
+          ![ someObject isKindOfClass:classToFind ] )
+      ;   // Simply iterate
 
    return someObject;
 }

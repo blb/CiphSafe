@@ -6,7 +6,7 @@
 @implementation NSData (withay_clear)
 
 /* 
- * This is a massive hack, but it gets the job done, at least for now...
+ * Warning: massive hack ahead, but it gets the job done, at least for now...
  */
 - (void) clearOutData
 {
