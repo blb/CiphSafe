@@ -60,22 +60,21 @@ static NSColor *tableViewAltBGColor;
 {
    NSBezierPath *linePath;
    int index;
-   NSAffineTransform *transform;
    NSRect columnRect;
+   float xPos;
 
    [ [ self gridColor ] set ];
    linePath = [ NSBezierPath bezierPath ];
    [ linePath setLineWidth:1.0 ];
-   [ linePath moveToPoint:NSMakePoint( -0.5, 0 ) ];
-   [ linePath lineToPoint:NSMakePoint( -0.5, aRect.size.height ) ];
    for( index = 0; index < [ self numberOfColumns ]; index++ )
    {
       columnRect = [ self rectOfColumn:index ];
-      transform = [ NSAffineTransform transform ];
-      [ transform translateXBy:columnRect.origin.x + columnRect.size.width
-                  yBy:aRect.origin.y ];
-      [ [ transform transformBezierPath:linePath ] stroke ];
+      xPos = columnRect.origin.x + columnRect.size.width - 0.5;
+      [ linePath moveToPoint:NSMakePoint( xPos, aRect.origin.y ) ];
+      [ linePath lineToPoint:NSMakePoint( xPos,
+                                          aRect.origin.y + aRect.size.height ) ];
    }
+   [ linePath stroke ];
 }
 
 
