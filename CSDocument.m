@@ -44,6 +44,7 @@
    mainWindowController = [ [ CSWinCtrlMain alloc ] init ];
    [ self addWindowController:mainWindowController ];
    [ mainWindowController release ];
+   getKeyState = CSDOCUMENT_GETKEYSTATE_NONE;
 }
 
 
@@ -62,20 +63,14 @@
 
 - (IBAction) saveDocumentAs:(id)sender
 {
-   if( bfKey == nil )
-      [ self _beginPassphraseSheetForState:CSDOCUMENT_GETKEYSTATE_SAVEAS
-             note:CSPassphraseNote_Save ];
-   else
-      [ super saveDocumentAs:sender ];
+   [ self _beginPassphraseSheetForState:CSDOCUMENT_GETKEYSTATE_SAVEAS
+          note:CSPassphraseNote_Save ];
 }
 
 - (IBAction) saveDocumentTo:(id)sender
 {
-   if( bfKey == nil )
-      [ self _beginPassphraseSheetForState:CSDOCUMENT_GETKEYSTATE_SAVETO
-             note:CSPassphraseNote_Save ];
-   else
-      [ super saveDocumentTo:sender ];
+   [ self _beginPassphraseSheetForState:CSDOCUMENT_GETKEYSTATE_SAVETO
+          note:CSPassphraseNote_Save ];
 }
 
 
