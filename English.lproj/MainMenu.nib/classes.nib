@@ -17,6 +17,7 @@
                 "_prefsAutoOpen" = NSButton; 
                 "_prefsAutoOpenName" = NSTextField; 
                 "_prefsAutoOpenSelect" = NSButton; 
+                "_prefsCellSpacing" = NSPopUpButton; 
                 "_prefsClearClipboard" = NSButton; 
                 "_prefsCloseAdd" = NSButton; 
                 "_prefsCloseAfterTimeout" = NSButton; 
