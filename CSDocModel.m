@@ -318,18 +318,22 @@ int sortEntries( id dict1, id dict2, void *context );
  */
 - (NSAttributedString *) RTFDStringNotesAtRow:(int)row
 {
+   NSData *rtfdData;
    NSAttributedString *rtfdString;
 
    rtfdString = [ _entryASCache objectForKey:
                              [ self stringForKey:CSDocModelKey_Name atRow:row ] ];
    if( rtfdString == nil )
    {
-      rtfdString = [ [ NSAttributedString alloc ]
-                       initWithRTFD:[ self RTFDNotesAtRow:row ]
-                     documentAttributes:NULL ];
-      [ _entryASCache setObject:rtfdString
-                      forKey:[ self stringForKey:CSDocModelKey_Name atRow:row ] ];
-      [ rtfdString release ];
+      rtfdData = [ self RTFDNotesAtRow:row ];
+      if( rtfdData != nil )
+      {
+         rtfdString = [ [ NSAttributedString alloc ]
+                          initWithRTFD:rtfdData documentAttributes:NULL ];
+         [ _entryASCache setObject:rtfdString
+                         forKey:[ self stringForKey:CSDocModelKey_Name atRow:row ] ];
+         [ rtfdString release ];
+      }
    }
 
    return rtfdString;
@@ -504,9 +508,9 @@ int sortEntries( id dict1, id dict2, void *context );
  * XXX Note that the deleted entries will live on in the undo manager
  * and the names are also given to the notification center
  */
-- (int) deleteEntriesWithNamesInArray:(NSArray *)nameArray
+- (unsigned) deleteEntriesWithNamesInArray:(NSArray *)nameArray
 {
-   int index, numDeleted;
+   unsigned index, numDeleted;
    NSMutableDictionary *theEntry;
 
    for( index = numDeleted = 0; index < [ nameArray count ]; index++ )
