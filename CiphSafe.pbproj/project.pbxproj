@@ -129,6 +129,7 @@
 				4A9504D0FFE6A4CB11CA0CBA,
 				4A9504D1FFE6A4CB11CA0CBA,
 			);
+			hasScannedForEncodings = 1;
 			isa = PBXProject;
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA;
 			projectDirPath = "";
@@ -153,6 +154,8 @@
 			children = (
 				F4638743039CA38001A8070A,
 				F4638744039CA38001A8070A,
+				6424FAAC0436703600A8070A,
+				6424FAAD0436703600A8070A,
 				F43DBE7803B9334B01A8070A,
 				F4709C3F0347B2E301A8070A,
 				F4709C400347B2E301A8070A,
@@ -165,11 +168,13 @@
 			refType = 4;
 		};
 		2A37F4ACFDCFA73011CA2CEA = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = CSDocument.m;
 			refType = 4;
 		};
 		2A37F4AEFDCFA73011CA2CEA = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = CSDocument.h;
 			refType = 4;
@@ -184,6 +189,7 @@
 			refType = 4;
 		};
 		2A37F4B0FDCFA73011CA2CEA = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = main.m;
 			refType = 4;
@@ -231,6 +237,7 @@
 				F4EA37B903494DDD01A8070A,
 				F4EA37BA03494DDD01A8070A,
 				F4BB092E03C90B3301A8070A,
+				64A1B554043BA14900A8070A,
 			);
 			isa = PBXGroup;
 			name = Resources;
@@ -316,7 +323,7 @@
 	<key>CFBundleExecutable</key>
 	<string>CiphSafe</string>
 	<key>CFBundleGetInfoString</key>
-	<string>1.0.1, Copyright © 2003 Bryan L Blackburn</string>
+	<string>1.1.0, Copyright © 2003 Bryan L Blackburn</string>
 	<key>CFBundleHelpBookFolder</key>
 	<string>CiphSafe Help</string>
 	<key>CFBundleHelpBookName</key>
@@ -332,11 +339,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.1</string>
+	<string>1.1.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.1</string>
+	<string>1.1.0</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
@@ -344,7 +351,6 @@
 </dict>
 </plist>
 ";
-			shouldUseHeadermap = 1;
 		};
 		2A37F4C7FDCFA73011CA2CEA = {
 			buildActionMask = 2147483647;
@@ -363,6 +369,7 @@
 				F4CC4E4603B3D0F701A8070A,
 				F43DBE7B03BA4DEB01A8070A,
 				F45C2DA003BD0B8301A8070A,
+				6424FAAE0436703600A8070A,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -387,6 +394,7 @@
 				F45C2DA403BD0DCD01A8070A,
 				F4BB092F03C90B3301A8070A,
 				F4C2EC0503C9375B01A8070A,
+				64A1B555043BA14900A8070A,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -409,6 +417,7 @@
 				F4CC4E4703B3D0F701A8070A,
 				F43DBE7C03BA4DEB01A8070A,
 				F45C2DA103BD0B8301A8070A,
+				6424FAAF0436703600A8070A,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -476,6 +485,51 @@
 //4A2
 //4A3
 //4A4
+//640
+//641
+//642
+//643
+//644
+		6424FAAC0436703600A8070A = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			path = BLBTextField.h;
+			refType = 4;
+		};
+		6424FAAD0436703600A8070A = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			path = BLBTextField.m;
+			refType = 4;
+		};
+		6424FAAE0436703600A8070A = {
+			fileRef = 6424FAAC0436703600A8070A;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		6424FAAF0436703600A8070A = {
+			fileRef = 6424FAAD0436703600A8070A;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		64A1B554043BA14900A8070A = {
+			isa = PBXFileReference;
+			path = ReadMe.rtf;
+			refType = 4;
+		};
+		64A1B555043BA14900A8070A = {
+			fileRef = 64A1B554043BA14900A8070A;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+//640
+//641
+//642
+//643
+//644
 //F40
 //F41
 //F42
@@ -493,11 +547,13 @@
 			refType = 4;
 		};
 		F43DBE7903BA4DEB01A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = CSWinCtrlMain.h;
 			refType = 4;
 		};
 		F43DBE7A03BA4DEB01A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = CSWinCtrlMain.m;
 			refType = 4;
@@ -515,11 +571,13 @@
 			};
 		};
 		F45C2D9E03BD0B8301A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = CSWinCtrlPassphrase.h;
 			refType = 4;
 		};
 		F45C2D9F03BD0B8301A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = CSWinCtrlPassphrase.m;
 			refType = 4;
@@ -558,11 +616,13 @@
 			};
 		};
 		F4638743039CA38001A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = BLBTableView.h;
 			refType = 4;
 		};
 		F4638744039CA38001A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = BLBTableView.m;
 			refType = 4;
@@ -614,11 +674,13 @@
 			refType = 4;
 		};
 		F463874E039DAAC701A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = NSAttributedString_RWDA.h;
 			refType = 4;
 		};
 		F463874F039DAAC701A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = NSAttributedString_RWDA.m;
 			refType = 4;
@@ -657,21 +719,25 @@
 			};
 		};
 		F4709C350347B16501A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = CSWinCtrlAdd.h;
 			refType = 4;
 		};
 		F4709C360347B16501A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = CSWinCtrlAdd.m;
 			refType = 4;
 		};
 		F4709C370347B16501A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = CSWinCtrlChange.h;
 			refType = 4;
 		};
 		F4709C380347B16501A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = CSWinCtrlChange.m;
 			refType = 4;
@@ -701,11 +767,13 @@
 			};
 		};
 		F4709C3F0347B2E301A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = CSAppController.h;
 			refType = 4;
 		};
 		F4709C400347B2E301A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = CSAppController.m;
 			refType = 4;
@@ -723,11 +791,13 @@
 			};
 		};
 		F4709C430347B35801A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = NSArray_FOOC.h;
 			refType = 4;
 		};
 		F4709C440347B35801A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = NSArray_FOOC.m;
 			refType = 4;
@@ -766,11 +836,13 @@
 			};
 		};
 		F477F7D8036E2EB301A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = CSWinCtrlEntry.h;
 			refType = 4;
 		};
 		F477F7D9036E2EB301A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = CSWinCtrlEntry.m;
 			refType = 4;
@@ -800,11 +872,13 @@
 			};
 		};
 		F47AEF4E038DDE2E01A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = CSDocModel.h;
 			refType = 4;
 		};
 		F47AEF4F038DDE2E01A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = CSDocModel.m;
 			refType = 4;
@@ -822,11 +896,13 @@
 			};
 		};
 		F4A59E40034A64F401A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = NSData_crypto.h;
 			refType = 4;
 		};
 		F4A59E41034A64F401A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = NSData_crypto.m;
 			refType = 4;
@@ -844,11 +920,13 @@
 			};
 		};
 		F4A59E44034A669701A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = NSData_compress.h;
 			refType = 4;
 		};
 		F4A59E45034A669701A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = NSData_compress.m;
 			refType = 4;
@@ -935,11 +1013,13 @@
 			};
 		};
 		F4CC4E4403B3D0F701A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = NSData_clear.h;
 			refType = 4;
 		};
 		F4CC4E4503B3D0F701A8070A = {
+			fileEncoding = 30;
 			isa = PBXFileReference;
 			path = NSData_clear.m;
 			refType = 4;
