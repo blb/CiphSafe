@@ -112,6 +112,18 @@ static NSAttributedString *defaultSearchString;
  */
 - (void) awakeFromNib
 {
+   NSString *displayName;
+   NSString *windowFrameString;
+
+   displayName = [ [ self document ] displayName ];
+   windowFrameString = [ [ NSUserDefaults standardUserDefaults ]
+                         stringForKey:[ NSString stringWithFormat:
+                                                    @"NSWindow Frame %@",
+                                                    displayName ] ];
+   if( windowFrameString != nil )
+      [ [ self window ] setFrameFromString:windowFrameString ];
+   [ _documentView setAutosaveName:displayName ];
+   [ _documentView setAutosaveTableColumns:YES ];
    [ _documentView setDrawsGrid:NO ];
    [ _documentView setDrawsGrid:YES ];
    [ _documentView setStripeColor:[ NSColor colorWithCalibratedRed:0.93
@@ -549,6 +561,13 @@ static NSAttributedString *defaultSearchString;
  */
 - (void) windowWillClose:(NSNotification *)notification
 {
+   NSUserDefaults *userDefaults;
+
+   userDefaults = [ NSUserDefaults standardUserDefaults ];
+   [ userDefaults setObject:[ [ self window ] stringWithSavedFrame ]
+                  forKey:[ NSString stringWithFormat:@"NSWindow Frame %@",
+                                       [ [ self document ] displayName ] ] ];
+   [ userDefaults synchronize ];
    [ self _setSearchResultList:nil ];
 }
 
