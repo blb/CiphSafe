@@ -5,12 +5,6 @@
 	};
 	objectVersion = 38;
 	objects = {
-		080E96D9FE201CDB7F000001 = {
-			fileRef = 2A37F4B9FDCFA73011CA2CEA;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		080E96DAFE201CDB7F000001 = {
 			fileRef = 2A37F4B6FDCFA73011CA2CEA;
 			isa = PBXBuildFile;
@@ -227,7 +221,6 @@
 		2A37F4B8FDCFA73011CA2CEA = {
 			children = (
 				F4C2EC0203C9375B01A8070A,
-				2A37F4B9FDCFA73011CA2CEA,
 				2A37F4B6FDCFA73011CA2CEA,
 				2A37F4B4FDCFA73011CA2CEA,
 				F4EA37BD0349833201A8070A,
@@ -242,21 +235,6 @@
 			isa = PBXGroup;
 			name = Resources;
 			path = "";
-			refType = 4;
-		};
-		2A37F4B9FDCFA73011CA2CEA = {
-			children = (
-				2A37F4BAFDCFA73011CA2CEA,
-			);
-			isa = PBXVariantGroup;
-			name = Credits.rtf;
-			path = "";
-			refType = 4;
-		};
-		2A37F4BAFDCFA73011CA2CEA = {
-			isa = PBXFileReference;
-			name = English;
-			path = English.lproj/Credits.rtf;
 			refType = 4;
 		};
 		2A37F4C3FDCFA73011CA2CEA = {
@@ -336,7 +314,7 @@
 	<key>CFBundleExecutable</key>
 	<string>CiphSafe</string>
 	<key>CFBundleGetInfoString</key>
-	<string>0.8.0, Copyright © 2002 Bryan L Blackburn</string>
+	<string>1.0.0, Copyright © 2002 Bryan L Blackburn</string>
 	<key>CFBundleHelpBookFolder</key>
 	<string>CiphSafe Help</string>
 	<key>CFBundleHelpBookName</key>
@@ -352,11 +330,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.8.0</string>
+	<string>1.0.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>0.8.0</string>
+	<string>1.0.0</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
@@ -396,7 +374,6 @@
 		2A37F4C9FDCFA73011CA2CEA = {
 			buildActionMask = 2147483647;
 			files = (
-				080E96D9FE201CDB7F000001,
 				080E96DAFE201CDB7F000001,
 				080E96DBFE201CDB7F000001,
 				089C1661FE840EACC02AAC07,
