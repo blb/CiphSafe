@@ -20,8 +20,8 @@
 - (void) viewEntries:(NSArray *)namesArray;
 
 // Copy/paste support (and drag/drop)
-- (BOOL) copyRows:(NSArray *)rows toPasteboard:(NSPasteboard *)pboard;
-- (BOOL) retrieveRowsFromPasteboard:(NSPasteboard *)pboard
+- (BOOL) copyNames:(NSArray *)names toPasteboard:(NSPasteboard *)pboard;
+- (BOOL) retrieveEntriesFromPasteboard:(NSPasteboard *)pboard
          undoName:(NSString *)undoName;
 
 // Methods to add/change/delete entries

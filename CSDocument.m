@@ -222,29 +222,27 @@
  * Copy the given rows to the given pasteboard (rows must be an array of
  * objects which respond to unsignedIntValue for the row number)
  */
-- (BOOL) copyRows:(NSArray *)rows toPasteboard:(NSPasteboard *)pboard
+- (BOOL) copyNames:(NSArray *)names toPasteboard:(NSPasteboard *)pboard
 {
    NSMutableArray *docArray;
    NSMutableAttributedString *rtfdStringRows;
    NSAttributedString *attrString, *attrEOL;
-   NSEnumerator *rowEnumerator;
-   id rowNumber;
+   NSEnumerator *nameEnumerator;
    int row;
-   NSString *nameString, *acctString, *passwdString, *urlString;
+   NSString *nextName, *acctString, *passwdString, *urlString;
 
    docArray = [ NSMutableArray arrayWithCapacity:10 ];
    attrEOL = [ [ NSAttributedString alloc ] initWithString:@"\n" ];
    rtfdStringRows = [ [ NSMutableAttributedString alloc ] initWithString:@"" ];
-   rowEnumerator = [ rows objectEnumerator ];
-   while( ( rowNumber = [ rowEnumerator nextObject ] ) != nil )
+   nameEnumerator = [ names objectEnumerator ];
+   while( ( nextName = [ nameEnumerator nextObject ] ) != nil )
    {
-      row = [ rowNumber unsignedIntValue ];
-      nameString = [ self stringForKey:CSDocModelKey_Name atRow:row ];
+      row = [ self rowForName:nextName ];
       acctString = [ self stringForKey:CSDocModelKey_Acct atRow:row ];
       urlString = [ self stringForKey:CSDocModelKey_URL atRow:row ];
       passwdString = [ self stringForKey:CSDocModelKey_Passwd atRow:row ];
       [ docArray addObject:[ NSDictionary dictionaryWithObjectsAndKeys:
-                                             nameString, CSDocModelKey_Name,
+                                             nextName, CSDocModelKey_Name,
                                              acctString, CSDocModelKey_Acct,
                                              passwdString, CSDocModelKey_Passwd,
                                              urlString, CSDocModelKey_URL,
@@ -254,11 +252,11 @@
                                      boolForKey:CSPrefDictKey_IncludePasswd ] )
          attrString = [ [ NSAttributedString alloc ] initWithString:
                            [ NSString stringWithFormat:@"%@\t%@\t%@\t%@\t",
-                              nameString, acctString, passwdString, urlString ] ];
+                              nextName, acctString, passwdString, urlString ] ];
       else
          attrString = [ [ NSAttributedString alloc ] initWithString:
                            [ NSString stringWithFormat:@"%@\t%@\t%@\t",
-                              nameString, acctString, urlString ] ];
+                              nextName, acctString, urlString ] ];
       [ rtfdStringRows appendAttributedString:attrString ];
       [ attrString release ];
       [ rtfdStringRows appendAttributedString:[ self RTFDStringNotesAtRow:row ] ];
@@ -289,31 +287,35 @@
 /*
  * Grab rows from the given pasteboard
  */
-- (BOOL) retrieveRowsFromPasteboard:(NSPasteboard *)pboard
+- (BOOL) retrieveEntriesFromPasteboard:(NSPasteboard *)pboard
          undoName:(NSString *)undoName
 {
-   NSArray *rowsArray;
+   BOOL retval;
+   NSArray *entryArray;
    int index;
-   NSDictionary *rowDictionary;
+   NSDictionary *entryDictionary;
 
-   rowsArray = [ NSUnarchiver unarchiveObjectWithData:
-                                 [ pboard dataForType:CSDocumentPboardType ] ];
-   if( rowsArray != nil && [ rowsArray count ] > 0 )
+   retval = NO;
+   entryArray = [ NSUnarchiver unarchiveObjectWithData:
+                                  [ pboard dataForType:CSDocumentPboardType ] ];
+   if( entryArray != nil && [ entryArray count ] > 0 )
    {
-      for( index = 0; index < [ rowsArray count ]; index++ )
+      for( index = 0; index < [ entryArray count ]; index++ )
       {
-         rowDictionary = [ rowsArray objectAtIndex:index ];
-         [ self addEntryWithName:[ self _uniqueNameForName:
-                                [ rowDictionary objectForKey:CSDocModelKey_Name ] ]
-                account:[ rowDictionary objectForKey:CSDocModelKey_Acct ]
-                password:[ rowDictionary objectForKey:CSDocModelKey_Passwd ]
-                URL:[ rowDictionary objectForKey:CSDocModelKey_URL ]
-                notesRTFD:[ rowDictionary objectForKey:CSDocModelKey_Notes ] ];
+         entryDictionary = [ entryArray objectAtIndex:index ];
+         [ self addEntryWithName:
+                   [ self _uniqueNameForName:
+                             [ entryDictionary objectForKey:CSDocModelKey_Name ] ]
+                   account:[ entryDictionary objectForKey:CSDocModelKey_Acct ]
+                   password:[ entryDictionary objectForKey:CSDocModelKey_Passwd ]
+                   URL:[ entryDictionary objectForKey:CSDocModelKey_URL ]
+                   notesRTFD:[ entryDictionary objectForKey:CSDocModelKey_Notes ] ];
       }
       [ [ self undoManager ] setActionName:undoName ];
+      retval = YES;
    }
 
-   return YES;
+   return retval;
 }
 
 
