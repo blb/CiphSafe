@@ -85,4 +85,7 @@ extern NSString * const CSDocumentPboardType;
 - (IBAction) prefsAutoOpenClicked:(id)sender;
 - (IBAction) prefsAutoOpenSelectPath:(id)sender;
 
+// Close all open documents
+- (IBAction) closeAll:(id)sender;
+
 @end

@@ -318,6 +318,49 @@ static NSString *MENUSPACE = @"   ";
 
 
 /*
+ * Enable only valid menu items
+ */
+- (BOOL) validateMenuItem:(id <NSMenuItem>)menuItem
+{
+   SEL menuItemAction;
+   BOOL retval;
+
+   menuItemAction = [ menuItem action ];
+
+   retval = YES;
+   if( menuItemAction == @selector( closeAll: ) )
+      retval = ( [ [ [ NSDocumentController sharedDocumentController ]
+                   documents ] count ] > 0 );
+
+   return retval;
+}
+
+
+/*
+ * Close all open documents
+ */
+- (IBAction) closeAll:(id)sender
+{
+   [ [ NSDocumentController sharedDocumentController ]
+     closeAllDocumentsWithDelegate:self
+     didCloseAllSelector:@selector( _docController:didCloseAll:contextInfo: )
+     contextInfo:NULL ];
+}
+
+
+/*
+ * A selector is required for the closeAll... stuff for the document
+ * controller
+ */
+- (void) _docController:(NSDocumentController *)docController
+         didCloseAll:(BOOL)didCloseAll
+         contextInfo:(void *)contextInfo
+{
+// We don't need to do anything
+}
+
+
+/*
  * We get here when a menu item is added to the window menu
  */
 - (void) _windowsMenuDidUpdate:(NSNotification *)aNotification
