@@ -85,6 +85,7 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
 {
    NSPasteboard *generalPB;
 
+   [ [ NSUserDefaults standardUserDefaults ] synchronize ];
    if( [ [ NSUserDefaults standardUserDefaults ]
          boolForKey:CSPrefDictKey_ClearClipboard ] )
    {
