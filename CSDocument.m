@@ -761,13 +761,17 @@
    NSString *category;
 
    [ _currentCategories release ];
-   _currentCategories = [ NSMutableArray arrayWithObjects:
-                                            CSDocModelCategory_General,
-                                            CSDocModelCategory_Banking,
-                                            CSDocModelCategory_Forum,
-                                            CSDocModelCategory_Retail,
-                                            CSDocModelCategory_OtherWeb,
-                                            nil ];
+   if( [ [ NSUserDefaults standardUserDefaults ]
+         boolForKey:CSPrefDictKey_IncludeDefaultCategories ] )
+      _currentCategories = [ NSMutableArray arrayWithObjects:
+                                               CSDocModelCategory_General,
+                                               CSDocModelCategory_Banking,
+                                               CSDocModelCategory_Forum,
+                                               CSDocModelCategory_Retail,
+                                               CSDocModelCategory_OtherWeb,
+                                               nil ];
+   else
+      _currentCategories = [ NSMutableArray arrayWithCapacity:10 ];
    for( index = 0; index < [ [ self _model ] entryCount ]; index++ )
    {
       category = [ [ self _model ] stringForKey:CSDocModelKey_Category
