@@ -5,36 +5,19 @@
 #import "CSAppController.h"
 #import "CSWinCtrlAdd.h"
 #import "CSWinCtrlChange.h"
+#import "CSWinCtrlMain.h"
 #import "NSArray_FOOC.h"
 #import "NSAttributedString_RWDA.h"
 #import "NSData_clear.h"
 
 // Defines for localized strings
-#define CSDOCUMENT_LOC_SUREDELROWS \
-        NSLocalizedString( @"Are you sure you want to delete the selected rows?", \
-                           @"" )
-#define CSDOCUMENT_LOC_SUREDELONEROW \
-        NSLocalizedString( @"Are you sure you want to delete the selected row?", \
-                           @"" )
-#define CSDOCUMENT_LOC_SURE NSLocalizedString( @"Are You Sure?", @"" )
-#define CSDOCUMENT_LOC_DELETE NSLocalizedString( @"Delete", @"" )
-#define CSDOCUMENT_LOC_CANCEL NSLocalizedString( @"Cancel", @"" )
-#define CSDOCUMENT_LOC_PASTE NSLocalizedString( @"Paste", @"" )
-#define CSDOCUMENT_LOC_DROP NSLocalizedString( @"Drop", @"" )
-#define CSDOCUMENT_LOC_CUT NSLocalizedString( @"Cut", @"" )
-#define CSDOCUMENT_LOC_CLEAR NSLocalizedString( @"Clear", @"" )
 #define CSDOCUMENT_LOC_NAMECOPYN NSLocalizedString( @"%@ copy %d", @"" )
 #define CSDOCUMENT_LOC_NAMECOPY NSLocalizedString( @"%@ copy", @"" )
 
 #define CSDOCUMENT_NAME @"CiphSafe Document"
 
 @interface CSDocument (InternalMethods)
-- (BOOL) _copyRows:(NSArray *)rows toPasteboard:(NSPasteboard *)pboard;
-- (BOOL) _retrieveRowsFromPasteboard:(NSPasteboard *)pboard
-         undoName:(NSString *)undoName;
 - (NSString *) _uniqueNameForName:(NSString *)name;
-- (void) _setSortingImageForColumn:(NSTableColumn *)tableColumn;
-- (NSArray *) _getSelectedNames;
 - (CSDocModel *) _model;
 - (void) _setupModel;
 - (void) _updateViewForNotification:(NSNotification *)notification;
@@ -44,54 +27,14 @@
 
 @implementation CSDocument
 
-static NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
-
 /*
  * We need our own window controller...
  */
 - (void) makeWindowControllers
 {
-   mainWindowController = [ [ NSWindowController alloc ]
-                            initWithWindowNibName:@"CSDocument" owner:self ];
-   [ mainWindowController setShouldCloseDocument:YES ];
+   mainWindowController = [ [ CSWinCtrlMain alloc ] init ];
    [ self addWindowController:mainWindowController ];
    [ mainWindowController release ];
-
-   // These are used to add É in any cell too small to display its data
-   textStorage = [ [ NSTextStorage alloc ] init ];
-   layoutManager = [ [ NSLayoutManager alloc ] init ];
-   textContainer = [ [ NSTextContainer alloc ] init ];
-   [ layoutManager addTextContainer:textContainer ];
-   [ textContainer release ];
-   [ textStorage addLayoutManager:layoutManager ];
-   [ layoutManager release ];
-}
-
-
-/*
- * Initial setup of the main document window
- */
-- (void) windowControllerDidLoadNib:(NSWindowController *)windowController
-{
-   // When the main controller loads the NIB, we need to setup the table view
-   if( windowController == mainWindowController )
-   {
-      [ documentView setDrawsGrid:NO ];
-      [ documentView setDrawsGrid:YES ];
-      [ documentView setDoubleAction:@selector( docViewEntry: ) ];
-      previouslySelectedColumn = [ documentView tableColumnWithIdentifier:
-                                                [ [ self _model ] sortKey ] ];
-      [ documentView setHighlightedTableColumn:previouslySelectedColumn ];
-      [ self _setSortingImageForColumn:previouslySelectedColumn ];
-      /*
-       * The table view is set as the initialFirstResponder, but we have to do
-       * this anyway
-       */
-      [ [ mainWindowController window ] makeFirstResponder:documentView ];
-      [ documentView reloadData ];
-      [ documentView registerForDraggedTypes:
-                        [ NSArray arrayWithObject:CSDocumentPboardType ] ];
-   }
 }
 
 
@@ -183,6 +126,16 @@ static NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 
 
 /*
+ * Set autosave name for the table view and window
+ */
+- (void) setFileName:(NSString *)fileName
+{
+   [ super setFileName:fileName ];
+   [ mainWindowController setAutosaveNames:[ fileName lastPathComponent ] ];
+}
+
+
+/*
  * Whether or not to keep a backup file (determined by user pref)
  */
 - (BOOL) keepBackupFile
@@ -195,7 +148,7 @@ static NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 /*
  * Open the window to add new entries, via CSWinCtrlAdd
  */
-- (IBAction) docAddEntry:(id)sender
+- (void) openAddEntryWindow
 {
    CSWinCtrlAdd *winController;
 
@@ -212,15 +165,13 @@ static NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 
 
 /*
- * Open a window for the selected rows, via CSWinCtrlChange
+ * Open a window for the given array of names, via CSWinCtrlChange
  */
-- (IBAction) docViewEntry:(id)sender
+- (void) viewEntries:(NSArray *)namesArray
 {
-   NSArray *namesArray;
    unsigned index;
    CSWinCtrlChange *winController;
 
-   namesArray = [ self _getSelectedNames ];
    for( index = 0; index < [ namesArray count ]; index++ )
    {
       winController = [ CSWinCtrlChange controllerForEntryName:
@@ -235,43 +186,6 @@ static NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
       }
       [ winController showWindow:self ];
    }
-}
-
-
-/*
- * Delete the selected rows
- */
-- (IBAction) docDeleteEntry:(id)sender
-{
-   NSString *sheetQuestion;
-   SEL delSelector;
-
-   if( [ [ NSUserDefaults standardUserDefaults ]
-         boolForKey:CSPrefDictKey_ConfirmDelete ] )
-   {
-      if( [ documentView numberOfSelectedRows ] > 1 )
-         sheetQuestion = CSDOCUMENT_LOC_SUREDELROWS;
-      else
-         sheetQuestion = CSDOCUMENT_LOC_SUREDELONEROW;
-      delSelector = @selector( deleteSheetDidEnd:returnCode:contextInfo: );
-      NSBeginCriticalAlertSheet( CSDOCUMENT_LOC_SURE, CSDOCUMENT_LOC_DELETE,
-                                 CSDOCUMENT_LOC_CANCEL, nil,
-                                 [ mainWindowController window ], self,
-                                 delSelector, nil, NULL, sheetQuestion );
-   }
-   else
-      [ self deleteEntriesWithNamesInArray:[ self _getSelectedNames ] ];
-}
-
-
-/*
- * Called when the "really delete" sheet is done
- */
-- (void) deleteSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode
-         contextInfo:(void *)contextInfo
-{
-   if( returnCode == NSAlertDefaultReturn )   // They said delete...
-      [ self deleteEntriesWithNamesInArray:[ self _getSelectedNames ] ];
 }
 
 
@@ -307,13 +221,6 @@ static NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
       retval = ( bfKey != nil );
    else if( menuItemAction == @selector( revertDocumentToSaved: ) )
       retval = [ self isDocumentEdited ];
-   else if( menuItemAction == @selector( copy: ) ||
-            menuItemAction == @selector( cut: ) )
-      retval = ( [ documentView numberOfSelectedRows ] > 0 );
-   else if( menuItemAction == @selector( paste: ) )
-      retval = ( [ [ NSPasteboard generalPasteboard ]
-                   availableTypeFromArray:
-                      [ NSArray arrayWithObject:CSDocumentPboardType ] ] != nil );
    else
       retval = [ super validateMenuItem:menuItem ];
 
@@ -322,184 +229,161 @@ static NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 
 
 /*
- * Cut selected rows
+ * Copy the given rows to the given pasteboard (rows must be an array of
+ * objects which respond to unsignedIntValue for the row number)
  */
-- (IBAction) cut:(id)sender
+- (BOOL) copyRows:(NSArray *)rows toPasteboard:(NSPasteboard *)pboard
 {
-   [ self _copyRows:[ [ documentView selectedRowEnumerator ] allObjects ]
-          toPasteboard:[ NSPasteboard generalPasteboard ] ];
-   [ self deleteEntriesWithNamesInArray:[ self _getSelectedNames ] ];
-   [ [ self undoManager ] setActionName:CSDOCUMENT_LOC_CUT ];
-}
+   NSMutableArray *docArray;
+   NSMutableAttributedString *rtfdStringRows;
+   NSAttributedString *attrString, *attrEOL;
+   NSEnumerator *rowEnumerator;
+   id rowNumber;
+   int row;
+   NSString *nameString, *acctString, *passwdString, *urlString;
 
-
-/*
- * Copy selected rows to the general pasteboard
- */
-- (IBAction) copy:(id)sender
-{
-   [ self _copyRows:[ [ documentView selectedRowEnumerator ] allObjects ]
-          toPasteboard:[ NSPasteboard generalPasteboard ] ];
-}
-
-
-/*
- * Paste rows from the general pasteboard
- */
-- (IBAction) paste:(id)sender
-{
-   [ self _retrieveRowsFromPasteboard:[ NSPasteboard generalPasteboard ]
-          undoName:CSDOCUMENT_LOC_PASTE ];
-}
-
-
-/*
- * Table view methods
- */
-
-/*
- * Handle the table view
- */
-- (int) numberOfRowsInTableView:(NSTableView *)aTableView
-{
-   return [ [ self _model ] entryCount ];
-}
-
-
-/*
- * Return the proper value
- */
-- (id) tableView:(NSTableView *)aTableView
-       objectValueForTableColumn:(NSTableColumn *)aTableColumn
-       row:(int)rowIndex
-{
-   NSString *colID;
-
-   colID = [ aTableColumn identifier ];
-   if( [ colID isEqualToString:CSDocModelKey_Notes ] )
-      return [ self RTFDStringNotesAtRow:rowIndex ];
-   else
-      return [ self stringForKey:colID atRow:rowIndex ];
-}
-
-
-/*
- * Change the sorting
- */
-- (void) tableView:(NSTableView*)tableView
-         didClickTableColumn:(NSTableColumn *)tableColumn;
-{
-   NSString *tableID;
-
-   tableID = [ tableColumn identifier ];
-   if( [ tableID isEqualToString:CSDocModelKey_Notes ] )
-      return;   // Don't sort on notes
-
-   // If the current sorting column is clicked, we reverse the order
-   if( [ [ [ self _model ] sortKey ] isEqualToString:tableID ] )
-      [ [ self _model ] setSortAscending:![ [ self _model ] isSortAscending ] ];
-   else   // Otherwise, set new sort key
-      [ [ self _model ] setSortKey:tableID ascending:YES ];
-
-   [ documentView setHighlightedTableColumn:tableColumn ];
-   [ self _setSortingImageForColumn:tableColumn ];
-}
-
-
-/*
- * Make sure cells don't draw the background, otherwise the striping will
- * look funny; also denote if a string is too long to be shown completely
- */
-- (void) tableView:(NSTableView *)tableView willDisplayCell:(id)theCell
-         forTableColumn:(NSTableColumn *)tableColumn row:(int)rowIndex
-{
-   NSAttributedString *cellAttrString;
-   float cellWidth;
-   int lastGlyph;
-   NSRange glyphRange, characterRange;
-   NSMutableAttributedString *newString;
-
-   [ theCell setDrawsBackground:NO ];
-
-   cellAttrString = [ theCell attributedStringValue ];
-   cellWidth = [ tableColumn width ];
-   // Use an ellipsis to denote strings longer than the cell can show when needed
-   if( [ cellAttrString size ].width > cellWidth )
+   docArray = [ NSMutableArray arrayWithCapacity:10 ];
+   attrEOL = [ [ NSAttributedString alloc ] initWithString:@"\n" ];
+   rtfdStringRows = [ [ NSMutableAttributedString alloc ] initWithString:@"" ];
+   rowEnumerator = [ rows objectEnumerator ];
+   while( ( rowNumber = [ rowEnumerator nextObject ] ) != nil )
    {
-      [ textStorage setAttributedString:cellAttrString ];
-      lastGlyph = [ layoutManager glyphIndexForPoint:NSMakePoint( cellWidth, 0 )
-                                  inTextContainer:textContainer ];
-      glyphRange = NSMakeRange( 0, lastGlyph - 1 );
-      characterRange = [ layoutManager characterRangeForGlyphRange:glyphRange
-                                       actualGlyphRange:NULL ];
-      newString = [ [ NSMutableAttributedString alloc ]
-                    initWithAttributedString:
-                       [ cellAttrString attributedSubstringFromRange:
-                                           characterRange ] ];
-      [ [ newString mutableString ] appendString:@"É" ];
-      // Remove the foreground color, otherwise it seems to get out of sync
-      [ newString removeAttribute:NSForegroundColorAttributeName
-                  range:NSMakeRange( 0, [ [ newString string ] length ] ) ];
-      [ theCell setAttributedStringValue:newString ];
-      [ newString release ];
+      row = [ rowNumber unsignedIntValue ];
+      nameString = [ self stringForKey:CSDocModelKey_Name atRow:row ];
+      acctString = [ self stringForKey:CSDocModelKey_Acct atRow:row ];
+      urlString = [ self stringForKey:CSDocModelKey_URL atRow:row ];
+      passwdString = [ self stringForKey:CSDocModelKey_Passwd atRow:row ];
+      [ docArray addObject:[ NSDictionary dictionaryWithObjectsAndKeys:
+                                             nameString, CSDocModelKey_Name,
+                                             acctString, CSDocModelKey_Acct,
+                                             passwdString, CSDocModelKey_Passwd,
+                                             urlString, CSDocModelKey_URL,
+                                             [ self RTFDNotesAtRow:row ],
+                                                CSDocModelKey_Notes, nil ] ];
+      if( [ [ NSUserDefaults standardUserDefaults ]
+                                     boolForKey:CSPrefDictKey_IncludePasswd ] )
+         attrString = [ [ NSAttributedString alloc ] initWithString:
+                           [ NSString stringWithFormat:@"%@\t%@\t%@\t%@\t",
+                              nameString, acctString, passwdString, urlString ] ];
+      else
+         attrString = [ [ NSAttributedString alloc ] initWithString:
+                           [ NSString stringWithFormat:@"%@\t%@\t%@\t",
+                              nameString, acctString, urlString ] ];
+      [ rtfdStringRows appendAttributedString:attrString ];
+      [ attrString release ];
+      [ rtfdStringRows appendAttributedString:[ self RTFDStringNotesAtRow:row ] ];
+      [ rtfdStringRows appendAttributedString:attrEOL ];
    }
+
+   [ attrEOL release ];
+   [ pboard declareTypes:[ NSArray arrayWithObjects:CSDocumentPboardType,
+                                                    NSRTFDPboardType,
+                                                    NSRTFPboardType,
+                                                    NSTabularTextPboardType,
+                                                    NSStringPboardType, nil ]
+            owner:nil ];
+   [ pboard setData:[ NSArchiver archivedDataWithRootObject:docArray ]
+            forType:CSDocumentPboardType ];
+   [ pboard setData:[ rtfdStringRows RTFDWithDocumentAttributes:NULL ]
+            forType:NSRTFDPboardType ];
+   [ pboard setData:[ rtfdStringRows RTFWithDocumentAttributes:NULL ]
+            forType:NSRTFPboardType ];
+   [ pboard setString:[ rtfdStringRows string ] forType:NSTabularTextPboardType ];
+   [ pboard setString:[ rtfdStringRows string ] forType:NSStringPboardType ];
+   [ rtfdStringRows release ];
+
+   return YES;
 }
 
 
 /*
- * Enable/disable delete and view buttons depending on whether something
- * is selected
+ * Grab rows from the given pasteboard
  */
-- (void) tableViewSelectionDidChange:(NSNotification *)aNotification
+- (BOOL) retrieveRowsFromPasteboard:(NSPasteboard *)pboard
+         undoName:(NSString *)undoName
 {
-   BOOL enableState;
+   NSArray *rowsArray;
+   int index;
+   NSDictionary *rowDictionary;
 
-   if( [ documentView numberOfSelectedRows ] == 0 )
-      enableState = NO;
-   else
-      enableState = YES;
+   rowsArray = [ NSUnarchiver unarchiveObjectWithData:
+                                 [ pboard dataForType:CSDocumentPboardType ] ];
+   if( rowsArray != nil && [ rowsArray count ] > 0 )
+   {
+      for( index = 0; index < [ rowsArray count ]; index++ )
+      {
+         rowDictionary = [ rowsArray objectAtIndex:index ];
+         [ self addEntryWithName:[ self _uniqueNameForName:
+                                [ rowDictionary objectForKey:CSDocModelKey_Name ] ]
+                account:[ rowDictionary objectForKey:CSDocModelKey_Acct ]
+                password:[ rowDictionary objectForKey:CSDocModelKey_Passwd ]
+                URL:[ rowDictionary objectForKey:CSDocModelKey_URL ]
+                notesRTFD:[ rowDictionary objectForKey:CSDocModelKey_Notes ] ];
+      }
+      [ [ self undoManager ] setActionName:undoName ];
+   }
 
-   [ documentDeleteButton setEnabled:enableState ];
-   [ documentViewButton setEnabled:enableState ];
-}
-
-
-/*
- * Support dragging of tableview rows
- */
-- (BOOL) tableView:(NSTableView *)tv writeRows:(NSArray *)rows
-         toPasteboard:(NSPasteboard *)pboard
-{
-   return [ self _copyRows:rows toPasteboard:pboard ];
-}
-
-
-/*
- * We copy on drops (the registerForDraggedTypes sets up for only
- * CSDocumentPboardType)
- */
-- (NSDragOperation) tableView:(NSTableView*)tv
-                    validateDrop:(id <NSDraggingInfo>)info proposedRow:(int)row
-                    proposedDropOperation:(NSTableViewDropOperation)op
-{
-   return NSDragOperationCopy;
-}
-
-
-/*
- * Accept a drop
- */
-- (BOOL) tableView:(NSTableView*)tv acceptDrop:(id <NSDraggingInfo>)info
-         row:(int)row dropOperation:(NSTableViewDropOperation)op
-{
-   return [ self _retrieveRowsFromPasteboard:[ info draggingPasteboard ]
-                 undoName:CSDOCUMENT_LOC_DROP ];
+   return YES;
 }
 
 
 /*
  * Proxy methods to the model
  */
+/*
+ * Number of rows/entries
+ */
+- (unsigned) entryCount
+{
+   return [ [ self _model ] entryCount ];
+}
+
+
+/*
+ * Set the model's sort key
+ */
+- (void) setSortKey:(NSString *)newSortKey
+{
+   [ [ self _model ] setSortKey:newSortKey ];
+}
+
+
+/*
+ * Return the model's sort key
+ */
+- (NSString *) sortKey
+{
+   return [ [ self _model ] sortKey ];
+}
+
+
+/*
+ * Set model's sort is/isn't ascending
+ */
+- (void) setSortAscending:(BOOL)sortAsc
+{
+   [ [ self _model ] setSortAscending:sortAsc ];
+}
+
+
+/*
+ * Is model's sort ascending?
+ */
+- (BOOL) isSortAscending
+{
+   return [ [ self _model ] isSortAscending ];
+}
+
+
+/*
+ * Set model's sort key and ascending state
+ */
+- (void) setSortKey:(NSString *)newSortKey ascending:(BOOL)sortAsc
+{
+   [ [ self _model ] setSortKey:newSortKey ascending:sortAsc ];
+}
+
+
 /*
  * Get the string value for some key at the given row
  */
@@ -593,107 +477,7 @@ static NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 {
    [ self _setBFKey:nil ];
    [ docModel release ];
-   [ textStorage release ];
    [ super dealloc ];
-}
-
-
-/*
- * Copy the given rows to the given pasteboard (rows must be an array of
- * objects which respond to unsignedIntValue for the row number)
- */
-- (BOOL) _copyRows:(NSArray *)rows toPasteboard:(NSPasteboard *)pboard
-{
-   NSMutableArray *docArray;
-   NSMutableAttributedString *rtfdStringRows;
-   NSAttributedString *attrString, *attrEOL;
-   NSEnumerator *rowEnumerator;
-   id rowNumber;
-   int row;
-   NSString *nameString, *acctString, *passwdString, *urlString;
-
-   docArray = [ NSMutableArray arrayWithCapacity:10 ];
-   attrEOL = [ [ NSAttributedString alloc ] initWithString:@"\n" ];
-   rtfdStringRows = [ [ NSMutableAttributedString alloc ] initWithString:@"" ];
-   rowEnumerator = [ rows objectEnumerator ];
-   while( ( rowNumber = [ rowEnumerator nextObject ] ) != nil )
-   {
-      row = [ rowNumber unsignedIntValue ];
-      nameString = [ self stringForKey:CSDocModelKey_Name atRow:row ];
-      acctString = [ self stringForKey:CSDocModelKey_Acct atRow:row ];
-      urlString = [ self stringForKey:CSDocModelKey_URL atRow:row ];
-      passwdString = [ self stringForKey:CSDocModelKey_Passwd atRow:row ];
-      [ docArray addObject:[ NSDictionary dictionaryWithObjectsAndKeys:
-                                             nameString, CSDocModelKey_Name,
-                                             acctString, CSDocModelKey_Acct,
-                                             passwdString, CSDocModelKey_Passwd,
-                                             urlString, CSDocModelKey_URL,
-                                             [ self RTFDNotesAtRow:row ],
-                                                CSDocModelKey_Notes, nil ] ];
-      if( [ [ NSUserDefaults standardUserDefaults ]
-                                     boolForKey:CSPrefDictKey_IncludePasswd ] )
-         attrString = [ [ NSAttributedString alloc ] initWithString:
-                           [ NSString stringWithFormat:@"%@\t%@\t%@\t%@\t",
-                              nameString, acctString, passwdString, urlString ] ];
-      else
-         attrString = [ [ NSAttributedString alloc ] initWithString:
-                           [ NSString stringWithFormat:@"%@\t%@\t%@\t",
-                              nameString, acctString, urlString ] ];
-      [ rtfdStringRows appendAttributedString:attrString ];
-      [ attrString release ];
-      [ rtfdStringRows appendAttributedString:[ self RTFDStringNotesAtRow:row ] ];
-      [ rtfdStringRows appendAttributedString:attrEOL ];
-   }
-
-   [ attrEOL release ];
-   [ pboard declareTypes:[ NSArray arrayWithObjects:CSDocumentPboardType,
-                                                    NSRTFDPboardType,
-                                                    NSRTFPboardType,
-                                                    NSTabularTextPboardType,
-                                                    NSStringPboardType, nil ]
-            owner:nil ];
-   [ pboard setData:[ NSArchiver archivedDataWithRootObject:docArray ]
-            forType:CSDocumentPboardType ];
-   [ pboard setData:[ rtfdStringRows RTFDWithDocumentAttributes:NULL ]
-            forType:NSRTFDPboardType ];
-   [ pboard setData:[ rtfdStringRows RTFWithDocumentAttributes:NULL ]
-            forType:NSRTFPboardType ];
-   [ pboard setString:[ rtfdStringRows string ] forType:NSTabularTextPboardType ];
-   [ pboard setString:[ rtfdStringRows string ] forType:NSStringPboardType ];
-   [ rtfdStringRows release ];
-
-   return YES;
-}
-
-
-/*
- * Grab rows from the given pasteboard
- */
-- (BOOL) _retrieveRowsFromPasteboard:(NSPasteboard *)pboard
-         undoName:(NSString *)undoName
-{
-   NSArray *rowsArray;
-   int index;
-   NSDictionary *rowDictionary;
-
-   rowsArray = [ NSUnarchiver unarchiveObjectWithData:
-                                 [ pboard dataForType:CSDocumentPboardType ] ];
-   if( rowsArray != nil && [ rowsArray count ] > 0 )
-   {
-      for( index = 0; index < [ rowsArray count ]; index++ )
-      {
-         rowDictionary = [ rowsArray objectAtIndex:index ];
-         [ self addEntryWithName:[ self _uniqueNameForName:
-                                [ rowDictionary objectForKey:CSDocModelKey_Name ] ]
-                account:[ rowDictionary objectForKey:CSDocModelKey_Acct ]
-                password:[ rowDictionary objectForKey:CSDocModelKey_Passwd ]
-                URL:[ rowDictionary objectForKey:CSDocModelKey_URL ]
-                notesRTFD:[ rowDictionary objectForKey:CSDocModelKey_Notes ] ];
-      }
-      [ [ self undoManager ] setActionName:undoName ];
-   }
-
-   return YES;
 }
 
 
@@ -718,46 +502,6 @@ static NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
    }
 
    return uniqueName;
-}
-
-
-/*
- * Setup the given column to have the correct indicator image, and remove the
- * one from the previous column
- */
-- (void) _setSortingImageForColumn:(NSTableColumn *)tableColumn
-{
-   if( [ [ self _model ] isSortAscending ] )
-      [ documentView setIndicatorImage:[ NSImage imageNamed:@"sortArrowUp" ]
-                     inTableColumn:tableColumn ];
-   else
-      [ documentView setIndicatorImage:[ NSImage imageNamed:@"sortArrowDown" ]
-                     inTableColumn:tableColumn ];
-   if( previouslySelectedColumn != tableColumn )
-      [ documentView setIndicatorImage:nil
-                     inTableColumn:previouslySelectedColumn ];
-   previouslySelectedColumn = tableColumn;
-}
-
-
-/*
- * Return an array of the names for selected rows in the table view
- */
-- (NSArray *) _getSelectedNames
-{
-   NSMutableArray *selectedNames;
-   NSEnumerator *rowEnumerator;
-   NSNumber *rowNumber;
-
-   selectedNames = [ NSMutableArray arrayWithCapacity:10 ];
-   rowEnumerator = [ documentView selectedRowEnumerator ];
-   while( ( rowNumber = [ rowEnumerator nextObject ] ) != nil )
-   {
-      [ selectedNames addObject:[ self stringForKey:CSDocModelKey_Name
-                                       atRow:[ rowNumber unsignedIntValue ] ] ];
-   }
-
-   return selectedNames;
 }
 
 
@@ -840,8 +584,7 @@ static NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
             [ [ changeController window ] performClose:self ];
       }
    }
-   [ documentView reloadData ];
-   [ documentView deselectAll:self ];
+   [ mainWindowController refreshWindow ];
 }
 
 

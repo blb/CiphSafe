@@ -3,32 +3,34 @@
 #import <Cocoa/Cocoa.h>
 
 @class CSDocModel;
+@class CSWinCtrlMain;
 
 @interface CSDocument : NSDocument 
 {
    CSDocModel *docModel;
    NSMutableData *bfKey;
-   NSTableColumn *previouslySelectedColumn;
-   NSWindowController *mainWindowController;
-   NSTextStorage *textStorage;
-   NSLayoutManager *layoutManager;
-   NSTextContainer *textContainer;
-
-   IBOutlet NSTableView *documentView;
-   IBOutlet NSMenu *contextualMenu;
-   IBOutlet NSButton *documentDeleteButton;
-   IBOutlet NSButton *documentViewButton;
+   CSWinCtrlMain *mainWindowController;
 }
-
-// Actions from the main window
-- (IBAction) docAddEntry:(id)sender;
-- (IBAction) docViewEntry:(id)sender;
-- (IBAction) docDeleteEntry:(id)sender;
 
 // Actions from the menu
 - (IBAction) docChangePassphrase:(id)sender;
 
+// Creating new windows
+- (void) openAddEntryWindow;
+- (void) viewEntries:(NSArray *)namesArray;
+
+// Copy/paste support (and drag/drop)
+- (BOOL) copyRows:(NSArray *)rows toPasteboard:(NSPasteboard *)pboard;
+- (BOOL) retrieveRowsFromPasteboard:(NSPasteboard *)pboard
+         undoName:(NSString *)undoName;
+
 // Methods to add/change/delete entries
+- (unsigned) entryCount;
+- (void) setSortKey:(NSString *)newSortKey;
+- (NSString *) sortKey;
+- (void) setSortAscending:(BOOL)sortAsc;
+- (BOOL) isSortAscending;
+- (void) setSortKey:(NSString *)newSortKey ascending:(BOOL)sortAsc;
 - (NSString *) stringForKey:(NSString *)key atRow:(unsigned)row;
 - (NSData *) RTFDNotesAtRow:(unsigned)row;
 - (NSData *) RTFNotesAtRow:(unsigned)row;
