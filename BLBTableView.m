@@ -108,23 +108,47 @@
 
 
 /*
- * The delegate must conform to the BLBTableView_CMM protocol for this to work
+ * The delegate must implement contextualMenuForTableView:row:column: for this
+ * to work
  */
 - (NSMenu *) menuForEvent:(NSEvent *)theEvent
 {
+   SEL contextMenuSel;
    NSPoint clickPoint;
    int clickColumn, clickRow;
 
-   clickPoint = [ self convertPoint:[ theEvent locationInWindow ] fromView:nil ];
-   clickColumn = [ self columnAtPoint:clickPoint ];
-   clickRow = [ self rowAtPoint:clickPoint ];
+   contextMenuSel = @selector( contextualMenuForTableView:row:column: );
+   if( [ [ self delegate ] respondsToSelector:contextMenuSel ] )
+   {
+      clickPoint = [ self convertPoint:[ theEvent locationInWindow ]
+                          fromView:nil ];
+      clickColumn = [ self columnAtPoint:clickPoint ];
+      clickRow = [ self rowAtPoint:clickPoint ];
 
-   if( clickColumn >= 0 && clickRow >= 0 &&
-       [ [ self delegate ]
-         conformsToProtocol:@protocol( BLBTableView_CMM ) ] )
-      return [ [ self delegate ] contextualMenuForTableViewRow:clickRow ];
+      if( clickColumn >= 0 && clickRow >= 0 )
+         return [ [ self delegate ] contextualMenuForTableView:self
+                                    row:clickRow
+                                    column:clickColumn ];
+   }
 
    return nil;
+}
+
+
+/*
+ * Allow delegate to handle keydown events, if it wants
+ */
+- (void) keyDown:(NSEvent *)theEvent
+{
+   BOOL sendToSuper;
+   SEL didReceiveSel = @selector( tableView:didReceiveKeyDownEvent: );
+
+   sendToSuper = YES;
+   if( [ [ self delegate ] respondsToSelector:didReceiveSel ] &&
+       [ [ self delegate ] tableView:self didReceiveKeyDownEvent:theEvent ] )
+      sendToSuper = NO;
+   if( sendToSuper )
+      [ super keyDown:theEvent ];
 }
 
 

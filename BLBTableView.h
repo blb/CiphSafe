@@ -34,11 +34,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-// Implement this to provide a contextual menu
-@protocol BLBTableView_CMM
-- (NSMenu *) contextualMenuForTableViewRow:(int)row;
-@end
-
 @interface BLBTableView : NSTableView
 {
    NSColor *_stripeColor;
@@ -47,4 +42,18 @@
 // Set the stripe color
 - (void) setStripeColor:(NSColor *)newStripeColor;
 
+@end
+
+/*
+ * Added methods for the delegate
+ *
+ * implement contextualMenuForTableView:row:column: to add a contextual menu for
+ * the given row
+ * implement tableView:didReceiveKeyDownEvent: to handle key presses in the table
+ */
+@interface NSObject (BLBTableViewDelegate)
+- (NSMenu *) contextualMenuForTableView:(BLBTableView *)tableView
+             row:(int)row column:(int)column;
+- (BOOL) tableView:(BLBTableView *)tableView
+         didReceiveKeyDownEvent:(NSEvent *)theEvent;
 @end
