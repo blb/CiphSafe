@@ -20,6 +20,11 @@ calculating the SHA-1 hash for each half.  Since SHA-1 generates a 160 bit
 result, this is where the 320 bit keysize originates.
 
 <p>
+Both the Blowfish and SHA-1 algorithms are not actually in the application,
+however, as CiphSafe uses the <a href="http://www.openssl.org">OpenSSL</a>
+library (shipped with Mac OS X) to perform this work.
+
+<p>
 Since CiphSafe uses cipher block chaining, it requires an initialization
 vector (IV).  The IV is simply eight random bytes, grabbed from the
 /dev/random device.  It is then saved as the first part of the resulting
