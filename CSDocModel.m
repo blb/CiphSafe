@@ -477,8 +477,10 @@ int sortEntries( id dict1, id dict2, void *context );
 {
    sortKey = CSDocModelKey_Name;
    sortAscending = YES;
-//   [ NSData setCompressLogging:NO ];
-//   [ NSData setCryptoLogging:NO ];
+#if !defined(DEBUG)
+   [ NSData setCompressLogging:NO ];
+   [ NSData setCryptoLogging:NO ];
+#endif
 }
 
 
