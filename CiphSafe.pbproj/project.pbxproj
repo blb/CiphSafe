@@ -331,7 +331,7 @@
 	<key>CFBundleExecutable</key>
 	<string>CiphSafe</string>
 	<key>CFBundleGetInfoString</key>
-	<string>0.4.0, Copyright © 2002 Bryan L Blackburn</string>
+	<string>0.6.0, Copyright © 2002 Bryan L Blackburn</string>
 	<key>CFBundleIconFile</key>
 	<string></string>
 	<key>CFBundleIdentifier</key>
@@ -343,11 +343,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.4.0</string>
+	<string>0.6.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>0.4.0</string>
+	<string>0.6.0</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
@@ -365,7 +365,6 @@
 				F4709C3B0347B16501A8070A,
 				F4709C410347B2E301A8070A,
 				F4709C470347B35801A8070A,
-				F4709C480347B35801A8070A,
 				F4A59E42034A64F401A8070A,
 				F4A59E46034A669701A8070A,
 				F477F7DA036E2EB301A8070A,
@@ -409,7 +408,6 @@
 				F4709C3E0347B16501A8070A,
 				F4709C420347B2E301A8070A,
 				F4709C490347B35801A8070A,
-				F4709C4A0347B35801A8070A,
 				F4A59E43034A64F401A8070A,
 				F4A59E47034A669701A8070A,
 				F477F7DB036E2EB301A8070A,
@@ -558,8 +556,6 @@
 				F4A59E45034A669701A8070A,
 				F4A59E40034A64F401A8070A,
 				F4A59E41034A64F401A8070A,
-				F4709C450347B35801A8070A,
-				F4709C460347B35801A8070A,
 			);
 			isa = PBXGroup;
 			name = CocoaExtensions;
@@ -697,36 +693,14 @@
 			path = NSArray_FOOC.m;
 			refType = 4;
 		};
-		F4709C450347B35801A8070A = {
-			isa = PBXFileReference;
-			path = NSTableView_CMM.h;
-			refType = 4;
-		};
-		F4709C460347B35801A8070A = {
-			isa = PBXFileReference;
-			path = NSTableView_CMM.m;
-			refType = 4;
-		};
 		F4709C470347B35801A8070A = {
 			fileRef = F4709C430347B35801A8070A;
 			isa = PBXBuildFile;
 			settings = {
 			};
 		};
-		F4709C480347B35801A8070A = {
-			fileRef = F4709C450347B35801A8070A;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F4709C490347B35801A8070A = {
 			fileRef = F4709C440347B35801A8070A;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F4709C4A0347B35801A8070A = {
-			fileRef = F4709C460347B35801A8070A;
 			isa = PBXBuildFile;
 			settings = {
 			};
