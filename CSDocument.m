@@ -119,23 +119,19 @@
  */
 - (BOOL) loadDataRepresentation:(NSData *)data ofType:(NSString *)aType
 {
-   BOOL inRevert;
-
    NSAssert( [ aType isEqualToString:CSDOCUMENT_NAME ], @"Unknown file type" );
 
-   inRevert = NO;
    if( docModel != nil )   // This'll happen on revert
    {
       [ CSWinCtrlChange closeOpenControllersForDocument:self ];
       [ docModel release ];
       docModel = nil;
-      inRevert = YES;
    }
    
    // Loop through until we either successfully open it, or the user cancels
    while( docModel == nil )
    {
-      if( !inRevert )
+      if( bfKey == nil )
          [ self _setBFKey:[ passphraseWindowController
                                getEncryptionKeyWithNote:CSPassphraseNote_Load
                                forDocumentNamed:[ self displayName ] ] ];
@@ -600,6 +596,7 @@
                    selector:@selector( _updateViewForNotification: )
                    name:CSDocModelDidRemoveEntryNotification
                    object:docModel ];
+   [ mainWindowController refreshWindow ];
 }
 
 
