@@ -34,6 +34,7 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
 #define CSWINCTRLPASSPHRASE_LOC_CANCEL NSLocalizedString( @"Cancel", @"" )
 
 @interface CSWinCtrlPassphrase (InternalMethods)
+- (void) _setAndSizeWindowForView:(NSView *)theView;
 - (BOOL) _doPassphrasesMatch;
 - (NSMutableData *) _genKeyForConfirm:(BOOL)useConfirmTab;
 @end
@@ -62,8 +63,7 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
                                             CSWINCTRLPASSPHRASE_LOC_WINTITLE,
                                             docName ] ];
    [ passphraseNote1 setStringValue:NSLocalizedString( noteType, nil ) ];
-   [ tabView selectTabViewItemWithIdentifier:
-                CSWINCTRLPASSPHRASE_TABVIEW_NOCONFIRM ];
+   [ self _setAndSizeWindowForView:nonConfirmView ];
    parentWindow = nil;
    windowReturn = [ NSApp runModalForWindow:[ self window ] ];
    [ [ self window ] orderOut:self ];
@@ -89,7 +89,7 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
 {
    [ [ self window ] setTitle:@"" ];
    [ passphraseNote2 setStringValue:NSLocalizedString( noteType, nil ) ];
-   [ tabView selectTabViewItemWithIdentifier:CSWINCTRLPASSPHRASE_TABVIEW_CONFIRM ];
+   [ self _setAndSizeWindowForView:confirmView ];
    parentWindow = window;
    modalDelegate = delegate;
    sheetEndSelector = selector;
@@ -155,6 +155,26 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
       [ [ self _genKeyForConfirm:YES ] clearOutData ];
       [ modalDelegate performSelector:sheetEndSelector withObject:nil ];
    }
+}
+
+
+/*
+ * Size the window to fit the given frame
+ */
+- (void) _setAndSizeWindowForView:(NSView *)theView
+{
+   NSWindow *myWindow;
+   NSRect contentRect;
+
+   myWindow = [ self window ];
+   contentRect = [ NSWindow contentRectForFrameRect:[ myWindow frame ]
+                             styleMask:[ myWindow styleMask ] ];
+   contentRect.origin.y += contentRect.size.height - [ theView frame ].size.height;
+   contentRect.size = [ theView frame ].size;
+   [ myWindow setFrame:[ NSWindow frameRectForContentRect:contentRect
+                                  styleMask:[ myWindow styleMask ] ]
+              display:NO ];
+   [ myWindow setContentView:theView ];
 }
 
 

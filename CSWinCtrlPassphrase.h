@@ -13,11 +13,13 @@ extern NSString * const CSPassphraseNote_Change;
    id modalDelegate;
    SEL sheetEndSelector;
 
-   IBOutlet NSTabView *tabView;
-   // Non-confirming tab
+   // View without confirmed passphrase entry
+   IBOutlet NSView *nonConfirmView;
    IBOutlet NSTextField *passphraseNote1;
    IBOutlet NSTextField *passphrasePhrase1;
-   // Confirming tab
+
+   // View with confirmed passphrase entry
+   IBOutlet NSView *confirmView;
    IBOutlet NSTextField *passphraseNote2;
    IBOutlet NSTextField *passphrasePhrase2;
    IBOutlet NSTextField *passphrasePhraseConfirm;
