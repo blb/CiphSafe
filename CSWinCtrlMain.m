@@ -38,6 +38,13 @@
 #import "CSDocModel.h"
 #import "BLBTextField.h"
 
+// Format strings for window and table view information saved in user defaults
+#define CSWINCTRLMAIN_PREF_WINDOW @"CSWinCtrlMain Window %@"
+#define CSWINCTRLMAIN_PREF_TABLE @"CSWinCtrlMain Table %@"
+// Dictionary keys in saved table view information
+#define CSWINCTRLMAIN_PREF_TABLE_NAME @"name"
+#define CSWINCTRLMAIN_PREF_TABLE_WIDTH @"width"
+
 // Localized strings
 #define CSWINCTRLMAIN_LOC_SUREDELROWS \
            NSLocalizedString( @"Are you sure you want to delete the selected " \
@@ -62,6 +69,10 @@
 #define CSWINCTRLMAIN_LOC_FILTERED NSLocalizedString( @"filtered", @"" )
 
 @interface CSWinCtrlMain (InternalMethods)
+- (void) _loadSavedWindowState;
+- (void) _saveWindowState;
+- (void) _loadSavedTableState;
+- (void) _saveTableState;
 - (void) _setSearchResultList:(NSArray *)newList;
 - (void) _filterView;
 - (void) _updateStatusField;
@@ -112,21 +123,12 @@ static NSAttributedString *defaultSearchString;
  */
 - (void) awakeFromNib
 {
-   NSString *displayName;
-   NSString *windowFrameString;
-
    if( [ [ self document ] fileName ] != nil )
    {
-      displayName = [ [ self document ] displayName ];
-      windowFrameString = [ [ NSUserDefaults standardUserDefaults ]
-                            stringForKey:[ NSString stringWithFormat:
-                                                       @"NSWindow Frame %@",
-                                                       displayName ] ];
-      if( windowFrameString != nil )
-         [ [ self window ] setFrameFromString:windowFrameString ];
-      [ _documentView setAutosaveName:displayName ];
-      [ _documentView setAutosaveTableColumns:YES ];
+      [ self _loadSavedWindowState ];
+      [ self _loadSavedTableState ];
    }
+
    [ _documentView setDrawsGrid:NO ];
    [ _documentView setDrawsGrid:YES ];
    [ _documentView setStripeColor:[ NSColor colorWithCalibratedRed:0.93
@@ -396,6 +398,37 @@ static NSAttributedString *defaultSearchString;
 
 
 /*
+ * Handle keypresses in the table view by scrolling to the first entry whose
+ * name begins with the key pressed
+ */
+- (BOOL) tableView:(BLBTableView *)tableView
+         didReceiveKeyDownEvent:(NSEvent *)theEvent
+{
+   BOOL retval;
+   NSNumber *rowForKey;
+   int filteredRow;
+
+   retval = NO;
+   rowForKey = [ [ self document ]
+                 firstRowBeginningWithString:[ theEvent characters ]
+                 ignoreCase:YES
+                 forKey:CSDocModelKey_Name ];
+   if( rowForKey != nil )
+   {
+      filteredRow = [ self _filteredRowForRow:[ rowForKey intValue ] ];
+      if( filteredRow >= 0 )
+      {
+         [ tableView selectRow:filteredRow byExtendingSelection:NO ];
+         [ tableView scrollRowToVisible:filteredRow ];
+         retval = YES;
+      }
+   }
+
+   return retval;
+}
+
+
+/*
  * Contextual menu methods
  */
 /*
@@ -497,37 +530,6 @@ static NSAttributedString *defaultSearchString;
 
 
 /*
- * Handle keypresses in the table view by scrolling to the first entry whose
- * name begins with the key pressed
- */
-- (BOOL) tableView:(BLBTableView *)tableView
-         didReceiveKeyDownEvent:(NSEvent *)theEvent
-{
-   BOOL retval;
-   NSNumber *rowForKey;
-   int filteredRow;
-
-   retval = NO;
-   rowForKey = [ [ self document ]
-                 firstRowBeginningWithString:[ theEvent characters ]
-                 ignoreCase:YES
-                 forKey:CSDocModelKey_Name ];
-   if( rowForKey != nil )
-   {
-      filteredRow = [ self _filteredRowForRow:[ rowForKey intValue ] ];
-      if( filteredRow >= 0 )
-      {
-         [ tableView selectRow:filteredRow byExtendingSelection:NO ];
-         [ tableView scrollRowToVisible:filteredRow ];
-         retval = YES;
-      }
-   }
-
-   return retval;
-}
-
-
-/*
  * This happens when the search text field is focused; we simply clear the
  * search field if it hasn't been modified yet (clearing the gray "search")
  */
@@ -564,21 +566,102 @@ static NSAttributedString *defaultSearchString;
  */
 - (void) windowWillClose:(NSNotification *)notification
 {
-   NSUserDefaults *userDefaults;
-   NSString *displayName;
-
    if( [ [ self document ] fileName ] != nil )
    {
-      userDefaults = [ NSUserDefaults standardUserDefaults ];
-      displayName = [ [ self document ] displayName ];
-      [ userDefaults setObject:[ [ self window ] stringWithSavedFrame ]
-                     forKey:[ NSString stringWithFormat:@"NSWindow Frame %@",
-                                                        displayName ] ];
-      [ _documentView setAutosaveName:displayName ];
-      [ _documentView setAutosaveTableColumns:YES ];
-      [ userDefaults synchronize ];
+      [ self _saveWindowState ];
+      [ self _saveTableState ];
+      [ [ NSUserDefaults standardUserDefaults ] synchronize ];
    }
    [ self _setSearchResultList:nil ];
+}
+
+
+/*
+ * Load previously-saved window layout information, if any
+ */
+- (void) _loadSavedWindowState
+{
+   NSString *windowFrameString;
+
+   windowFrameString = [ [ NSUserDefaults standardUserDefaults ]
+                         stringForKey:[ NSString stringWithFormat:
+                                            CSWINCTRLMAIN_PREF_WINDOW,
+                                            [ [ self document ] displayName ] ] ];
+   if( windowFrameString != nil )
+      [ [ self window ] setFrameFromString:windowFrameString ];
+}
+
+
+/*
+ * Save window layout information
+ */
+- (void) _saveWindowState
+{
+   [ [ NSUserDefaults standardUserDefaults ]
+     setObject:[ [ self window ] stringWithSavedFrame ]
+     forKey:[ NSString stringWithFormat:CSWINCTRLMAIN_PREF_WINDOW,
+                                           [ [ self document ] displayName ] ] ];
+}
+
+
+/*
+ * Load previously-saved table layout information, if any
+ */
+- (void) _loadSavedTableState
+{
+   NSArray *tableInfoArray, *colName;
+   int index, currentColIndex;
+   NSDictionary *columnInfoDict;
+   NSTableColumn *tableColumn;
+
+   tableInfoArray = [ [ NSUserDefaults standardUserDefaults ]
+                      objectForKey:[ NSString stringWithFormat:
+                                            CSWINCTRLMAIN_PREF_TABLE,
+                                            [ [ self document ] displayName ] ] ];
+   // Loop through rearranging columns and setting each column's size
+   if( tableInfoArray != nil )
+   {
+      for( index = 0; index < [ tableInfoArray count ]; index++ )
+      {
+         columnInfoDict = [ tableInfoArray objectAtIndex:index ];
+         colName = [ columnInfoDict objectForKey:CSWINCTRLMAIN_PREF_TABLE_NAME  ];
+         currentColIndex = [ _documentView columnWithIdentifier:colName ];
+         [ _documentView moveColumn:currentColIndex toColumn:index ];
+         tableColumn = [ _documentView tableColumnWithIdentifier:colName ];
+         [ tableColumn setWidth:[ [ columnInfoDict objectForKey:
+                                                  CSWINCTRLMAIN_PREF_TABLE_WIDTH ]
+                                  floatValue ] ];
+      }
+   }
+}
+
+
+/*
+ * Save table layout information
+ */
+- (void) _saveTableState
+{
+   NSArray *tableColumns;
+   NSMutableArray *colArray;
+   int index;
+   NSTableColumn *tableColumn;
+
+   tableColumns = [ _documentView tableColumns ];
+   colArray = [ NSMutableArray arrayWithCapacity:[ tableColumns count ] ];
+   for( index = 0; index < [ tableColumns count ]; index++ )
+   {
+      tableColumn = [ tableColumns objectAtIndex:index ];
+      [ colArray addObject:[ NSDictionary dictionaryWithObjectsAndKeys:
+                               [ tableColumn identifier ],
+                                  CSWINCTRLMAIN_PREF_TABLE_NAME,
+                               [ NSNumber numberWithFloat:[ tableColumn width ] ],
+                                  CSWINCTRLMAIN_PREF_TABLE_WIDTH,
+                               nil ] ];
+   }
+   [ [ NSUserDefaults standardUserDefaults ]
+     setObject:colArray
+     forKey:[ NSString stringWithFormat:CSWINCTRLMAIN_PREF_TABLE,
+                                           [ [ self document ] displayName ] ] ];
 }
 
 
