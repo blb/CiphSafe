@@ -1,13 +1,13 @@
-/* CSTableView.h */
+/* BLBTableView.h */
 
 #import <Cocoa/Cocoa.h>
 
 // Implement this to provide a contextual menu
-@protocol CSTableView_CMM
+@protocol BLBTableView_CMM
 - (NSMenu *) contextualMenuForTableViewRow:(int)row;
 @end
 
-@interface CSTableView : NSTableView
+@interface BLBTableView : NSTableView
 {
    NSColor *stripeColor;
 }

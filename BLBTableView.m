@@ -1,12 +1,12 @@
-/* CSTableView.m */
+/* BLBTableView.m */
 
-#import "CSTableView.h"
+#import "BLBTableView.h"
 
-@interface CSTableView (InternalMethods)
+@interface BLBTableView (InternalMethods)
 - (void) _drawStripesInRect:(NSRect)clipRect;
 @end
 
-@implementation CSTableView
+@implementation BLBTableView
 
 /*
  * Set the cells to not draw a background, so the striping works nicely
@@ -76,7 +76,7 @@
 
 
 /*
- * The delegate must conform to the CSTableView_CMM protocol for this to work
+ * The delegate must conform to the BLBTableView_CMM protocol for this to work
  */
 - (NSMenu *) menuForEvent:(NSEvent *)theEvent
 {
@@ -89,7 +89,7 @@
 
    if( clickColumn >= 0 && clickRow >= 0 &&
        [ [ self delegate ]
-         conformsToProtocol:@protocol( CSTableView_CMM ) ] )
+         conformsToProtocol:@protocol( BLBTableView_CMM ) ] )
       return [ [ self delegate ] contextualMenuForTableViewRow:clickRow ];
 
    return nil;
