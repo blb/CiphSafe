@@ -65,11 +65,12 @@ static BOOL cryptoLoggingEnabled = YES;
    ssize_t amtRead, oneRead;
    NSFileHandle *devRandom;
 
-   randomData = [ NSMutableData dataWithLength:len ];
+   randomData = nil;
    amtRead = 0;
    devRandom = [ NSFileHandle fileHandleForReadingAtPath:@"/dev/random" ];
    if( devRandom != nil )
    {
+      randomData = [ NSMutableData dataWithLength:len ];
       while( amtRead < len )
       {
          /*
