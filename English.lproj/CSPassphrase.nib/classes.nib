@@ -1,0 +1,13 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {passphraseAccept = id; passphraseCancel = id; }; 
+            CLASS = CSWinCtrlPassphrase; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {passphraseNote = NSTextField; passphrasePhrase = NSTextField; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}
