@@ -297,8 +297,8 @@ int sortEntries( id dict1, id dict2, void *context );
  */
 - (NSAttributedString *) RTFStringNotesAtRow:(unsigned)row
 {
-   return [ [ [ NSAttributedString alloc ] initWithRTF:[ self RTFNotesAtRow:row ]
-                                           documentAttributes:NULL ]
+   return [ [ [ NSAttributedString alloc ]
+              initWithRTF:[ self RTFNotesAtRow:row ] documentAttributes:NULL ]
             autorelease ];
 }
 
@@ -331,8 +331,10 @@ int sortEntries( id dict1, id dict2, void *context );
  * XXX Note that the name of the added entry will live on in the undo manager
  * and is also given to the notification center
  */
-- (BOOL) addEntryWithName:(NSString *)name account:(NSString *)account
-         password:(NSString *)password URL:(NSString *)url
+- (BOOL) addEntryWithName:(NSString *)name
+         account:(NSString *)account
+         password:(NSString *)password
+         URL:(NSString *)url
          notesRTFD:(NSData *)notes
 {
    // If it already exists, we're outta here
@@ -340,12 +342,17 @@ int sortEntries( id dict1, id dict2, void *context );
       return NO;
 
    [ _allEntries addObject:[ NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                                   name, CSDocModelKey_Name,
-                                                   account, CSDocModelKey_Acct,
-                                                   password, CSDocModelKey_Passwd,
-                                                   url, CSDocModelKey_URL,
-                                                   notes, CSDocModelKey_Notes,
-                                                   nil ] ];
+                                                    name,
+                                                       CSDocModelKey_Name,
+                                                    account,
+                                                       CSDocModelKey_Acct,
+                                                    password,
+                                                       CSDocModelKey_Passwd,
+                                                    url,
+                                                       CSDocModelKey_URL,
+                                                    notes,
+                                                       CSDocModelKey_Notes,
+                                                    nil ] ];
    if( _undoManager != nil )
    {
       [ _undoManager registerUndoWithTarget:self
@@ -375,9 +382,12 @@ int sortEntries( id dict1, id dict2, void *context );
  * XXX Note that the changed entry will live on in the undo manager
  * and both the old and new names are given to the notification center
  */
-- (BOOL) changeEntryWithName:(NSString *)name newName:(NSString *)newName
-         account:(NSString *)account password:(NSString *)password
-         URL:(NSString *)url notesRTFD:(NSData *)notes
+- (BOOL) changeEntryWithName:(NSString *)name
+         newName:(NSString *)newName
+         account:(NSString *)account
+         password:(NSString *)password
+         URL:(NSString *)url
+         notesRTFD:(NSData *)notes
 {
    NSMutableDictionary *theEntry;
    NSString *realNewName;   // This will be the name of the end result
@@ -423,9 +433,11 @@ int sortEntries( id dict1, id dict2, void *context );
      postNotificationName:CSDocModelDidChangeEntryNotification
      object:self
      userInfo:[ NSDictionary dictionaryWithObjectsAndKeys:
-                         name, CSDocModelNotificationInfoKey_ChangedNameFrom,
-                         realNewName, CSDocModelNotificationInfoKey_ChangedNameTo,
-                         nil ] ];
+                                name,
+                                   CSDocModelNotificationInfoKey_ChangedNameFrom,
+                                realNewName,
+                                   CSDocModelNotificationInfoKey_ChangedNameTo,
+                                nil ] ];
 
    return YES;
 }
@@ -538,8 +550,7 @@ int sortEntries( id dict1, id dict2, void *context );
       compareOptions = NSCaseInsensitiveSearch;
    for( index = 0; index < [ _allEntries count ]; index++ )
    {
-      searchResult = [ [ [ _allEntries objectAtIndex:index ]
-                         objectForKey:key ]
+      searchResult = [ [ [ _allEntries objectAtIndex:index ] objectForKey:key ]
                        rangeOfString:findMe options:compareOptions ];
       if( searchResult.location != NSNotFound )
 

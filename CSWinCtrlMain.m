@@ -98,7 +98,7 @@ static NSAttributedString *defaultSearchString;
                            attributes:
                               [ NSDictionary dictionaryWithObjectsAndKeys:
                                                 [ NSColor grayColor ],
-                                                NSForegroundColorAttributeName,
+                                                   NSForegroundColorAttributeName,
                                                 nil ] ];
 }
 

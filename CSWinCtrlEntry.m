@@ -169,7 +169,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
  */
 - (NSUndoManager *) windowWillReturnUndoManager:(NSWindow *)window
 {
-   if( [ [ self window ] firstResponder ] == _notes )
+   if( [ [ [ self window ] firstResponder ] isEqual:_notes ] )
       return _notesUM;
    else
       return _otherUM;

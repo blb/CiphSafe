@@ -53,7 +53,8 @@
  */
 @interface NSObject (BLBTableViewDelegate)
 - (NSMenu *) contextualMenuForTableView:(BLBTableView *)tableView
-             row:(int)row column:(int)column;
+             row:(int)row
+             column:(int)column;
 - (BOOL) tableView:(BLBTableView *)tableView
          didReceiveKeyDownEvent:(NSEvent *)theEvent;
 @end

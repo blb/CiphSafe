@@ -48,6 +48,7 @@
 + (void) _removeController:(CSWinCtrlChange *)oldController
          forDocument:(NSDocument *)document;
 + (NSNumber *) _numberForDocument:(NSDocument *)document;
+- (BOOL) _doesField:(NSTextField *)field matchStringWithKey:(NSString *)key;
 - (void) _updateFields;
 @end
 
@@ -240,35 +241,20 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 
 - (BOOL) accountChanged
 {
-   int row;
-
-   row = [ [ self document ] rowForName:_myEntryName ];
-
-   return ![ [ _accountText stringValue ]
-             isEqualToString:[ [ self document ] stringForKey:CSDocModelKey_Acct
-                                                 atRow:row ] ];
+   return ![ self _doesField:_accountText
+                  matchStringWithKey:CSDocModelKey_Acct ];
 }
 
 - (BOOL) passwordChanged
 {
-   int row;
-
-   row = [ [ self document ] rowForName:_myEntryName ];
-
-   return ![ [ _passwordText stringValue ]
-             isEqualToString:[ [ self document ] stringForKey:CSDocModelKey_Passwd
-                                                 atRow:row ] ];
+   return ![ self _doesField:_passwordText
+                  matchStringWithKey:CSDocModelKey_Passwd ];
 }
 
 - (BOOL) urlChanged
 {
-   int row;
-
-   row = [ [ self document ] rowForName:_myEntryName ];
-
-   return ![ [ _urlText stringValue ]
-             isEqualToString:[ [ self document ] stringForKey:CSDocModelKey_URL
-                                                 atRow:row ] ];
+   return ![ self _doesField:_urlText
+                  matchStringWithKey:CSDocModelKey_URL ];
 }
 
 - (BOOL) notesChanged
@@ -335,6 +321,20 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 + (NSNumber *) _numberForDocument:(NSDocument *)document
 {
    return [ NSNumber numberWithUnsignedInt:[ document hash ] ];
+}
+
+
+/*
+ * Return YES if the value in the given field matches the represented entry's
+ * original value for the given key
+ */
+- (BOOL) _doesField:(NSTextField *)field matchStringWithKey:(NSString *)key
+{
+   int row;
+
+   row = [ [ self document ] rowForName:_myEntryName ];
+   return [ [ field stringValue ]
+            isEqualToString:[ [ self document ] stringForKey:key atRow:row ] ];
 }
 
 

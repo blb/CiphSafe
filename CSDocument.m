@@ -326,14 +326,19 @@
       urlString = [ self stringForKey:CSDocModelKey_URL atRow:row ];
       passwdString = [ self stringForKey:CSDocModelKey_Passwd atRow:row ];
       [ docArray addObject:[ NSDictionary dictionaryWithObjectsAndKeys:
-                                             nextName, CSDocModelKey_Name,
-                                             acctString, CSDocModelKey_Acct,
-                                             passwdString, CSDocModelKey_Passwd,
-                                             urlString, CSDocModelKey_URL,
+                                             nextName,
+                                                CSDocModelKey_Name,
+                                             acctString,
+                                                CSDocModelKey_Acct,
+                                             passwdString,
+                                                CSDocModelKey_Passwd,
+                                             urlString,
+                                                CSDocModelKey_URL,
                                              [ self RTFDNotesAtRow:row ],
-                                                CSDocModelKey_Notes, nil ] ];
+                                                CSDocModelKey_Notes,
+                                             nil ] ];
       if( [ [ NSUserDefaults standardUserDefaults ]
-                                     boolForKey:CSPrefDictKey_IncludePasswd ] )
+            boolForKey:CSPrefDictKey_IncludePasswd ] )
          attrString = [ [ NSAttributedString alloc ] initWithString:
                            [ NSString stringWithFormat:@"%@\t%@\t%@\t%@\t",
                               nextName, acctString, passwdString, urlString ] ];
@@ -352,7 +357,8 @@
                                                     NSRTFDPboardType,
                                                     NSRTFPboardType,
                                                     NSTabularTextPboardType,
-                                                    NSStringPboardType, nil ]
+                                                    NSStringPboardType,
+                                                    nil ]
             owner:nil ];
    [ pboard setData:[ NSArchiver archivedDataWithRootObject:docArray ]
             forType:CSDocumentPboardType ];
@@ -706,7 +712,7 @@
       {
          changeController = [ CSWinCtrlChange controllerForEntryName:
                                                 [ namesArray objectAtIndex:index ]
-                                             inDocument:self ];
+                                              inDocument:self ];
          if( changeController != nil )
             [ [ changeController window ] performClose:self ];
       }
