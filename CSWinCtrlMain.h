@@ -1,6 +1,6 @@
 /* CSWinCtrlMain.h */
 
-#import <AppKit/AppKit.h>
+#import <Cocoa/Cocoa.h>
 #import "BLBTableView.h"
 
 @interface CSWinCtrlMain : NSWindowController <BLBTableView_CMM>
