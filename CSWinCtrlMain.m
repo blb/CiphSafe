@@ -739,15 +739,15 @@ static NSArray *searchWhatArray;
              integerForKey:CSPrefDictKey_CellSpacing ] )
    {
       case 0:   // Small
-         newSpacing = NSMakeSize( 4, 2 );
+         newSpacing = NSMakeSize( 3, 2 );
          break;
 
       case 1:   // Medium
-         newSpacing = NSMakeSize( 6, 2 );
+         newSpacing = NSMakeSize( 5, 2 );
          break;
 
       case 2:   // Large
-         newSpacing = NSMakeSize( 8, 3 );
+         newSpacing = NSMakeSize( 7, 3 );
          break;
    }
    [ _documentView setIntercellSpacing:newSpacing ];
