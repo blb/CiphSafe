@@ -555,7 +555,7 @@ int sortEntries( id dict1, id dict2, void *context )
       value2 = [ dict1 objectForKey:[ objSelf sortKey ] ];
    }
 
-   return [ value1 compare:value2 ];
+   return [ value1 caseInsensitiveCompare:value2 ];
 }
 
 @end
