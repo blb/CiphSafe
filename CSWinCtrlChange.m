@@ -157,11 +157,11 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
                            URL:[ urlText stringValue ]
                            notesRTFD:[ notes RTFDFromRange:fullNotesRange ] ] )
    {
+      [ [ self window ] setDocumentEdited:NO ];
       if( ![ [ NSUserDefaults standardUserDefaults ]
              boolForKey:CSPrefDictKey_CloseEdit ] )
       {
          [ self setEntryName:[ nameText stringValue ] ];
-         [ [ self window ] setDocumentEdited:NO ];
          // This won't work if we do it right away, so put it on the event queue
          [ [ NSRunLoop currentRunLoop ]
            performSelector:@selector( makeFirstResponder: )
