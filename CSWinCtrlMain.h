@@ -35,7 +35,7 @@
 #import <Cocoa/Cocoa.h>
 #import "BLBTableView.h"
 
-@interface CSWinCtrlMain : NSWindowController <BLBTableView_CMM>
+@interface CSWinCtrlMain : NSWindowController
 {
    NSTableColumn *_previouslySelectedColumn;
 

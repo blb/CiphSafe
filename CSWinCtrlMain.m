@@ -345,9 +345,11 @@
  * Provide the contextual menu for the table view; select the view for good
  * visual feedback
  */
-- (NSMenu *) contextualMenuForTableViewRow:(int)row
+- (NSMenu *) contextualMenuForTableView:(BLBTableView *)tableView
+             row:(int)row
+             column:(int)column
 {
-   [ _documentView selectRow:row byExtendingSelection:NO ];
+   [ tableView selectRow:row byExtendingSelection:NO ];
 
    return _contextualMenu;
 }
@@ -432,6 +434,31 @@
       NSBeginInformationalAlertSheet( CSWINCTRLMAIN_LOC_INVALIDURL,
                                       nil, nil, nil, [ self window ], nil, nil,
                                       nil, nil, CSWINCTRLMAIN_LOC_URLNOTVALID );
+}
+
+
+/*
+ * Handle keypresses in the table view by scrolling to the first entry whose
+ * name begins with the key pressed
+ */
+- (BOOL) tableView:(BLBTableView *)tableView
+         didReceiveKeyDownEvent:(NSEvent *)theEvent
+{
+   NSNumber *rowForKey;
+
+   rowForKey = [ [ self document ]
+                 firstRowBeginningWithString:[ theEvent characters ]
+                 ignoreCase:YES
+                 forKey:CSDocModelKey_Name ];
+   if( rowForKey != nil )
+   {
+      [ tableView selectRow:[ rowForKey unsignedIntValue ]
+                  byExtendingSelection:NO ];
+      [ tableView scrollRowToVisible:[ rowForKey unsignedIntValue ] ];
+      return YES;
+   }
+   else
+      return NO;
 }
 
 
