@@ -29,6 +29,14 @@ static const char *genOther    = "`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
    if( self != nil )
    {
       notesUM = [ [ NSUndoManager alloc ] init ];
+      [ [ NSNotificationCenter defaultCenter ]
+        addObserver:self selector:@selector( _undoManagerDidChange: )
+        name:NSUndoManagerDidUndoChangeNotification
+        object:notesUM ];
+      [ [ NSNotificationCenter defaultCenter ]
+        addObserver:self selector:@selector( _undoManagerDidChange: )
+        name:NSUndoManagerDidRedoChangeNotification
+        object:notesUM ];
       otherUM = [ [ NSUndoManager alloc ] init ];
    }
 
@@ -241,6 +249,16 @@ static const char *genOther    = "`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
    [ notesUM release ];
    [ otherUM release ];
    [ super dealloc ];
+}
+
+
+/*
+ * When the undo manager for the notes text view performs undo or redo, we
+ * update the edited status
+ */
+- (void) _undoManagerDidChange:(NSNotification *)notification
+{
+   [ self updateDocumentEditedStatus ];
 }
 
 @end
