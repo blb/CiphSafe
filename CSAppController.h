@@ -19,6 +19,8 @@ extern NSString * const CSDocumentPboardType;
 
 @interface CSAppController : NSObject
 {
+   int lastPBChangeCount;
+
    // Preferences window
    IBOutlet NSWindow *prefsWindow;
    // Interface tab
@@ -35,6 +37,9 @@ extern NSString * const CSDocumentPboardType;
    IBOutlet NSButton *prefsKeepBackup;
    IBOutlet NSButton *prefsClearClipboard;
 }
+
+// Note the general pasteboard's current change count
+- (void) notePBChangeCount;
 
 // Actions for the prefs window
 - (IBAction) openPrefs:(id)sender;
