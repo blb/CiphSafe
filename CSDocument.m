@@ -17,23 +17,17 @@
 
 #define CSDOCUMENT_NAME @"CiphSafe Document"
 
-#define CSDOCUMENT_SAVETOFILE_FILENAME @"CSDOCUMENT_SAVETOFILE_FILENAME"
-#define CSDOCUMENT_SAVETOFILE_SAVEOP @"CSDOCUMENT_SAVETOFILE_SAVEOP"
-#define CSDOCUMENT_SAVETOFILE_DELEGATE @"CSDOCUMENT_SAVETOFILE_DELEGATE"
-#define CSDOCUMENT_SAVETOFILE_SELECTOR @"CSDOCUMENT_SAVETOFILE_SELECTOR"
-#define CSDOCUMENT_SAVETOFILE_CONTEXTINFO @"CSDOCUMENT_SAVETOFILE_CONTEXTINFO"
-
-#define CSDOCUMENT_GETKEYSTATE_NONE       0
-#define CSDOCUMENT_GETKEYSTATE_SAVETOFILE 1
-#define CSDOCUMENT_GETKEYSTATE_CHANGE     2
-
 @interface CSDocument (InternalMethods)
 - (NSString *) _uniqueNameForName:(NSString *)name;
 - (CSDocModel *) _model;
 - (void) _setupModel;
 - (void) _updateViewForNotification:(NSNotification *)notification;
-- (void) _beginPassphraseSheetForState:(int)state note:(NSString *)note;
 - (void) _getKeyResult:(NSMutableData *)newKey;
+- (void) _saveToFile:(NSString *)fileName
+         saveOperation:(NSSaveOperationType)saveOperation
+         delegate:(id)delegate
+         didSaveSelector:(SEL)didSaveSelector
+         contextInfo:(void *)contextInfo;
 - (void) _setBFKey:(NSMutableData *)newKey;
 @end
 
@@ -44,8 +38,6 @@
    self = [ super init ];
    if( self != nil )
    {
-      getKeyState = CSDOCUMENT_GETKEYSTATE_NONE;
-      saveToFileInfo = [ [ NSMutableDictionary alloc ] initWithCapacity:5 ];
       // Note this window controller is NOT added to NSDocument's list
       passphraseWindowController = [ [ CSWinCtrlPassphrase alloc ] init ];
    }
@@ -74,24 +66,32 @@
          didSaveSelector:(SEL)didSaveSelector
          contextInfo:(void *)contextInfo
 {
+   SEL mySelector;
+   NSMethodSignature *mySelSig;
+
    // If a filename was given and we don't yet have a key, or we're doing a save as
    if( fileName != nil &&
        ( bfKey == nil || ![ fileName isEqualToString:[ self fileName ] ] ) )
    {
-      // Save the parameters
-      [ saveToFileInfo setObject:fileName forKey:CSDOCUMENT_SAVETOFILE_FILENAME ];
-      [ saveToFileInfo setObject:[ NSNumber numberWithInt:saveOperation ]
-                       forKey:CSDOCUMENT_SAVETOFILE_SAVEOP ];
-      if( delegate != nil )
-         [ saveToFileInfo setObject:delegate
-                          forKey:CSDOCUMENT_SAVETOFILE_DELEGATE ];
-      if( didSaveSelector != nil )
-         [ saveToFileInfo setObject:NSStringFromSelector( didSaveSelector )
-                          forKey:CSDOCUMENT_SAVETOFILE_SELECTOR ];
-      [ saveToFileInfo setObject:[ NSValue valueWithPointer:contextInfo ]
-                       forKey:CSDOCUMENT_SAVETOFILE_CONTEXTINFO ];
-      [ self _beginPassphraseSheetForState:CSDOCUMENT_GETKEYSTATE_SAVETOFILE
-             note:CSPassphraseNote_Save ];
+      // Setup to call [ self _saveToFile:... ] on successful passphrase request
+      mySelector = @selector( _saveToFile:saveOperation:delegate:didSaveSelector:
+                              contextInfo: );
+      mySelSig = [ CSDocument instanceMethodSignatureForSelector:mySelector ];
+      saveToFileInvocation = [ NSInvocation invocationWithMethodSignature:
+                                               mySelSig ];
+      [ saveToFileInvocation setTarget:self ];
+      [ saveToFileInvocation setSelector:mySelector ];
+      [ saveToFileInvocation retainArguments ];
+      [ saveToFileInvocation setArgument:&fileName atIndex:2 ];
+      [ saveToFileInvocation setArgument:&saveOperation atIndex:3 ];
+      [ saveToFileInvocation setArgument:&delegate atIndex:4 ];
+      [ saveToFileInvocation setArgument:&didSaveSelector atIndex:5 ];
+      [ saveToFileInvocation setArgument:&contextInfo atIndex:6 ];
+      [ saveToFileInvocation retain ];
+      [ passphraseWindowController getEncryptionKeyWithNote:CSPassphraseNote_Save
+                                   inWindow:[ mainWindowController window ]
+                                   modalDelegate:self
+                                   sendToSelector:@selector( _getKeyResult:) ];
    }
    else
       [ super saveToFile:fileName
@@ -216,8 +216,21 @@
  */
 - (IBAction) docChangePassphrase:(id)sender
 {
-   [ self _beginPassphraseSheetForState:CSDOCUMENT_GETKEYSTATE_CHANGE
-          note:CSPassphraseNote_Change ];
+   SEL mySelector;
+   NSMethodSignature *mySelSig;
+
+   // Setup to call [ self saveDocument:self ] on successful passphrase request
+   mySelector = @selector( saveDocument: );
+   mySelSig = [ CSDocument instanceMethodSignatureForSelector:mySelector ];
+   saveToFileInvocation = [ NSInvocation invocationWithMethodSignature:mySelSig ];
+   [ saveToFileInvocation setTarget:self ];
+   [ saveToFileInvocation setSelector:mySelector ];
+   [ saveToFileInvocation setArgument:&self atIndex:2 ];
+   [ saveToFileInvocation retain ];
+   [ passphraseWindowController getEncryptionKeyWithNote:CSPassphraseNote_Change
+                                inWindow:[ mainWindowController window ]
+                                modalDelegate:self
+                                sendToSelector:@selector( _getKeyResult:) ];
 }
 
 
@@ -515,7 +528,6 @@
 - (void) dealloc
 {
    [ self _setBFKey:nil ];
-   [ saveToFileInfo release ];
    [ passphraseWindowController release ];
    [ docModel release ];
    [ super dealloc ];
@@ -637,47 +649,40 @@
 
 
 /*
- * Run the passphrase sheet for the given state and note
- */
-- (void) _beginPassphraseSheetForState:(int)state note:(NSString *)note
-{
-   getKeyState = state;
-   [ passphraseWindowController getEncryptionKeyWithNote:note
-                                inWindow:[ mainWindowController window ]
-                                modalDelegate:self
-                                sendToSelector:@selector( _getKeyResult:) ];
-}
-
-
-/*
  * Callback for the passphrase controller, when run document-modally (is
- * modally a word?)
+ * modally a word?); simply invokes saveToFileInvocation is the user didn't
+ * hit cancel 
  */
 - (void) _getKeyResult:(NSMutableData *)newKey
 {
-   NSAssert( getKeyState != CSDOCUMENT_GETKEYSTATE_NONE,
-             @"getKeyState is none, but our callback has been called" );
+   NSAssert( saveToFileInvocation != nil, @"saveToFileInvocation is nil" );
 
    if( newKey != nil )
    {
       [ self _setBFKey:newKey ];
-      switch( getKeyState )
-      {
-         case CSDOCUMENT_GETKEYSTATE_SAVETOFILE:
-            [ super saveToFile:[ saveToFileInfo objectForKey:CSDOCUMENT_SAVETOFILE_FILENAME ]
-                    saveOperation:[ [ saveToFileInfo objectForKey:CSDOCUMENT_SAVETOFILE_SAVEOP ] intValue ]
-                    delegate:[ saveToFileInfo objectForKey:CSDOCUMENT_SAVETOFILE_DELEGATE ]
-                    didSaveSelector:NSSelectorFromString( [ saveToFileInfo objectForKey:CSDOCUMENT_SAVETOFILE_SELECTOR ] )
-                    contextInfo:[ [ saveToFileInfo objectForKey:CSDOCUMENT_SAVETOFILE_CONTEXTINFO ] pointerValue ] ];
-            break;
-
-         case CSDOCUMENT_GETKEYSTATE_CHANGE:
-            [ super saveDocument:self ];
-            break;
-      }
+      [ saveToFileInvocation invoke ];
    }
 
-   getKeyState = CSDOCUMENT_GETKEYSTATE_NONE;
+   [ saveToFileInvocation release ];
+   saveToFileInvocation = nil;
+}
+
+
+/*
+ * This simply calls super's saveToFile:... as we need to pass some object
+ * to NSInvocation as the target, and super won't work
+ */
+- (void) _saveToFile:(NSString *)fileName
+         saveOperation:(NSSaveOperationType)saveOperation
+         delegate:(id)delegate
+         didSaveSelector:(SEL)didSaveSelector
+         contextInfo:(void *)contextInfo
+{
+   [ super saveToFile:fileName
+           saveOperation:saveOperation
+           delegate:delegate
+           didSaveSelector:didSaveSelector
+           contextInfo:contextInfo ];
 }
 
 
