@@ -178,6 +178,7 @@ static NSColor *selectedEndColor, *unselectedEndColor;
    [ newMenu retain ];
    [ _menuToDisplay release ];
    _menuToDisplay = newMenu;
+   [ self setMenu:newMenu ];
 }
 
 
