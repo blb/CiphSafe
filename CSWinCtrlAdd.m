@@ -56,7 +56,6 @@
  */
 - (void) awakeFromNib
 {
-   [ super awakeFromNib ];
    [ self doClear:self ];
 }
 
