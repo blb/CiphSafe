@@ -70,13 +70,26 @@
         NSLocalizedString( @"EVP_DigestFinal wrote %u bytes, not the expected " \
         @"of %u", @"" )
 
-@interface NSData (withay_crypto_InternalMethods)
-+ (void) _doCryptoLog:(NSString *)format, ...;
-@end
 
 @implementation NSData (withay_crypto)
 
 static BOOL cryptoLoggingEnabled = YES;
+
+/*
+ * Log the warning/error, if logging enabled
+ */
++ (void) doCryptoLog:(NSString *)format, ...
+{
+   va_list args;
+   
+   if( cryptoLoggingEnabled )
+   {
+      va_start( args, format );
+      NSLogv( [ NSString stringWithFormat:@"NSData_crypto: %@\n", format ], args );
+      va_end( args );
+   }
+}
+
 
 /*
  * Whether or not errors should be logged
@@ -113,7 +126,7 @@ static BOOL cryptoLoggingEnabled = YES;
                          len - amtRead );
          if( oneRead <= 0 && ( errno != EINTR && errno != EAGAIN ) )
          {
-            [ NSData _doCryptoLog:NSDATA_CRYPTO_LOC_READERR, strerror( errno ),
+            [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_READERR, strerror( errno ),
                                   errno ];
             randomData = nil;
             break;
@@ -123,7 +136,7 @@ static BOOL cryptoLoggingEnabled = YES;
       [ devRandom closeFile ];
    }
    else
-      [ NSData _doCryptoLog:NSDATA_CRYPTO_LOC_FAILOPENRAND ];
+      [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_FAILOPENRAND ];
 
    return randomData;
 }
@@ -152,36 +165,36 @@ static BOOL cryptoLoggingEnabled = YES;
                encLen = [ self length ] + 8;   // Make sure we have enough space
                encryptedData = [ NSMutableData dataWithLength:encLen ];
                if( EVP_EncryptUpdate( &cipherContext,
-                                      [ encryptedData mutableBytes ], &encLen,
+                                      [ encryptedData mutableBytes ], (int *) &encLen,
                                       [ self bytes ], [ self length ] ) )
                {
                   finalLen = encLen;
                   encLen = [ encryptedData length ] - finalLen;
                   if( EVP_EncryptFinal( &cipherContext,
                                        [ encryptedData mutableBytes ] + finalLen,
-                                       &encLen ) )
+                                       (int *) &encLen ) )
                   {
                      finalLen += encLen;
                      [ encryptedData setLength:finalLen ];
                   }
                   else
-                     [ NSData _doCryptoLog:NSDATA_CRYPTO_LOC_ENCRYPTFINALFAIL ];
+                     [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_ENCRYPTFINALFAIL ];
                }
                else
-                  [ NSData _doCryptoLog:NSDATA_CRYPTO_LOC_ENCRYPTUPDATEFAIL ];
+                  [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_ENCRYPTUPDATEFAIL ];
             }
             else
-               [ NSData _doCryptoLog:NSDATA_CRYPTO_LOC_ENCRYPTINITFAIL ];
+               [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_ENCRYPTINITFAIL ];
          }
          else
-            [ NSData _doCryptoLog:NSDATA_CRYPTO_LOC_SETKEYLENFAIL ];
+            [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_SETKEYLENFAIL ];
          EVP_CIPHER_CTX_cleanup( &cipherContext );
       }
       else
-         [ NSData _doCryptoLog:NSDATA_CRYPTO_LOC_ENCRYPTINITINITIALFAIL ];
+         [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_ENCRYPTINITINITIALFAIL ];
    }
    else
-      [ NSData _doCryptoLog:NSDATA_CRYPTO_LOC_IVBAD, [ iv length ] ];
+      [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_IVBAD, [ iv length ] ];
 
    if( encryptedData != nil && [ encryptedData length ] != finalLen )
       encryptedData = nil;
@@ -213,35 +226,35 @@ static BOOL cryptoLoggingEnabled = YES;
                decLen = [ self length ] + 8;   // Make sure there's enough room
                plainData = [ NSMutableData dataWithLength:decLen ];
                if( EVP_DecryptUpdate( &cipherContext, [ plainData mutableBytes ],
-                                      &decLen, [ self bytes ], [ self length ] ) )
+                                      (int *) &decLen, [ self bytes ], [ self length ] ) )
                {
                   finalLen = decLen;
                   decLen = [ plainData length ] - finalLen;
                   if( EVP_DecryptFinal( &cipherContext,
                                         [ plainData mutableBytes ] + finalLen,
-                                        &decLen ) )
+                                        (int *) &decLen ) )
                   {
                      finalLen += decLen;
                      [ plainData setLength:finalLen ];
                   }
                   else
-                     [ NSData _doCryptoLog:NSDATA_CRYPTO_LOC_DECRYPTFINALFAIL ];
+                     [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_DECRYPTFINALFAIL ];
                }
                else
-                  [ NSData _doCryptoLog:NSDATA_CRYPT_LOC_DECRYPTUPDATEFAIL ];
+                  [ NSData doCryptoLog:NSDATA_CRYPT_LOC_DECRYPTUPDATEFAIL ];
             }
             else
-               [ NSData _doCryptoLog:NSDATA_CRYPTO_LOC_DECRYPTINITSETKEYFAIL ];
+               [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_DECRYPTINITSETKEYFAIL ];
          }
          else
-            [ NSData _doCryptoLog:NSDATA_CRYPTO_LOC_SETKEYLENFAIL ];
+            [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_SETKEYLENFAIL ];
          EVP_CIPHER_CTX_cleanup( &cipherContext );
       }
       else
-         [ NSData _doCryptoLog:NSDATA_CRYPTO_LOC_DECRYPTINITINTIALFAIL ];
+         [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_DECRYPTINITINTIALFAIL ];
    }
    else
-      [ NSData _doCryptoLog:NSDATA_CRYPTO_LOC_IVBAD, [ iv length ] ];
+      [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_IVBAD, [ iv length ] ];
 
    if( plainData != nil && [ plainData length ] != finalLen )
       plainData = nil;
@@ -266,28 +279,12 @@ static BOOL cryptoLoggingEnabled = YES;
    EVP_DigestFinal( &digestContext, [ hashValue mutableBytes ], &writtenLen );
    if( writtenLen != hashLen )
    {
-      [ NSData _doCryptoLog:NSDATA_CRYPTO_LOC_DIGESTFINALFAIL, writtenLen,
+      [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_DIGESTFINALFAIL, writtenLen,
                             hashLen ];
       hashValue = nil;
    }
 
    return hashValue;
-}
-
-
-/*
- * Log the warning/error, if logging enabled
- */
-+ (void) _doCryptoLog:(NSString *)format, ...
-{
-   va_list args;
-
-   if( cryptoLoggingEnabled )
-   {
-      va_start( args, format );
-      NSLogv( [ NSString stringWithFormat:@"NSData_crypto: %@\n", format ], args );
-      va_end( args );
-   }
 }
 
 @end
