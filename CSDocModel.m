@@ -83,12 +83,6 @@ NSString * const CSDocModelNotificationInfoKey_DeletedNames =
 // Used to sort the array
 int sortEntries( id dict1, id dict2, void *context );
 
-@interface CSDocModel (InternalMethods)
-- (NSMutableDictionary *) _findEntryWithName:(NSString *)name;
-- (void) _setupSelf;
-- (NSString *) _stringFrom:(NSDictionary *)dict forKey:(NSString *)key;
-- (NSData *) _dataFrom:(NSDictionary *)dict forKey:(NSString *)key;
-@end
 
 @implementation CSDocModel
 
@@ -101,6 +95,68 @@ int sortEntries( id dict1, id dict2, void *context );
    CSDocModelCategory_OtherWeb = CSDOCMODEL_LOC_CATOTHERWEB;
 }
 
+
+/*
+ * Return the entry for the given name, or nil if not found
+ */
+- (NSMutableDictionary *) findEntryWithName:(NSString *)name
+{
+   NSEnumerator *enumerator;
+   NSMutableDictionary *anEntry;
+   
+   enumerator = [ allEntries objectEnumerator ];
+   while( ( ( anEntry = [ enumerator nextObject ] ) != nil ) &&
+          ![ [ anEntry objectForKey:CSDocModelKey_Name ] isEqualToString:name ] )
+      ;   // Just loop through...
+   
+   return anEntry;
+}
+
+
+/*
+ * Setup our configuration
+ */
+- (void) setupSelf
+{
+   sortKey = CSDocModelKey_Name;
+   sortAscending = YES;
+#if !defined(DEBUG)
+   [ NSData setCompressLogging:NO ];
+   [ NSData setCryptoLogging:NO ];
+#endif
+}
+
+
+/*
+ * Return a valid string (empty, @"", if necessary)
+ */
+- (NSString *) stringFrom:(NSDictionary *)dict forKey:(NSString *)key
+{
+   NSString *result;
+   
+   result = [ dict objectForKey:key ];
+   if( result == nil )
+      result = @"";
+   
+   return result;
+}
+
+
+/*
+ * Return valid data (empty if necessary)
+ */
+- (NSData *) dataFrom:(NSDictionary *)dict forKey:(NSString *)key
+{
+   NSData *result;
+   
+   result = [ dict objectForKey:key ];
+   if( result == nil )
+      result = [ NSData data ];
+   
+   return result;
+}
+
+
 /*
  * Initialize an empty document
  */
@@ -108,9 +164,9 @@ int sortEntries( id dict1, id dict2, void *context );
 {
    if( ( self = [ super init ] ) )
    {
-      _allEntries = [ [ NSMutableArray alloc ] initWithCapacity:25 ];
-      _entryASCache = [ [ NSMutableDictionary alloc ] initWithCapacity:25 ];
-      [ self _setupSelf ];
+      allEntries = [ [ NSMutableArray alloc ] initWithCapacity:25 ];
+      entryASCache = [ [ NSMutableDictionary alloc ] initWithCapacity:25 ];
+      [ self setupSelf ];
    }
 
    return self;
@@ -144,20 +200,20 @@ int sortEntries( id dict1, id dict2, void *context );
          [ decryptedData clearOutData ];
          if( uncompressedData != nil )
          {
-            _allEntries = [ NSUnarchiver unarchiveObjectWithData:
+            allEntries = [ NSUnarchiver unarchiveObjectWithData:
                                             uncompressedData ];
             [ uncompressedData clearOutData ];
-            if( _allEntries != nil )
+            if( allEntries != nil )
             {
-               [ _allEntries retain ];
-               _entryASCache = [ [ NSMutableDictionary alloc ]
-                                 initWithCapacity:[ _allEntries count ] ];
-               [ self _setupSelf ];
-               [ _allEntries sortUsingFunction:sortEntries context:self ];
+               [ allEntries retain ];
+               entryASCache = [ [ NSMutableDictionary alloc ]
+                                 initWithCapacity:[ allEntries count ] ];
+               [ self setupSelf ];
+               [ allEntries sortUsingFunction:sortEntries context:self ];
             }
          }
       }
-      if( _allEntries == nil )
+      if( allEntries == nil )
       {
          [ self release ];
          self = nil;
@@ -177,7 +233,7 @@ int sortEntries( id dict1, id dict2, void *context );
    NSMutableData *compressedData, *ivAndData;
 
    iv = [ NSData randomDataOfLength:8 ];
-   archivedData = [ NSArchiver archivedDataWithRootObject:_allEntries ];
+   archivedData = [ NSArchiver archivedDataWithRootObject:allEntries ];
    compressedData = [ archivedData compressedData ];
    [ archivedData clearOutData ];
    ceData = [ compressedData blowfishEncryptedDataWithKey:bfKey iv:iv ];
@@ -197,8 +253,8 @@ int sortEntries( id dict1, id dict2, void *context );
 - (void) setUndoManager:(NSUndoManager *)newManager
 {
    [ newManager retain ];
-   [ _undoManager release ];
-   _undoManager = newManager;
+   [ undoManager release ];
+   undoManager = newManager;
 }
 
 
@@ -207,7 +263,7 @@ int sortEntries( id dict1, id dict2, void *context );
  */
 - (NSUndoManager *) undoManager
 {
-   return _undoManager;
+   return undoManager;
 }
 
 
@@ -216,7 +272,7 @@ int sortEntries( id dict1, id dict2, void *context );
  */
 - (void) setSortKey:(NSString *)newSortKey
 {
-   [ self setSortKey:newSortKey ascending:_sortAscending ];
+   [ self setSortKey:newSortKey ascending:sortAscending ];
 }
 
 
@@ -225,7 +281,7 @@ int sortEntries( id dict1, id dict2, void *context );
  */
 - (NSString *) sortKey
 {
-   return _sortKey;
+   return sortKey;
 }
 
 
@@ -234,7 +290,7 @@ int sortEntries( id dict1, id dict2, void *context );
  */
 - (void) setSortAscending:(BOOL)sortAsc
 {
-   [ self setSortKey:_sortKey ascending:sortAsc ];
+   [ self setSortKey:sortKey ascending:sortAsc ];
 }
 
 
@@ -243,7 +299,7 @@ int sortEntries( id dict1, id dict2, void *context );
  */
 - (BOOL) isSortAscending
 {
-   return _sortAscending;
+   return sortAscending;
 }
 
 
@@ -252,9 +308,9 @@ int sortEntries( id dict1, id dict2, void *context );
  */
 - (void) setSortKey:(NSString *)newSortKey ascending:(BOOL)sortAsc
 {
-   _sortKey = newSortKey;
-   _sortAscending = sortAsc;
-   [ _allEntries sortUsingFunction:sortEntries context:self ];
+   sortKey = newSortKey;
+   sortAscending = sortAsc;
+   [ allEntries sortUsingFunction:sortEntries context:self ];
    [ [ NSNotificationCenter defaultCenter ]
      postNotificationName:CSDocModelDidChangeSortNotification
      object:self ];
@@ -266,7 +322,7 @@ int sortEntries( id dict1, id dict2, void *context );
  */
 - (int) entryCount
 {
-   return [ _allEntries count ];
+   return [ allEntries count ];
 }
 
 
@@ -280,7 +336,7 @@ int sortEntries( id dict1, id dict2, void *context );
    if( [ key isEqualToString:CSDocModelKey_Notes ] )
       result = [ [ self RTFDStringNotesAtRow:row ] string ];
    else
-      result = [ [ _allEntries objectAtIndex:row ] objectForKey:key ];
+      result = [ [ allEntries objectAtIndex:row ] objectForKey:key ];
    if( result == nil )
       result = @"";
 
@@ -293,7 +349,7 @@ int sortEntries( id dict1, id dict2, void *context );
  */
 - (NSData *) RTFDNotesAtRow:(int)row
 {
-   return [ [ _allEntries objectAtIndex:row ] objectForKey:CSDocModelKey_Notes ];
+   return [ [ allEntries objectAtIndex:row ] objectForKey:CSDocModelKey_Notes ];
 }
 
 
@@ -321,7 +377,7 @@ int sortEntries( id dict1, id dict2, void *context );
    NSData *rtfdData;
    NSAttributedString *rtfdString;
 
-   rtfdString = [ _entryASCache objectForKey:
+   rtfdString = [ entryASCache objectForKey:
                              [ self stringForKey:CSDocModelKey_Name atRow:row ] ];
    if( rtfdString == nil )
    {
@@ -330,7 +386,7 @@ int sortEntries( id dict1, id dict2, void *context );
       {
          rtfdString = [ [ NSAttributedString alloc ]
                           initWithRTFD:rtfdData documentAttributes:NULL ];
-         [ _entryASCache setObject:rtfdString
+         [ entryASCache setObject:rtfdString
                          forKey:[ self stringForKey:CSDocModelKey_Name atRow:row ] ];
          [ rtfdString release ];
       }
@@ -392,7 +448,7 @@ int sortEntries( id dict1, id dict2, void *context );
    if( [ self rowForName:name ] != -1 )
       return NO;
 
-   [ _allEntries addObject:[ NSMutableDictionary dictionaryWithObjectsAndKeys:
+   [ allEntries addObject:[ NSMutableDictionary dictionaryWithObjectsAndKeys:
                                                     name,
                                                        CSDocModelKey_Name,
                                                     account,
@@ -406,16 +462,16 @@ int sortEntries( id dict1, id dict2, void *context );
                                                     notes,
                                                        CSDocModelKey_Notes,
                                                     nil ] ];
-   if( _undoManager != nil )
+   if( undoManager != nil )
    {
-      [ _undoManager registerUndoWithTarget:self
+      [ undoManager registerUndoWithTarget:self
                      selector:@selector( deleteEntryWithName: )
                      object:name ];
-      if( ![ _undoManager isUndoing ] && ![ _undoManager isRedoing ] )
-         [ _undoManager setActionName:CSDOCMODEL_LOC_ADD ];
+      if( ![ undoManager isUndoing ] && ![ undoManager isRedoing ] )
+         [ undoManager setActionName:CSDOCMODEL_LOC_ADD ];
    }
 
-   [ _allEntries sortUsingFunction:sortEntries context:self ];
+   [ allEntries sortUsingFunction:sortEntries context:self ];
    [ [ NSNotificationCenter defaultCenter ]
       postNotificationName:CSDocModelDidAddEntryNotification
       object:self
@@ -446,7 +502,7 @@ int sortEntries( id dict1, id dict2, void *context );
    NSMutableDictionary *theEntry;
    NSString *realNewName;   // This will be the name of the end result
 
-   theEntry = [ self _findEntryWithName:name ];
+   theEntry = [ self findEntryWithName:name ];
    /*
     * If theEntry is nil, we can't change it...
     * Also, if newName is not the same as name, and newName is already present,
@@ -457,20 +513,20 @@ int sortEntries( id dict1, id dict2, void *context );
          [ self rowForName:newName ] != -1 ) )
       return NO;
 
-   [ _entryASCache removeObjectForKey:name ];
+   [ entryASCache removeObjectForKey:name ];
    realNewName = ( newName != nil ? newName : name );
-   if( _undoManager != nil )
+   if( undoManager != nil )
    {
-      [ [ _undoManager prepareWithInvocationTarget:self ]
+      [ [ undoManager prepareWithInvocationTarget:self ]
         changeEntryWithName:realNewName
         newName:name
-        account:[ self _stringFrom:theEntry forKey:CSDocModelKey_Acct ]
-        password:[ self _stringFrom:theEntry forKey:CSDocModelKey_Passwd ]
-        URL:[ self _stringFrom:theEntry forKey:CSDocModelKey_URL ]
-        category:[ self _stringFrom:theEntry forKey:CSDocModelKey_Category ]
-        notesRTFD:[ self _dataFrom:theEntry forKey:CSDocModelKey_Notes ] ];
-      if( ![ _undoManager isUndoing ] && ![ _undoManager isRedoing ] )
-         [ _undoManager setActionName:CSDOCMODEL_LOC_CHANGE ];
+        account:[ self stringFrom:theEntry forKey:CSDocModelKey_Acct ]
+        password:[ self stringFrom:theEntry forKey:CSDocModelKey_Passwd ]
+        URL:[ self stringFrom:theEntry forKey:CSDocModelKey_URL ]
+        category:[ self stringFrom:theEntry forKey:CSDocModelKey_Category ]
+        notesRTFD:[ self dataFrom:theEntry forKey:CSDocModelKey_Notes ] ];
+      if( ![ undoManager isUndoing ] && ![ undoManager isRedoing ] )
+         [ undoManager setActionName:CSDOCMODEL_LOC_CHANGE ];
    }
 
    if( newName != nil )
@@ -486,7 +542,7 @@ int sortEntries( id dict1, id dict2, void *context );
    if( notes != nil )
       [ theEntry setObject:notes forKey:CSDocModelKey_Notes ];
 
-   [ _allEntries sortUsingFunction:sortEntries context:self ];
+   [ allEntries sortUsingFunction:sortEntries context:self ];
    [ [ NSNotificationCenter defaultCenter ]
      postNotificationName:CSDocModelDidChangeEntryNotification
      object:self
@@ -515,24 +571,24 @@ int sortEntries( id dict1, id dict2, void *context );
 
    for( index = numDeleted = 0; index < [ nameArray count ]; index++ )
    {
-      theEntry = [ self _findEntryWithName:[ nameArray objectAtIndex:index ] ];
+      theEntry = [ self findEntryWithName:[ nameArray objectAtIndex:index ] ];
       if( theEntry != nil )
       {
          numDeleted++;
-         [ _entryASCache removeObjectForKey:[ nameArray objectAtIndex:index ] ];
+         [ entryASCache removeObjectForKey:[ nameArray objectAtIndex:index ] ];
          [ theEntry retain ];   // Hold for the undo manager
-         [ _allEntries removeObject:theEntry ];
-         if( _undoManager != nil )
+         [ allEntries removeObject:theEntry ];
+         if( undoManager != nil )
          {
-            [ [ _undoManager prepareWithInvocationTarget:self ]
+            [ [ undoManager prepareWithInvocationTarget:self ]
               addEntryWithName:[ theEntry objectForKey:CSDocModelKey_Name ]
               account:[ theEntry objectForKey:CSDocModelKey_Acct ]
               password:[ theEntry objectForKey:CSDocModelKey_Passwd ]
               URL:[ theEntry objectForKey:CSDocModelKey_URL ]
               category:[ theEntry objectForKey:CSDocModelKey_Category ]
               notesRTFD:[ theEntry objectForKey:CSDocModelKey_Notes ] ];
-            if( ![ _undoManager isUndoing ] && ![ _undoManager isRedoing ] )
-               [ _undoManager setActionName:CSDOCMODEL_LOC_DELETE ];
+            if( ![ undoManager isUndoing ] && ![ undoManager isRedoing ] )
+               [ undoManager setActionName:CSDOCMODEL_LOC_DELETE ];
          }
          [ theEntry release ];   // Undo manager now has it
       }
@@ -540,7 +596,7 @@ int sortEntries( id dict1, id dict2, void *context );
 
    if( numDeleted > 0 )
    {
-      [ _allEntries sortUsingFunction:sortEntries context:self ];
+      [ allEntries sortUsingFunction:sortEntries context:self ];
       [ [ NSNotificationCenter defaultCenter ]
         postNotificationName:CSDocModelDidRemoveEntryNotification
         object:self
@@ -629,78 +685,25 @@ int sortEntries( id dict1, id dict2, void *context );
 - (void) dealloc
 {
    /*
-    * XXX At this point, we should go through all entries in _allEntries, and
+    * XXX At this point, we should go through all entries in allEntries, and
     * clear out each dictionary entry; however, since the entries are mostly
     * strings, and these tend to be NSCFString, ie, bridged to CFString, and
     * CFString being more difficult to look into than, say, NSData, we can't
     * clear it out.
     */
-   [ _allEntries release ];
-   [ _entryASCache release ];
-   [ _undoManager release ];
+   [ allEntries release ];
+   [ entryASCache release ];
+   [ undoManager release ];
    [ super dealloc ];
 }
 
 
-/*
- * Return the entry for the given name, or nil if not found
- */
-- (NSMutableDictionary *) _findEntryWithName:(NSString *)name
-{
-   NSEnumerator *enumerator;
-   NSMutableDictionary *anEntry;
-
-   enumerator = [ _allEntries objectEnumerator ];
-   while( ( ( anEntry = [ enumerator nextObject ] ) != nil ) &&
-          ![ [ anEntry objectForKey:CSDocModelKey_Name ] isEqualToString:name ] )
-      ;   // Just loop through...
-
-   return anEntry;
-}
 
 
-/*
- * Setup our configuration
- */
-- (void) _setupSelf
-{
-   _sortKey = CSDocModelKey_Name;
-   _sortAscending = YES;
-#if !defined(DEBUG)
-   [ NSData setCompressLogging:NO ];
-   [ NSData setCryptoLogging:NO ];
-#endif
-}
 
 
-/*
- * Return a valid string (empty, @"", if necessary)
- */
-- (NSString *) _stringFrom:(NSDictionary *)dict forKey:(NSString *)key
-{
-   NSString *result;
-
-   result = [ dict objectForKey:key ];
-   if( result == nil )
-      result = @"";
-
-   return result;
-}
 
 
-/*
- * Return valid data (empty if necessary)
- */
-- (NSData *) _dataFrom:(NSDictionary *)dict forKey:(NSString *)key
-{
-   NSData *result;
-
-   result = [ dict objectForKey:key ];
-   if( result == nil )
-      result = [ NSData data ];
-
-   return result;
-}
 
 
 /*
