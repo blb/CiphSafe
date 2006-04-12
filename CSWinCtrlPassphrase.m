@@ -241,7 +241,7 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
          NSBeginAlertSheet( CSWINCTRLPASSPHRASE_LOC_DONTMATCH,
             CSWINCTRLPASSPHRASE_LOC_ENTERAGAIN, CSWINCTRLPASSPHRASE_LOC_CANCEL,
             nil, parentWindow, self, nil,
-            @selector( _noMatchSheetDidDismiss:returnCode:contextInfo: ),
+            @selector( noMatchSheetDidDismiss:returnCode:contextInfo: ),
             NULL, CSWINCTRLPASSPHRASE_LOC_NOMATCH );
       }
       else if( ( [ [ passphrasePhrase2 stringValue ] length ] <
@@ -253,7 +253,7 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
          NSBeginAlertSheet( CSWINCTRLPASSPHRASE_LOC_SHORTPHRASE,
             CSWINCTRLPASSPHRASE_LOC_USEIT, CSWINCTRLPASSPHRASE_LOC_ENTERAGAIN,
             nil, parentWindow, self, nil,
-            @selector( _shortPPSheetDidDismiss:returnCode:contextInfo: ),
+            @selector( shortPPSheetDidDismiss:returnCode:contextInfo: ),
             NULL, CSWINCTRLPASSPHRASE_LOC_PHRASEISSHORT );
       }
       else   // All is well, send the key
@@ -280,12 +280,10 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
 }
 
 
-
-
 /*
  * End of the "passphrases don't match" sheet
  */
-- (void) _noMatchSheetDidDismiss:(NSWindow *)sheet returnCode:(int)returnCode
+- (void) noMatchSheetDidDismiss:(NSWindow *)sheet returnCode:(int)returnCode
          contextInfo:(void  *)contextInfo
 {
    if( returnCode == NSAlertDefaultReturn )   // Enter again
@@ -305,7 +303,7 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
 /*
  * End of the "short passphrase" warning sheet
  */
-- (void) _shortPPSheetDidDismiss:(NSWindow *)sheet returnCode:(int)returnCode
+- (void) shortPPSheetDidDismiss:(NSWindow *)sheet returnCode:(int)returnCode
          contextInfo:(void  *)contextInfo
 {
    if( returnCode == NSAlertDefaultReturn )   // Use it
@@ -318,9 +316,5 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
               didEndSelector:nil
               contextInfo:NULL ];
 }
-
-
-
-
 
 @end

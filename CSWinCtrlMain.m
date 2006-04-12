@@ -553,7 +553,7 @@ static NSArray *searchWhatArray;
       [ [ searchWhat itemAtIndex:index ] setEnabled:YES ];
    [ [ NSNotificationCenter defaultCenter ]
      addObserver:self
-     selector:@selector( _prefsDidChange: )
+     selector:@selector( prefsDidChange: )
      name:CSApplicationDidChangePrefs
      object:nil ];
 }
@@ -1071,48 +1071,10 @@ static NSArray *searchWhatArray;
 /*
  * When preferences change
  */
-- (void) _prefsDidChange:(NSNotification *)aNotification
+- (void) prefsDidChange:(NSNotification *)aNotification
 {
    [ self updateSetCategoryMenu ];
    [ self setTableViewSpacing ];
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 @end
