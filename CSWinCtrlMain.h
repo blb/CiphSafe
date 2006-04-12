@@ -39,22 +39,22 @@
 
 @interface CSWinCtrlMain : NSWindowController
 {
-   NSTableColumn *_previouslySelectedColumn;
-   BOOL _searchFieldModified;
-   NSArray *_searchResultList;
+   NSTableColumn *previouslySelectedColumn;
+   BOOL searchFieldModified;
+   NSArray *searchResultList;
 
-   IBOutlet BLBTableView *_documentView;
-   IBOutlet NSButton *_documentDeleteButton;
-   IBOutlet NSButton *_documentViewButton;
-   IBOutlet NSTextField *_documentStatus;
-   IBOutlet BLBTextField *_documentSearch;
-   IBOutlet NSMenu *_contextualMenu;
-   IBOutlet NSMenu *_cmmTableHeader;
-   IBOutlet NSPopUpButton *_searchWhat;
+   IBOutlet BLBTableView *documentView;
+   IBOutlet NSButton *documentDeleteButton;
+   IBOutlet NSButton *documentViewButton;
+   IBOutlet NSTextField *documentStatus;
+   IBOutlet BLBTextField *documentSearch;
+   IBOutlet NSMenu *contextualMenu;
+   IBOutlet NSMenu *cmmTableHeader;
+   IBOutlet NSPopUpButton *searchWhat;
 
    // New Category window
-   IBOutlet NSPanel *_newCategoryWindow;
-   IBOutlet NSTextField *_newCategory;
+   IBOutlet NSPanel *newCategoryWindow;
+   IBOutlet NSTextField *newCategory;
 }
 
 // Actions from the main window
