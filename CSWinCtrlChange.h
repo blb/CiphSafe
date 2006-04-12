@@ -55,6 +55,6 @@
 - (void) setEntryName:(NSString *)newEntryName;
 
 // Make the change
-- (IBAction) doChange:(id)sender;
+- (IBAction) change:(id)sender;
 
 @end

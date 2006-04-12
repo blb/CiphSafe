@@ -262,7 +262,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 /*
  * Change the entry
  */
-- (IBAction) doChange:(id)sender
+- (IBAction) change:(id)sender
 {
    NSRange fullNotesRange;
 
