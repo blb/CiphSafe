@@ -78,7 +78,7 @@ static BOOL cryptoLoggingEnabled = YES;
 /*
  * Log the warning/error, if logging enabled
  */
-+ (void) doCryptoLog:(NSString *)format, ...
++ (void) logCryptoMessage:(NSString *)format, ...
 {
    va_list args;
    
@@ -126,7 +126,7 @@ static BOOL cryptoLoggingEnabled = YES;
                          len - amtRead );
          if( oneRead <= 0 && ( errno != EINTR && errno != EAGAIN ) )
          {
-            [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_READERR, strerror( errno ),
+            [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_READERR, strerror( errno ),
                                   errno ];
             randomData = nil;
             break;
@@ -136,7 +136,7 @@ static BOOL cryptoLoggingEnabled = YES;
       [ devRandom closeFile ];
    }
    else
-      [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_FAILOPENRAND ];
+      [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_FAILOPENRAND ];
 
    return randomData;
 }
@@ -178,23 +178,23 @@ static BOOL cryptoLoggingEnabled = YES;
                      [ encryptedData setLength:finalLen ];
                   }
                   else
-                     [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_ENCRYPTFINALFAIL ];
+                     [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_ENCRYPTFINALFAIL ];
                }
                else
-                  [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_ENCRYPTUPDATEFAIL ];
+                  [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_ENCRYPTUPDATEFAIL ];
             }
             else
-               [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_ENCRYPTINITFAIL ];
+               [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_ENCRYPTINITFAIL ];
          }
          else
-            [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_SETKEYLENFAIL ];
+            [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_SETKEYLENFAIL ];
          EVP_CIPHER_CTX_cleanup( &cipherContext );
       }
       else
-         [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_ENCRYPTINITINITIALFAIL ];
+         [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_ENCRYPTINITINITIALFAIL ];
    }
    else
-      [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_IVBAD, [ iv length ] ];
+      [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_IVBAD, [ iv length ] ];
 
    if( encryptedData != nil && [ encryptedData length ] != finalLen )
       encryptedData = nil;
@@ -238,23 +238,23 @@ static BOOL cryptoLoggingEnabled = YES;
                      [ plainData setLength:finalLen ];
                   }
                   else
-                     [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_DECRYPTFINALFAIL ];
+                     [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_DECRYPTFINALFAIL ];
                }
                else
-                  [ NSData doCryptoLog:NSDATA_CRYPT_LOC_DECRYPTUPDATEFAIL ];
+                  [ NSData logCryptoMessage:NSDATA_CRYPT_LOC_DECRYPTUPDATEFAIL ];
             }
             else
-               [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_DECRYPTINITSETKEYFAIL ];
+               [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_DECRYPTINITSETKEYFAIL ];
          }
          else
-            [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_SETKEYLENFAIL ];
+            [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_SETKEYLENFAIL ];
          EVP_CIPHER_CTX_cleanup( &cipherContext );
       }
       else
-         [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_DECRYPTINITINTIALFAIL ];
+         [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_DECRYPTINITINTIALFAIL ];
    }
    else
-      [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_IVBAD, [ iv length ] ];
+      [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_IVBAD, [ iv length ] ];
 
    if( plainData != nil && [ plainData length ] != finalLen )
       plainData = nil;
@@ -279,7 +279,7 @@ static BOOL cryptoLoggingEnabled = YES;
    EVP_DigestFinal( &digestContext, [ hashValue mutableBytes ], &writtenLen );
    if( writtenLen != hashLen )
    {
-      [ NSData doCryptoLog:NSDATA_CRYPTO_LOC_DIGESTFINALFAIL, writtenLen,
+      [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_DIGESTFINALFAIL, writtenLen,
                             hashLen ];
       hashValue = nil;
    }
