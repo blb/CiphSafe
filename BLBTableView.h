@@ -36,7 +36,7 @@
 
 @interface BLBTableView : NSTableView
 {
-   NSColor *_stripeColor;
+   NSColor *stripeColor;
 }
 
 // Set the stripe color
