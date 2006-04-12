@@ -66,11 +66,6 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
                               @"enter again or cancel?", @"" )
 #define CSWINCTRLPASSPHRASE_LOC_CANCEL NSLocalizedString( @"Cancel", @"" )
 
-@interface CSWinCtrlPassphrase (InternalMethods)
-- (void) _setAndSizeWindowForView:(NSView *)theView;
-- (BOOL) _doPassphrasesMatch;
-- (NSMutableData *) _genKeyForConfirm:(BOOL)useConfirmTab;
-@end
 
 @implementation CSWinCtrlPassphrase
 
@@ -79,6 +74,88 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
    self = [ super initWithWindowNibName:@"CSPassphrase" ];
 
    return self;
+}
+
+
+/*
+ * Size the window to fit the given frame
+ */
+- (void) setAndSizeWindowForView:(NSView *)theView
+{
+   NSWindow *myWindow;
+   NSRect contentRect;
+   
+   myWindow = [ self window ];
+   contentRect = [ NSWindow contentRectForFrameRect:[ myWindow frame ]
+                                          styleMask:[ myWindow styleMask ] ];
+   contentRect.origin.y += contentRect.size.height -
+      [ theView frame ].size.height;
+   contentRect.size = [ theView frame ].size;
+   [ myWindow setFrame:[ NSWindow frameRectForContentRect:contentRect
+                                                styleMask:[ myWindow styleMask ] ]
+               display:NO ];
+   [ myWindow setContentView:theView ];
+}
+
+
+/*
+ * Return whether or not the passphrases match
+ */
+- (BOOL) doPassphrasesMatch
+{
+   // XXX This may leave stuff around, but there's no way around it
+   return [ [ passphrasePhrase2 stringValue ]
+            isEqualToString:[ passphrasePhraseConfirm stringValue ] ];
+}
+
+
+/*
+ * Generate the key from the passphrase in the window; this does not verify
+ * passphrases match on the confirm tab
+ */
+- (NSMutableData *) genKeyForConfirm:(BOOL)useConfirmTab
+{
+   NSString *passphrase;
+   NSData *passphraseData, *dataFirst, *dataSecond;
+   NSMutableData *keyData, *tmpData;
+   int pdLen;
+   
+   if( useConfirmTab )
+   {
+      passphrase = [ passphrasePhrase2 stringValue ];
+      // XXX Might setStringValue: leave any cruft around?
+      [ passphrasePhrase2 setStringValue:@"" ];
+      // XXX Again, anything left behind from setStringValue:?
+      [ passphrasePhraseConfirm setStringValue:@"" ];
+   }
+   else
+   {
+      passphrase = [ passphrasePhrase1 stringValue ];
+      // XXX And again, setStringValue:?
+      [ passphrasePhrase1 setStringValue:@"" ];
+   }
+   
+   passphraseData = [ passphrase dataUsingEncoding:NSUnicodeStringEncoding ];
+   pdLen = [ passphraseData length ];
+   dataFirst = [ passphraseData subdataWithRange:NSMakeRange( 0, pdLen / 2 ) ];
+   dataSecond = [ passphraseData subdataWithRange:
+      NSMakeRange( pdLen / 2, pdLen - pdLen / 2 ) ];
+   /*
+    * XXX At this point, passphrase should be cleared, however, there is no way,
+    * that I've yet found, to do that...here's hoping it gets released and the
+    * memory reused soon...
+    */
+   passphrase = nil;
+   
+   keyData = [ dataFirst SHA1Hash ];
+   tmpData = [ dataSecond SHA1Hash ];
+   [ keyData appendData:tmpData ];
+   [ tmpData clearOutData ];
+   [ dataFirst clearOutData ];
+   [ dataSecond clearOutData ];
+   [ passphraseData clearOutData ];
+   
+   return keyData;
 }
 
 
@@ -95,18 +172,18 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
    [ [ self window ] setTitle:[ NSString stringWithFormat:
                                             CSWINCTRLPASSPHRASE_LOC_WINTITLE,
                                             docName ] ];
-   [ _passphraseNote1 setStringValue:NSLocalizedString( noteType, nil ) ];
-   [ self _setAndSizeWindowForView:_nonConfirmView ];
+   [ passphraseNote1 setStringValue:NSLocalizedString( noteType, nil ) ];
+   [ self setAndSizeWindowForView:nonConfirmView ];
    [ [ NSRunLoop currentRunLoop ]
      performSelector:@selector( makeFirstResponder: )
      target:[ self window ]
-     argument:_passphrasePhrase1
+     argument:passphrasePhrase1
      order:9999
      modes:[ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ] ];
-   _parentWindow = nil;
+   parentWindow = nil;
    windowReturn = [ NSApp runModalForWindow:[ self window ] ];
    [ [ self window ] orderOut:self ];
-   keyData = [ self _genKeyForConfirm:NO ];
+   keyData = [ self genKeyForConfirm:NO ];
    if( windowReturn == NSRunAbortedResponse )
    {
       [ keyData clearOutData ];
@@ -127,19 +204,19 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
          sendToSelector:(SEL)selector
 {
    [ [ self window ] setTitle:@"" ];
-   [ _passphraseNote2 setStringValue:NSLocalizedString( noteType, nil ) ];
-   [ self _setAndSizeWindowForView:_confirmView ];
+   [ passphraseNote2 setStringValue:NSLocalizedString( noteType, nil ) ];
+   [ self setAndSizeWindowForView:confirmView ];
    [ [ NSRunLoop currentRunLoop ]
      performSelector:@selector( makeFirstResponder: )
      target:[ self window ]
-     argument:_passphrasePhrase2
+     argument:passphrasePhrase2
      order:9999
      modes:[ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ] ];
-   _parentWindow = window;
-   _modalDelegate = delegate;
-   _sheetEndSelector = selector;
+   parentWindow = window;
+   modalDelegate = delegate;
+   sheetEndSelector = selector;
    [ NSApp beginSheet:[ self window ]
-           modalForWindow:_parentWindow
+           modalForWindow:parentWindow
            modalDelegate:self
            didEndSelector:nil
            contextInfo:NULL ];
@@ -151,23 +228,23 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
  */
 - (IBAction) passphraseAccept:(id)sender
 {
-   if( _parentWindow == nil )   // Running app-modal
+   if( parentWindow == nil )   // Running app-modal
       [ NSApp stopModal ];
    else   // As a sheet
    {
       // Remove the sheet before starting a new one
       [ NSApp endSheet:[ self window ] ];
       [ [ self window ] orderOut:self ];
-      if( ![ self _doPassphrasesMatch ] )
+      if( ![ self doPassphrasesMatch ] )
       {
          // Ask for direction if the passphrases don't match
          NSBeginAlertSheet( CSWINCTRLPASSPHRASE_LOC_DONTMATCH,
             CSWINCTRLPASSPHRASE_LOC_ENTERAGAIN, CSWINCTRLPASSPHRASE_LOC_CANCEL,
-            nil, _parentWindow, self, nil,
+            nil, parentWindow, self, nil,
             @selector( _noMatchSheetDidDismiss:returnCode:contextInfo: ),
             NULL, CSWINCTRLPASSPHRASE_LOC_NOMATCH );
       }
-      else if( ( [ [ _passphrasePhrase2 stringValue ] length ] <
+      else if( ( [ [ passphrasePhrase2 stringValue ] length ] <
                  CSWINCTRLPASSPHRASE_SHORT_PASSPHRASE ) &&
                [ [ NSUserDefaults standardUserDefaults ]
                  boolForKey:CSPrefDictKey_WarnShort ] )
@@ -175,13 +252,13 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
          // Warn if it is short and the user pref is enabled
          NSBeginAlertSheet( CSWINCTRLPASSPHRASE_LOC_SHORTPHRASE,
             CSWINCTRLPASSPHRASE_LOC_USEIT, CSWINCTRLPASSPHRASE_LOC_ENTERAGAIN,
-            nil, _parentWindow, self, nil,
+            nil, parentWindow, self, nil,
             @selector( _shortPPSheetDidDismiss:returnCode:contextInfo: ),
             NULL, CSWINCTRLPASSPHRASE_LOC_PHRASEISSHORT );
       }
       else   // All is well, send the key
-         [ _modalDelegate performSelector:_sheetEndSelector
-                          withObject:[ self _genKeyForConfirm:YES ] ];
+         [ modalDelegate performSelector:sheetEndSelector
+                          withObject:[ self genKeyForConfirm:YES ] ];
    }
 }
 
@@ -191,37 +268,18 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
  */
 - (IBAction) passphraseCancel:(id)sender
 {
-   if( _parentWindow == nil )   // Running app-modal
+   if( parentWindow == nil )   // Running app-modal
       [ NSApp abortModal ];
    else   // Sheet
    {
       [ NSApp endSheet:[ self window ] ];
       [ [ self window ] orderOut:self ];
-      [ [ self _genKeyForConfirm:YES ] clearOutData ];
-      [ _modalDelegate performSelector:_sheetEndSelector withObject:nil ];
+      [ [ self genKeyForConfirm:YES ] clearOutData ];
+      [ modalDelegate performSelector:sheetEndSelector withObject:nil ];
    }
 }
 
 
-/*
- * Size the window to fit the given frame
- */
-- (void) _setAndSizeWindowForView:(NSView *)theView
-{
-   NSWindow *myWindow;
-   NSRect contentRect;
-
-   myWindow = [ self window ];
-   contentRect = [ NSWindow contentRectForFrameRect:[ myWindow frame ]
-                             styleMask:[ myWindow styleMask ] ];
-   contentRect.origin.y += contentRect.size.height -
-                           [ theView frame ].size.height;
-   contentRect.size = [ theView frame ].size;
-   [ myWindow setFrame:[ NSWindow frameRectForContentRect:contentRect
-                                  styleMask:[ myWindow styleMask ] ]
-              display:NO ];
-   [ myWindow setContentView:theView ];
-}
 
 
 /*
@@ -232,14 +290,14 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
 {
    if( returnCode == NSAlertDefaultReturn )   // Enter again
       [ NSApp beginSheet:[ self window ]
-              modalForWindow:_parentWindow
+              modalForWindow:parentWindow
               modalDelegate:self
               didEndSelector:nil
               contextInfo:NULL ];
    else   // Cancel all together
    {
-      [ [ self _genKeyForConfirm:YES ] clearOutData ];
-      [ _modalDelegate performSelector:_sheetEndSelector withObject:nil ];
+      [ [ self genKeyForConfirm:YES ] clearOutData ];
+      [ modalDelegate performSelector:sheetEndSelector withObject:nil ];
    }
 }
 
@@ -251,75 +309,18 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
          contextInfo:(void  *)contextInfo
 {
    if( returnCode == NSAlertDefaultReturn )   // Use it
-      [ _modalDelegate performSelector:_sheetEndSelector
-                       withObject:[ self _genKeyForConfirm:YES ] ];
+      [ modalDelegate performSelector:sheetEndSelector
+                       withObject:[ self genKeyForConfirm:YES ] ];
    else   // Bring back the original sheet
       [ NSApp beginSheet:[ self window ]
-              modalForWindow:_parentWindow
+              modalForWindow:parentWindow
               modalDelegate:self
               didEndSelector:nil
               contextInfo:NULL ];
 }
 
 
-/*
- * Return whether or not the passphrases match
- */
-- (BOOL) _doPassphrasesMatch
-{
-   // XXX This may leave stuff around, but there's no way around it
-   return [ [ _passphrasePhrase2 stringValue ]
-            isEqualToString:[ _passphrasePhraseConfirm stringValue ] ];
-}
 
 
-/*
- * Generate the key from the passphrase in the window; this does not verify
- * passphrases match on the confirm tab
- */
-- (NSMutableData *) _genKeyForConfirm:(BOOL)useConfirmTab
-{
-   NSString *passphrase;
-   NSData *passphraseData, *dataFirst, *dataSecond;
-   NSMutableData *keyData, *tmpData;
-   int pdLen;
-
-   if( useConfirmTab )
-   {
-      passphrase = [ _passphrasePhrase2 stringValue ];
-      // XXX Might setStringValue: leave any cruft around?
-      [ _passphrasePhrase2 setStringValue:@"" ];
-      // XXX Again, anything left behind from setStringValue:?
-      [ _passphrasePhraseConfirm setStringValue:@"" ];
-   }
-   else
-   {
-      passphrase = [ _passphrasePhrase1 stringValue ];
-      // XXX And again, setStringValue:?
-      [ _passphrasePhrase1 setStringValue:@"" ];
-   }
-
-   passphraseData = [ passphrase dataUsingEncoding:NSUnicodeStringEncoding ];
-   pdLen = [ passphraseData length ];
-   dataFirst = [ passphraseData subdataWithRange:NSMakeRange( 0, pdLen / 2 ) ];
-   dataSecond = [ passphraseData subdataWithRange:
-                                    NSMakeRange( pdLen / 2, pdLen - pdLen / 2 ) ];
-   /*
-    * XXX At this point, passphrase should be cleared, however, there is no way,
-    * that I've yet found, to do that...here's hoping it gets released and the
-    * memory reused soon...
-    */
-   passphrase = nil;
-
-   keyData = [ dataFirst SHA1Hash ];
-   tmpData = [ dataSecond SHA1Hash ];
-   [ keyData appendData:tmpData ];
-   [ tmpData clearOutData ];
-   [ dataFirst clearOutData ];
-   [ dataSecond clearOutData ];
-   [ passphraseData clearOutData ];
-
-   return keyData;
-}
 
 @end
