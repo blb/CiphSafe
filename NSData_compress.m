@@ -71,7 +71,7 @@ static BOOL compressLoggingEnabled = YES;
 /*
  * Log the warning/error, if logging enabled
  */
-+ (void) doCompressLog:(NSString *)format, ...
++ (void) logCompressMessage:(NSString *)format, ...
 {
    va_list args;
    
@@ -132,13 +132,13 @@ static BOOL compressLoggingEnabled = YES;
       }
       else
       {
-         [ NSData doCompressLog:NSDATA_COMPRESS_LOC_COMPRESS2FAIL,
+         [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_COMPRESS2FAIL,
                                  zlibError, zError( zlibError ) ];
          newData = nil;
       }
    }
    else
-      [ NSData doCompressLog:NSDATA_COMPRESS_LOC_MEMERR ];
+      [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_MEMERR ];
 
    return newData;
 }
@@ -175,7 +175,7 @@ static BOOL compressLoggingEnabled = YES;
          if( [ [ localException name ]
                isEqualToString:NSInvalidArgumentException ] )
          {
-            [ NSData doCompressLog:NSDATA_COMPRESS_LOC_BADSIZE,
+            [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_BADSIZE,
                                     [ localException reason ] ];
             NS_VALUERETURN( nil, NSMutableData * );
          }
@@ -190,19 +190,19 @@ static BOOL compressLoggingEnabled = YES;
                                  [ self length ] - sizeof( unsigned ) );
          if( zlibError != Z_OK )
          {
-            [ NSData doCompressLog:NSDATA_COMPRESS_LOC_UNCOMPRESSFAIL,
+            [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_UNCOMPRESSFAIL,
                                     zlibError, zError( zlibError ) ];
             newData = nil;
          }
          else if( originalSize != outSize )
-            [ NSData doCompressLog:NSDATA_COMPRESS_LOC_DATASIZEWARN,
+            [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_DATASIZEWARN,
                                     outSize, originalSize ];
       }
       else
-         [ NSData doCompressLog:NSDATA_COMPRESS_LOC_MEMERR ];
+         [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_MEMERR ];
    }
    else
-      [ NSData doCompressLog:NSDATA_COMPRESS_LOC_NOTZLIBFMT ];
+      [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_NOTZLIBFMT ];
 
    return newData;
 }
