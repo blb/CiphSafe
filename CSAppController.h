@@ -60,30 +60,30 @@ extern NSString * const CSApplicationDidChangePrefs;
 
 @interface CSAppController : NSObject
 {
-   int _lastPBChangeCount;
+   int lastPBChangeCount;
 
-   IBOutlet NSMenuItem *_editMenuSetCategory;
+   IBOutlet NSMenuItem *editMenuSetCategory;
    // Preferences window
-   IBOutlet NSWindow *_prefsWindow;
+   IBOutlet NSWindow *prefsWindow;
    // Interface tab
-   IBOutlet NSButton *_prefsCloseAdd;
-   IBOutlet NSButton *_prefsCloseEdit;
-   IBOutlet NSButton *_prefsConfirmDelete;
-   IBOutlet NSButton *_prefsWarnShort;
-   IBOutlet NSButton *_prefsCreateNew;
-   IBOutlet NSButton *_prefsAutoOpen;
-   IBOutlet NSTextField *_prefsAutoOpenName;
-   IBOutlet NSButton *_prefsAutoOpenSelect;
-   IBOutlet NSPopUpButton *_prefsCellSpacing;
-   IBOutlet NSButton *_prefsKeepBackup;
-   IBOutlet NSButton *_prefsIncludeDefaultCategories;
+   IBOutlet NSButton *prefsCloseAdd;
+   IBOutlet NSButton *prefsCloseEdit;
+   IBOutlet NSButton *prefsConfirmDelete;
+   IBOutlet NSButton *prefsWarnShort;
+   IBOutlet NSButton *prefsCreateNew;
+   IBOutlet NSButton *prefsAutoOpen;
+   IBOutlet NSTextField *prefsAutoOpenName;
+   IBOutlet NSButton *prefsAutoOpenSelect;
+   IBOutlet NSPopUpButton *prefsCellSpacing;
+   IBOutlet NSButton *prefsKeepBackup;
+   IBOutlet NSButton *prefsIncludeDefaultCategories;
    // Security tab
-   IBOutlet NSButton *_prefsIncludePasswd;
-   IBOutlet NSButton *_prefsCloseAfterTimeout;
-   IBOutlet NSTextField *_prefsTimeout;
-   IBOutlet NSTextField *_prefsGenSize;
-   IBOutlet NSButton *_prefsAlphanumOnly;
-   IBOutlet NSButton *_prefsClearClipboard;
+   IBOutlet NSButton *prefsIncludePasswd;
+   IBOutlet NSButton *prefsCloseAfterTimeout;
+   IBOutlet NSTextField *prefsTimeout;
+   IBOutlet NSTextField *prefsGenSize;
+   IBOutlet NSButton *prefsAlphanumOnly;
+   IBOutlet NSButton *prefsClearClipboard;
 }
 
 // Note the general pasteboard's current change count
