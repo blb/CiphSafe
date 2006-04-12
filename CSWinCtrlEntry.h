@@ -56,10 +56,10 @@
 }
 
 // Gererate an random password
-- (IBAction) doGenerate:(id)sender;
+- (IBAction) generate:(id)sender;
 
 // Open the URL from the URL field
-- (IBAction) doOpenURL:(id)sender;
+- (IBAction) openURL:(id)sender;
 
 // Our implementation of whether the data is dirty
 - (void) updateDocumentEditedStatus;

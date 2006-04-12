@@ -133,7 +133,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 /*
  * Generate a random password
  */
-- (IBAction) doGenerate:(id)sender
+- (IBAction) generate:(id)sender
 {
    const char *genString;
    int genStringLength;
@@ -174,7 +174,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 /*
  * Open the URL in the URL field
  */
-- (IBAction) doOpenURL:(id)sender
+- (IBAction) openURL:(id)sender
 {
    BOOL urlIsInvalid;
    NSURL *theURL;
