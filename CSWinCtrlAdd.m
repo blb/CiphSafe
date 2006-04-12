@@ -73,7 +73,7 @@
 /*
  * Clear out all the fields
  */
-- (IBAction) doClear:(id)sender
+- (IBAction) clear:(id)sender
 {
    // XXX If there's a way to clear out a control's data space, we'd do that here
    [ nameText setStringValue:@"" ];
@@ -91,7 +91,7 @@
 /*
  * Add the entry from data given
  */
-- (IBAction) doAdd:(id)sender
+- (IBAction) add:(id)sender
 {
    NSRange fullNotesRange;
 

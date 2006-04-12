@@ -39,7 +39,7 @@
 {
 }
 
-- (IBAction) doClear:(id)sender;
-- (IBAction) doAdd:(id)sender;
+- (IBAction) clear:(id)sender;
+- (IBAction) add:(id)sender;
 
 @end
