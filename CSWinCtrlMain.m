@@ -562,7 +562,7 @@ static NSArray *searchWhatArray;
 /*
  * Tell the document to do whatever to allow for a new entry
  */
-- (IBAction) doAddEntry:(id)sender
+- (IBAction) addEntry:(id)sender
 {
    [ [ self document ] openAddEntryWindow ];
 }
@@ -571,7 +571,7 @@ static NSArray *searchWhatArray;
 /*
  * Tell the document to view the certain entries
  */
-- (IBAction) doViewEntry:(id)sender
+- (IBAction) viewEntry:(id)sender
 {
    [ [ self document ] viewEntries:[ self getSelectedNames ] ];
 }
@@ -580,7 +580,7 @@ static NSArray *searchWhatArray;
 /*
  * Tell the document to delete certain entries
  */
-- (IBAction) doDeleteEntry:(id)sender
+- (IBAction) deleteEntry:(id)sender
 {
    NSString *sheetQuestion;
    SEL delSelector;
@@ -607,7 +607,7 @@ static NSArray *searchWhatArray;
 /*
  * Reset the search field
  */
-- (IBAction) doResetSearch:(id)sender
+- (IBAction) resetSearch:(id)sender
 {
    searchFieldModified = NO;
    [ documentSearch setStringValue:@"" ];
@@ -853,7 +853,7 @@ static NSArray *searchWhatArray;
 /*
  * Set the category on a bunch of entries
  */
-- (IBAction) doSetCategory:(id)sender
+- (IBAction) setCategory:(id)sender
 {
    NSMenu *categoriesMenu;
    NSString *category;

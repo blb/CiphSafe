@@ -58,17 +58,17 @@
 }
 
 // Actions from the main window
-- (IBAction) doAddEntry:(id)sender;
-- (IBAction) doViewEntry:(id)sender;
-- (IBAction) doDeleteEntry:(id)sender;
-- (IBAction) doResetSearch:(id)sender;
+- (IBAction) addEntry:(id)sender;
+- (IBAction) viewEntry:(id)sender;
+- (IBAction) deleteEntry:(id)sender;
+- (IBAction) resetSearch:(id)sender;
 
 // Actions from the new category window
 - (IBAction) newCategoryOK:(id)sender;
 - (IBAction) newCategoryCancel:(id)sender;
 
 // Actions from the main menu
-- (IBAction) doSetCategory:(id)sender;
+- (IBAction) setCategory:(id)sender;
 
 // Actions from the contextual menu
 - (IBAction) cmmCopyField:(id)sender;
