@@ -56,7 +56,7 @@
  */
 - (void) awakeFromNib
 {
-   [ self doClear:self ];
+   [ self clear:self ];
 }
 
 
@@ -103,7 +103,7 @@
                            category:[ category stringValue ]
                            notesRTFD:[ notes RTFDFromRange:fullNotesRange ] ] )
    {
-      [ self doClear:self ];
+      [ self clear:self ];
       if( ![ [ NSUserDefaults standardUserDefaults ] 
              boolForKey:CSPrefDictKey_CloseAdd ] )
       {
