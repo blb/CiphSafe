@@ -34,9 +34,6 @@
 
 #import "BLBTableView.h"
 
-@interface BLBTableView (InternalMethods)
-- (void) _drawStripesInRect:(NSRect)clipRect;
-@end
 
 @implementation BLBTableView
 
@@ -51,6 +48,40 @@
    tableColumns = [ self tableColumns ];
    for( index = 0; index < [ tableColumns count ]; index++ )
       [ [ [ tableColumns objectAtIndex:index ] dataCell ] setDrawsBackground:NO ];
+}
+
+
+/*
+ * This routine does the actual blue stripe drawing, filling in every other row
+ * of the table with a blue background so you can follow the rows easier with
+ * your eyes.  Shamelessly lifted from Apple's MP3 Player sample code.
+ */
+- (void) drawStripesInRect:(NSRect)clipRect
+{
+   NSRect stripeRect;
+   float fullRowHeight, clipBottom;
+   int firstStripe;
+   
+   fullRowHeight = [ self rowHeight ] + [ self intercellSpacing ].height;
+   clipBottom = NSMaxY( clipRect );
+   firstStripe = clipRect.origin.y / fullRowHeight;
+   if( firstStripe % 2 == 1 )
+      firstStripe++;   // We're only interested in drawing the stripes
+   
+   // Set up first rect
+   stripeRect.origin.x = clipRect.origin.x;
+   stripeRect.origin.y = firstStripe * fullRowHeight;
+   stripeRect.size.width = clipRect.size.width;
+   stripeRect.size.height = fullRowHeight;
+   
+   // Set the color
+   [ stripeColor set ];
+   // ...and draw the stripes
+   while( stripeRect.origin.y < clipBottom )
+   {
+      NSRectFill( stripeRect );
+      stripeRect.origin.y += fullRowHeight * 2.0;
+   }
 }
 
 
@@ -86,8 +117,8 @@
 - (void) setStripeColor:(NSColor *)newStripeColor
 {
    [ newStripeColor retain ];
-   [ _stripeColor release ];
-   _stripeColor = newStripeColor;
+   [ stripeColor release ];
+   stripeColor = newStripeColor;
 }
 
 
@@ -108,8 +139,8 @@
  */
 - (void) highlightSelectionInClipRect:(NSRect)clipRect
 {
-   if( _stripeColor != nil )
-      [ self _drawStripesInRect:clipRect ];
+   if( stripeColor != nil )
+      [ self drawStripesInRect:clipRect ];
    [ super highlightSelectionInClipRect:clipRect ];
 }
 
@@ -185,40 +216,6 @@
 {
    [ self setStripeColor:nil ];
    [ super dealloc ];
-}
-
-
-/*
- * This routine does the actual blue stripe drawing, filling in every other row
- * of the table with a blue background so you can follow the rows easier with
- * your eyes.  Shamelessly lifted from Apple's MP3 Player sample code.
- */
-- (void) _drawStripesInRect:(NSRect)clipRect
-{
-   NSRect stripeRect;
-   float fullRowHeight, clipBottom;
-   int firstStripe;
-
-   fullRowHeight = [ self rowHeight ] + [ self intercellSpacing ].height;
-   clipBottom = NSMaxY( clipRect );
-   firstStripe = clipRect.origin.y / fullRowHeight;
-   if( firstStripe % 2 == 1 )
-      firstStripe++;   // We're only interested in drawing the stripes
-
-   // Set up first rect
-   stripeRect.origin.x = clipRect.origin.x;
-   stripeRect.origin.y = firstStripe * fullRowHeight;
-   stripeRect.size.width = clipRect.size.width;
-   stripeRect.size.height = fullRowHeight;
-
-   // Set the color
-   [ _stripeColor set ];
-   // ...and draw the stripes
-   while( stripeRect.origin.y < clipBottom )
-   {
-      NSRectFill( stripeRect );
-      stripeRect.origin.y += fullRowHeight * 2.0;
-   }
 }
 
 @end
