@@ -52,12 +52,6 @@
 #define CSWINCTRLENTRY_LOC_CLOSEANYWAY NSLocalizedString( @"Close Anyway", @"" )
 #define CSWINCTRLENTRY_LOC_DONTCLOSE NSLocalizedString( @"Don't Close", @"" )
 
-@interface CSWinCtrlEntry (InternalMethods)
-- (void) _closeSheetDidEnd:(NSWindow *)sheet
-         returnCode:(int)returnCode
-         contextInfo:(void *)contextInfo;
-- (void) _undoManagerDidChange:(NSNotification *)notification;
-@end
 
 @implementation CSWinCtrlEntry
 
@@ -83,22 +77,56 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
        * Watching undo/redo change notifications lets us update the 'document
        * is dirty' status
        */
-      _notesUM = [ [ NSUndoManager alloc ] init ];
+      notesUM = [ [ NSUndoManager alloc ] init ];
       [ [ NSNotificationCenter defaultCenter ]
         addObserver:self
-        selector:@selector( _undoManagerDidChange: )
+        selector:@selector( undoManagerDidChange: )
         name:NSUndoManagerDidUndoChangeNotification
-        object:_notesUM ];
+        object:notesUM ];
       [ [ NSNotificationCenter defaultCenter ]
         addObserver:self
-        selector:@selector( _undoManagerDidChange: )
+        selector:@selector( undoManagerDidChange: )
         name:NSUndoManagerDidRedoChangeNotification
-        object:_notesUM ];
+        object:notesUM ];
       // Undo manager for everything else in the window
-      _otherUM = [ [ NSUndoManager alloc ] init ];
+      otherUM = [ [ NSUndoManager alloc ] init ];
    }
 
    return self;
+}
+
+
+/*
+ * Handle the "should close" sheet
+ */
+- (void) closeSheetDidEnd:(NSWindow *)sheet
+               returnCode:(int)returnCode
+              contextInfo:(void *)contextInfo
+{
+   if( returnCode == NSAlertDefaultReturn )
+   {
+      // Close the window this way so the proper delegation is performed
+      [ [ self window ] setDocumentEdited:NO ];
+      [ [ NSRunLoop currentRunLoop ]
+        performSelector:@selector( performClose: )
+                 target:[ self window ]
+               argument:self
+                  order:9999
+                  modes:[ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ] ];
+   }
+   [ sheet orderOut:self ];
+   [ NSApp endSheet:sheet ];
+   NSReleaseAlertPanel( sheet );
+}
+
+
+/*
+ * When the undo manager for the notes text view performs undo or redo, we
+ * update the edited status
+ */
+- (void) undoManagerDidChange:(NSNotification *)notification
+{
+   [ self updateDocumentEditedStatus ];
 }
 
 
@@ -130,7 +158,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
    for( index = 0; index < genSize; index++ )
       [ randomString appendFormat:@"%c",
                         genString[ randomBytes[ index ] % genStringLength ] ];
-   [ _passwordText setStringValue:randomString ];
+   [ passwordText setStringValue:randomString ];
    [ randomData clearOutData ];
    /*
     * XXX deleteCharactersInRange: probably just changes its length; strings are
@@ -152,7 +180,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
    NSURL *theURL;
 
    urlIsInvalid = YES;
-   theURL = [ NSURL URLWithString:[ _urlText stringValue ] ];
+   theURL = [ NSURL URLWithString:[ urlText stringValue ] ];
    if( theURL != nil && [ [ NSWorkspace sharedWorkspace ] openURL:theURL ] )
       urlIsInvalid = NO;
 
@@ -169,10 +197,10 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
  */
 - (NSUndoManager *) windowWillReturnUndoManager:(NSWindow *)window
 {
-   if( [ [ [ self window ] firstResponder ] isEqual:_notes ] )
-      return _notesUM;
+   if( [ [ [ self window ] firstResponder ] isEqual:notes ] )
+      return notesUM;
    else
-      return _otherUM;
+      return otherUM;
 }
 
 
@@ -194,13 +222,13 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
    NSString *nameTextString;
 
    [ self updateDocumentEditedStatus ];
-   if( [ [ aNotification object ] isEqual:_nameText ] )
+   if( [ [ aNotification object ] isEqual:nameText ] )
    {
-      nameTextString = [ _nameText stringValue ];
+      nameTextString = [ nameText stringValue ];
       if( nameTextString == nil || [ nameTextString length ] == 0 )
-         [ _mainButton setEnabled:NO ];
+         [ mainButton setEnabled:NO ];
       else
-         [ _mainButton setEnabled:YES ];
+         [ mainButton setEnabled:YES ];
    }
 }
 
@@ -242,7 +270,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
               modalForWindow:[ self window ]
               modalDelegate:self
               didEndSelector:
-                 @selector( _closeSheetDidEnd:returnCode:contextInfo: )
+                 @selector( closeSheetDidEnd:returnCode:contextInfo: )
               contextInfo:NULL ];
       retval = NO;
    }
@@ -285,14 +313,14 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
  */
 - (int) numberOfItemsInComboBox:(NSComboBox *)aComboBox
 {
-   if( [ aComboBox isEqual:_category ] )
+   if( [ aComboBox isEqual:category ] )
       return [ [ [ self document ] categories ] count ];
    return 0;
 }
 
 - (id) comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(int)index
 {
-   if( [ aComboBox isEqual:_category ] )
+   if( [ aComboBox isEqual:category ] )
       return [ [ [ self document ] categories ] objectAtIndex:index ];
    return nil;
 }
@@ -300,7 +328,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 - (unsigned int) comboBox:(NSComboBox *)aComboBox
                  indexOfItemWithStringValue:(NSString *)aString
 {
-   if( [ aComboBox isEqual:_category ] )
+   if( [ aComboBox isEqual:category ] )
       return [ [ [ self document ] categories ] indexOfObject:aString ];
    return -1;
 }
@@ -345,43 +373,9 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
  */
 - (void) dealloc
 {
-   [ _notesUM release ];
-   [ _otherUM release ];
+   [ notesUM release ];
+   [ otherUM release ];
    [ super dealloc ];
-}
-
-
-/*
- * Handle the "should close" sheet
- */
-- (void) _closeSheetDidEnd:(NSWindow *)sheet
-         returnCode:(int)returnCode
-         contextInfo:(void *)contextInfo
-{
-   if( returnCode == NSAlertDefaultReturn )
-   {
-      // Close the window this way so the proper delegation is performed
-      [ [ self window ] setDocumentEdited:NO ];
-      [ [ NSRunLoop currentRunLoop ]
-        performSelector:@selector( performClose: )
-        target:[ self window ]
-        argument:self
-        order:9999
-        modes:[ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ] ];
-   }
-   [ sheet orderOut:self ];
-   [ NSApp endSheet:sheet ];
-   NSReleaseAlertPanel( sheet );
-}
-
-
-/*
- * When the undo manager for the notes text view performs undo or redo, we
- * update the edited status
- */
-- (void) _undoManagerDidChange:(NSNotification *)notification
-{
-   [ self updateDocumentEditedStatus ];
 }
 
 @end
