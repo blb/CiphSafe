@@ -446,7 +446,7 @@
 
    menuItemAction = [ menuItem action ];
 
-   if( menuItemAction == @selector( doChangePassphrase: ) )
+   if( menuItemAction == @selector( changePassphrase: ) )
       retval = ( bfKey != nil );
    else if( menuItemAction == @selector( revertDocumentToSaved: ) )
       retval = [ self isDocumentEdited ];
