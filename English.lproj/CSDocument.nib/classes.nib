@@ -33,16 +33,16 @@
             CLASS = CSWinCtrlMain; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                "_cmmTableHeader" = NSMenu; 
-                "_contextualMenu" = NSMenu; 
-                "_documentDeleteButton" = NSButton; 
-                "_documentSearch" = BLBTextField; 
-                "_documentStatus" = NSTextField; 
-                "_documentView" = BLBTableView; 
-                "_documentViewButton" = NSButton; 
-                "_newCategory" = NSTextField; 
-                "_newCategoryWindow" = NSPanel; 
-                "_searchWhat" = NSPopUpButton; 
+                cmmTableHeader = NSMenu; 
+                contextualMenu = NSMenu; 
+                documentDeleteButton = NSButton; 
+                documentSearch = BLBTextField; 
+                documentStatus = NSTextField; 
+                documentView = BLBTableView; 
+                documentViewButton = NSButton; 
+                newCategory = NSTextField; 
+                newCategoryWindow = NSPanel; 
+                searchWhat = NSPopUpButton; 
             }; 
             SUPERCLASS = NSWindowController; 
         }, 
