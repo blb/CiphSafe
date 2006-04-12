@@ -41,20 +41,20 @@ extern NSString * const CSPassphraseNote_Change;
 
 @interface CSWinCtrlPassphrase : NSWindowController
 {
-   NSWindow *_parentWindow;
-   id _modalDelegate;
-   SEL _sheetEndSelector;
+   NSWindow *parentWindow;
+   id modalDelegate;
+   SEL sheetEndSelector;
 
    // View without confirmed passphrase entry
-   IBOutlet NSView *_nonConfirmView;
-   IBOutlet NSTextField *_passphraseNote1;
-   IBOutlet NSTextField *_passphrasePhrase1;
+   IBOutlet NSView *nonConfirmView;
+   IBOutlet NSTextField *passphraseNote1;
+   IBOutlet NSTextField *passphrasePhrase1;
 
    // View with confirmed passphrase entry
-   IBOutlet NSView *_confirmView;
-   IBOutlet NSTextField *_passphraseNote2;
-   IBOutlet NSTextField *_passphrasePhrase2;
-   IBOutlet NSTextField *_passphrasePhraseConfirm;
+   IBOutlet NSView *confirmView;
+   IBOutlet NSTextField *passphraseNote2;
+   IBOutlet NSTextField *passphrasePhrase2;
+   IBOutlet NSTextField *passphrasePhraseConfirm;
 }
 
 // Request a passphrase, app-modal
