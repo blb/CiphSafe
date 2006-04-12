@@ -347,11 +347,11 @@ static NSArray *searchWhatArray;
          objectEnumerator ];
       while( ( newItem = [ currentCategoriesEnum nextObject ] ) != nil )
          [ categoriesMenu addItemWithTitle:newItem
-                                    action:@selector( doSetCategory: )
+                                    action:@selector( setCategory: )
                              keyEquivalent:@"" ];
       [ categoriesMenu addItem:[ NSMenuItem separatorItem ] ];
       [ categoriesMenu addItemWithTitle:CSWINCTRLMAIN_LOC_NEWCATEGORY
-                                 action:@selector( doSetCategory: )
+                                 action:@selector( setCategory: )
                           keyEquivalent:@"" ];
    }
 }
@@ -530,7 +530,7 @@ static NSArray *searchWhatArray;
                                             green:0.95
                                             blue:1.0
                                             alpha:1.0 ] ];
-   [ documentView setDoubleAction:@selector( doViewEntry: ) ];
+   [ documentView setDoubleAction:@selector( viewEntry: ) ];
    previouslySelectedColumn = [ documentView tableColumnWithIdentifier:
                                                   [ [ self document ] sortKey ] ];
    [ documentView setHighlightedTableColumn:previouslySelectedColumn ];
@@ -692,7 +692,7 @@ static NSArray *searchWhatArray;
    menuItemAction = [ menuItem action ];
    if( menuItemAction == @selector( copy: ) ||
        menuItemAction == @selector( cut: ) ||
-       menuItemAction == @selector( doSetCategory: ) )
+       menuItemAction == @selector( setCategory: ) )
       retval = ( [ documentView numberOfSelectedRows ] > 0 );
    else if( menuItemAction == @selector( paste: ) )
       retval = ( [ [ NSPasteboard generalPasteboard ]
