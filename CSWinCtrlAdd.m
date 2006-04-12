@@ -76,14 +76,14 @@
 - (IBAction) doClear:(id)sender
 {
    // XXX If there's a way to clear out a control's data space, we'd do that here
-   [ _nameText setStringValue:@"" ];
-   [ _accountText setStringValue:@"" ];
-   [ _passwordText setStringValue:@"" ];
-   [ _urlText setStringValue:@"" ];
-   [ _category setStringValue:CSDocModelCategory_General ];
-   [ _notes setString:@"" ];
-   [ [ _notes undoManager ] removeAllActions ];
-   [ _mainButton setEnabled:NO ];
+   [ nameText setStringValue:@"" ];
+   [ accountText setStringValue:@"" ];
+   [ passwordText setStringValue:@"" ];
+   [ urlText setStringValue:@"" ];
+   [ category setStringValue:CSDocModelCategory_General ];
+   [ notes setString:@"" ];
+   [ [ notes undoManager ] removeAllActions ];
+   [ mainButton setEnabled:NO ];
    [ [ self window ] setDocumentEdited:NO ];
 }
 
@@ -95,13 +95,13 @@
 {
    NSRange fullNotesRange;
 
-   fullNotesRange = NSMakeRange( 0, [ [ _notes textStorage ] length ] );
-   if( [ [ self document ] addEntryWithName:[ _nameText stringValue ]
-                           account:[ _accountText stringValue ]
-                           password:[ _passwordText stringValue ]
-                           URL:[ _urlText stringValue ]
-                           category:[ _category stringValue ]
-                           notesRTFD:[ _notes RTFDFromRange:fullNotesRange ] ] )
+   fullNotesRange = NSMakeRange( 0, [ [ notes textStorage ] length ] );
+   if( [ [ self document ] addEntryWithName:[ nameText stringValue ]
+                           account:[ accountText stringValue ]
+                           password:[ passwordText stringValue ]
+                           URL:[ urlText stringValue ]
+                           category:[ category stringValue ]
+                           notesRTFD:[ notes RTFDFromRange:fullNotesRange ] ] )
    {
       [ self doClear:self ];
       if( ![ [ NSUserDefaults standardUserDefaults ] 
@@ -111,7 +111,7 @@
          [ [ NSRunLoop currentRunLoop ]
            performSelector:@selector( makeFirstResponder: )
            target:[ self window ]
-           argument:_nameText
+           argument:nameText
            order:9999
            modes:[ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ] ];
       }
@@ -131,33 +131,33 @@
  */
 - (BOOL) nameChanged
 {
-   return ( [ [ _nameText stringValue ] length ] > 0 );
+   return ( [ [ nameText stringValue ] length ] > 0 );
 }
 
 - (BOOL) accountChanged
 {
-   return ( [ [ _accountText stringValue ] length ] > 0 );
+   return ( [ [ accountText stringValue ] length ] > 0 );
 }
 
 - (BOOL) passwordChanged
 {
-   return ( [ [ _passwordText stringValue ] length ] > 0 );
+   return ( [ [ passwordText stringValue ] length ] > 0 );
 }
 
 - (BOOL) urlChanged
 {
-   return ( [ [ _urlText stringValue ] length ] > 0 );
+   return ( [ [ urlText stringValue ] length ] > 0 );
 }
 
 - (BOOL) categoryChanged
 {
-   return ![ [ _category stringValue ]
+   return ![ [ category stringValue ]
              isEqualToString:CSDocModelCategory_General ];
 }
 
 - (BOOL) notesChanged
 {
-   return ( [ [ _notes textStorage ] length ] > 0 );
+   return ( [ [ notes textStorage ] length ] > 0 );
 }
 
 @end
