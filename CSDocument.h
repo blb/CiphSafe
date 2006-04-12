@@ -48,7 +48,7 @@
 }
 
 // Actions from the menu
-- (IBAction) doChangePassphrase:(id)sender;
+- (IBAction) changePassphrase:(id)sender;
 
 // Return just the main window controller
 - (CSWinCtrlMain *) mainWindowController;

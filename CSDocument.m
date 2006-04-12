@@ -407,7 +407,7 @@
 /*
  * Change the passphrase associated with the document
  */
-- (IBAction) doChangePassphrase:(id)sender
+- (IBAction) changePassphrase:(id)sender
 {
    SEL mySelector;
    NSMethodSignature *mySelSig;
