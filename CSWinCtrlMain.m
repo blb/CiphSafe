@@ -198,7 +198,7 @@ static NSArray *searchWhatArray;
    {
       newColumn = [ [ NSTableColumn alloc ] initWithIdentifier:colID ];
       [ newColumn setEditable:NO ];
-      [ newColumn setResizable:YES ];
+      [ newColumn setResizingMask:( NSTableColumnAutoresizingMask | NSTableColumnUserResizingMask ) ];
       [ [ newColumn headerCell ] setStringValue:NSLocalizedString( colID, @"" ) ];
       [ documentView addTableColumn:[ newColumn autorelease ] ];
    }
