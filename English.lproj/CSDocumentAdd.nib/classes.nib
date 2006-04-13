@@ -1,13 +1,13 @@
 {
     IBClasses = (
         {
-            ACTIONS = {doAdd = id; doClear = id; }; 
+            ACTIONS = {add = id; clear = id; }; 
             CLASS = CSWinCtrlAdd; 
             LANGUAGE = ObjC; 
             SUPERCLASS = CSWinCtrlEntry; 
         }, 
         {
-            ACTIONS = {doGenerate = id; doOpenURL = id; }; 
+            ACTIONS = {generate = id; openURL = id; }; 
             CLASS = CSWinCtrlEntry; 
             LANGUAGE = ObjC; 
             OUTLETS = {

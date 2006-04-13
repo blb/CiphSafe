@@ -36,12 +36,7 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {
-                deselectAll = id; 
-                doAddEntry = id; 
-                doChangePassphrase = id; 
-                doSetCategory = id; 
-            }; 
+            ACTIONS = {addEntry = id; changePassphrase = id; deselectAll = id; setCategory = id; }; 
             CLASS = FirstResponder; 
             LANGUAGE = ObjC; 
             SUPERCLASS = NSObject; 

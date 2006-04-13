@@ -3,7 +3,7 @@
         {CLASS = BLBTableView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }, 
         {CLASS = BLBTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
         {
-            ACTIONS = {doGenerate = id; doOpenURL = id; }; 
+            ACTIONS = {generate = id; openURL = id; }; 
             CLASS = CSWinCtrlEntry; 
             LANGUAGE = ObjC; 
             OUTLETS = {
@@ -19,16 +19,16 @@
         }, 
         {
             ACTIONS = {
+                addEntry = id; 
                 cmmCopyField = id; 
                 cmmOpenURL = id; 
                 cornerSelectField = id; 
-                doAddEntry = id; 
-                doDeleteEntry = id; 
-                doResetSearch = id; 
-                doSetCategory = id; 
-                doViewEntry = id; 
+                deleteEntry = id; 
                 newCategoryCancel = id; 
                 newCategoryOK = id; 
+                resetSearch = id; 
+                setCategory = id; 
+                viewEntry = id; 
             }; 
             CLASS = CSWinCtrlMain; 
             LANGUAGE = ObjC; 
