@@ -1,5 +1,5 @@
 /*
- * Copyright Â© 2003, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
