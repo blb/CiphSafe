@@ -72,7 +72,7 @@
 #define CSWINCTRLMAIN_LOC_NEEDCOLTEXT \
            NSLocalizedString( @"At least one column is needed in order to " \
            @"be useful", @"" )
-#define CSWINCTRLMAIN_LOC_NEWCATEGORY NSLocalizedString( @"New Category…", @"" )
+#define CSWINCTRLMAIN_LOC_NEWCATEGORY NSLocalizedString( @"New Category", @"" )
 
 
 @implementation CSWinCtrlMain
