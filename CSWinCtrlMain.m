@@ -828,32 +828,35 @@ static NSArray *searchWhatArray;
 
 /*
  * Handle keypresses in the table view by scrolling to the first entry whose
- * name begins with the key pressed
+ * name begins with the key pressed; spacebar is a pagedown equivalent
  */
 - (BOOL) tableView:(BLBTableView *)tableView
-         didReceiveKeyDownEvent:(NSEvent *)theEvent
+   didReceiveKeyDownEvent:(NSEvent *)theEvent
 {
-   BOOL retval;
-   NSNumber *rowForKey;
-   int filteredRow;
-
-   retval = NO;
-   rowForKey = [ [ self document ]
-                 firstRowBeginningWithString:[ theEvent characters ]
-                 ignoreCase:YES
-                 forKey:CSDocModelKey_Name ];
+   NSNumber *rowForKey = [ [ self document ] firstRowBeginningWithString:[ theEvent characters ]
+                                                              ignoreCase:YES
+                                                                  forKey:CSDocModelKey_Name ];
    if( rowForKey != nil )
    {
-      filteredRow = [ self filteredRowForRow:[ rowForKey intValue ] ];
+      int filteredRow = [ self filteredRowForRow:[ rowForKey intValue ] ];
       if( filteredRow >= 0 )
       {
          [ tableView selectRow:filteredRow byExtendingSelection:NO ];
          [ tableView scrollRowToVisible:filteredRow ];
-         retval = YES;
+         return YES;
       }
    }
+   else if( [ [ theEvent characters ] characterAtIndex:0 ] == ' ' )
+   {
+      NSSize contentViewSize = [ [ tableView enclosingScrollView ] contentSize ];
+      float amtToKeepVisible = [ [ tableView enclosingScrollView ] verticalPageScroll ];
+      [ tableView scrollRectToVisible:NSOffsetRect( [ tableView visibleRect ],
+                                                    0,
+                                                    contentViewSize.height - amtToKeepVisible ) ];
+      return YES;
+   }
 
-   return retval;
+   return NO;
 }
 
 
