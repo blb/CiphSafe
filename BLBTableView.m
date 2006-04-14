@@ -42,33 +42,28 @@
  */
 - (void) awakeFromNib
 {
-   NSArray *tableColumns;
+   NSArray *tableColumns = [ self tableColumns ];
    unsigned index;
-
-   tableColumns = [ self tableColumns ];
    for( index = 0; index < [ tableColumns count ]; index++ )
       [ [ [ tableColumns objectAtIndex:index ] dataCell ] setDrawsBackground:NO ];
 }
 
 
 /*
- * This routine does the actual blue stripe drawing, filling in every other row
- * of the table with a blue background so you can follow the rows easier with
+ * This routine does the actual stripe drawing, filling in every other row
+ * of the table with some color for the background so you can follow the rows easier with
  * your eyes.  Shamelessly lifted from Apple's MP3 Player sample code.
  */
 - (void) drawStripesInRect:(NSRect)clipRect
 {
-   NSRect stripeRect;
-   float fullRowHeight, clipBottom;
-   int firstStripe;
-   
-   fullRowHeight = [ self rowHeight ] + [ self intercellSpacing ].height;
-   clipBottom = NSMaxY( clipRect );
-   firstStripe = clipRect.origin.y / fullRowHeight;
+   float fullRowHeight = [ self rowHeight ] + [ self intercellSpacing ].height;
+   float clipBottom = NSMaxY( clipRect );
+   int firstStripe = clipRect.origin.y / fullRowHeight;
    if( firstStripe % 2 == 1 )
       firstStripe++;   // We're only interested in drawing the stripes
    
    // Set up first rect
+   NSRect stripeRect;
    stripeRect.origin.x = clipRect.origin.x;
    stripeRect.origin.y = firstStripe * fullRowHeight;
    stripeRect.size.width = clipRect.size.width;
@@ -101,9 +96,7 @@
  */
 - (BOOL) validateMenuItem:(NSMenuItem *)menuItem
 {
-   BOOL retval;
-
-   retval = YES;
+   BOOL retval = YES;
    if( [ menuItem action ] == @selector( deselectAll: ) )
       retval = ( [ self numberOfSelectedRows ] > 0 );
 
@@ -116,9 +109,11 @@
  */
 - (void) setStripeColor:(NSColor *)newStripeColor
 {
-   [ newStripeColor retain ];
-   [ stripeColor release ];
-   stripeColor = newStripeColor;
+   if( newStripeColor != stripeColor )
+   {
+      [ stripeColor autorelease ];
+      stripeColor = [ newStripeColor retain ];
+   }
 }
 
 
@@ -146,46 +141,22 @@
 
 
 /*
- * Draw only vertical lines for the grid
- */
-- (void) drawGridInClipRect:(NSRect)aRect
-{
-   int index;
-   NSRect columnRect;
-   float xPos;
-
-   [ [ self gridColor ] set ];
-   for( index = 0; index < [ self numberOfColumns ]; index++ )
-   {
-      columnRect = [ self rectOfColumn:index ];
-      xPos = columnRect.origin.x + columnRect.size.width - 1;
-      NSFrameRect( NSMakeRect( xPos, aRect.origin.y, 1, aRect.size.height ) );
-   }
-}
-
-
-/*
  * The delegate must implement contextualMenuForTableView:row:column: for this
  * to work
  */
 - (NSMenu *) menuForEvent:(NSEvent *)theEvent
 {
-   SEL contextMenuSel;
-   NSPoint clickPoint;
-   int clickColumn, clickRow;
-
-   contextMenuSel = @selector( contextualMenuForTableView:row:column: );
+   SEL contextMenuSel = @selector( contextualMenuForTableView:row:column: );
    if( [ [ self delegate ] respondsToSelector:contextMenuSel ] )
    {
-      clickPoint = [ self convertPoint:[ theEvent locationInWindow ]
-                          fromView:nil ];
-      clickColumn = [ self columnAtPoint:clickPoint ];
-      clickRow = [ self rowAtPoint:clickPoint ];
+      NSPoint clickPoint = [ self convertPoint:[ theEvent locationInWindow ] fromView:nil ];
+      int clickColumn = [ self columnAtPoint:clickPoint ];
+      int clickRow = [ self rowAtPoint:clickPoint ];
 
       if( clickColumn >= 0 && clickRow >= 0 )
          return [ [ self delegate ] contextualMenuForTableView:self
-                                    row:clickRow
-                                    column:clickColumn ];
+                                                           row:clickRow
+                                                        column:clickColumn ];
    }
 
    return nil;
@@ -197,14 +168,8 @@
  */
 - (void) keyDown:(NSEvent *)theEvent
 {
-   BOOL sendToSuper;
-   SEL didReceiveSel = @selector( tableView:didReceiveKeyDownEvent: );
-
-   sendToSuper = YES;
-   if( [ [ self delegate ] respondsToSelector:didReceiveSel ] &&
-       [ [ self delegate ] tableView:self didReceiveKeyDownEvent:theEvent ] )
-      sendToSuper = NO;
-   if( sendToSuper )
+   if( ![ [ self delegate ] respondsToSelector:@selector( tableView:didReceiveKeyDownEvent: ) ] ||
+       ![ [ self delegate ] tableView:self didReceiveKeyDownEvent:theEvent ] )
       [ super keyDown:theEvent ];
 }
 
