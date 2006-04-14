@@ -35,22 +35,19 @@
 #import <Cocoa/Cocoa.h>
 #import "BLBTableView.h"
 
-@class BLBTextField;
-
 @interface CSWinCtrlMain : NSWindowController
 {
    NSTableColumn *previouslySelectedColumn;
-   BOOL searchFieldModified;
    NSArray *searchResultList;
+   int currentSearchCategory;
 
    IBOutlet BLBTableView *documentView;
    IBOutlet NSButton *documentDeleteButton;
    IBOutlet NSButton *documentViewButton;
    IBOutlet NSTextField *documentStatus;
-   IBOutlet BLBTextField *documentSearch;
    IBOutlet NSMenu *contextualMenu;
    IBOutlet NSMenu *cmmTableHeader;
-   IBOutlet NSPopUpButton *searchWhat;
+   IBOutlet NSSearchField *searchField;
 
    // New Category window
    IBOutlet NSPanel *newCategoryWindow;
@@ -60,8 +57,7 @@
 // Actions from the main window
 - (IBAction) addEntry:(id)sender;
 - (IBAction) viewEntry:(id)sender;
-- (IBAction) deleteEntry:(id)sender;
-- (IBAction) resetSearch:(id)sender;
+- (IBAction) delete:(id)sender;
 
 // Actions from the new category window
 - (IBAction) newCategoryOK:(id)sender;
@@ -79,5 +75,8 @@
 
 // Refresh the window and contents
 - (void) refreshWindow;
+
+// Search field stuff
+- (IBAction) limitSearch:(id)sender;
 
 @end

@@ -36,7 +36,7 @@
 #import "CSAppController.h"
 #import "CSDocument.h"
 #import "CSDocModel.h"
-#import "BLBTextField.h"
+
 
 // Format strings for window and table view information saved in user defaults
 #define CSWINCTRLMAIN_PREF_WINDOW @"CSWinCtrlMain Window %@"
@@ -74,6 +74,14 @@
            @"be useful", @"" )
 #define CSWINCTRLMAIN_LOC_NEWCATEGORY NSLocalizedString( @"New Category", @"" )
 
+// Menu tag mappings
+const int CSWinCtrlMainTag_Name = 0;
+const int CSWinCtrlMainTag_Acct = 1;
+const int CSWinCtrlMainTag_Passwd = 2;
+const int CSWinCtrlMainTag_URL = 3;
+const int CSWinCtrlMainTag_Category = 4;
+const int CSWinCtrlMainTag_Notes = 5;
+
 
 @implementation CSWinCtrlMain
 
@@ -108,8 +116,7 @@ static NSArray *searchWhatArray;
                                                  CSDocModelKey_Category,
                                                  CSDocModelKey_Notes,
                                                  nil ];
-   searchWhatArray = [ [ NSArray alloc ] initWithObjects:@"Search in:",
-                                                         CSDocModelKey_Name,
+   searchWhatArray = [ [ NSArray alloc ] initWithObjects:CSDocModelKey_Name,
                                                          CSDocModelKey_Acct,
                                                          CSDocModelKey_Passwd,
                                                          CSDocModelKey_URL,
@@ -127,7 +134,11 @@ static NSArray *searchWhatArray;
 {
    self = [ super initWithWindowNibName:@"CSDocument" ];
    if( self != nil )
+   {
       [ self setShouldCloseDocument:YES ];
+      currentSearchCategory = CSWinCtrlMainTag_Name;
+      searchResultList = nil;
+   }
 
    return self;
 }
@@ -362,9 +373,11 @@ static NSArray *searchWhatArray;
  */
 - (void) setSearchResultList:(NSArray *)newList
 {
-   [ newList retain ];
-   [ searchResultList release ];
-   searchResultList = newList;
+   if( newList != searchResultList )
+   {
+      [ searchResultList autorelease ];
+      searchResultList = [ newList retain ];
+   }
 }
 
 
@@ -373,15 +386,13 @@ static NSArray *searchWhatArray;
  */
 - (void) filterView
 {
-   NSString *searchString;
-   
-   searchString = [ documentSearch stringValue ];
-   if( searchFieldModified )
+   NSString *searchString = [ searchField stringValue ];
+   if( searchString != nil && [ searchString length ] > 0 )
       [ self setSearchResultList:[ [ self document ]
-                                    rowsMatchingString:searchString
-                                            ignoreCase:YES
-                                                forKey:[ searchWhatArray objectAtIndex:
-                                                   [ searchWhat indexOfSelectedItem ] ] ] ];
+                                   rowsMatchingString:searchString
+                                           ignoreCase:YES
+                                               forKey:[ searchWhatArray
+                                                        objectAtIndex:currentSearchCategory ] ] ];
    else
       [ self setSearchResultList:nil ];
 }
@@ -403,7 +414,7 @@ static NSArray *searchWhatArray;
    else
       statusString = [ NSString stringWithFormat:CSWINCTRLMAIN_LOC_NUMENTRIES,
          entryCount, selectedCount ];
-   if( searchFieldModified )
+   if( searchResultList != nil )
       statusString = [ NSString stringWithFormat:@"%@ (%@)",
          statusString, CSWINCTRLMAIN_LOC_FILTERED ];
    [ documentStatus setStringValue:statusString ];
@@ -490,10 +501,9 @@ static NSArray *searchWhatArray;
  */
 - (int) filteredRowForRow:(int)row
 {
-   unsigned index;
-   
    if( searchResultList != nil )
    {
+      unsigned index;
       for( index = 0; index < [ searchResultList count ]; index++ )
       {
          if( [ [ searchResultList objectAtIndex:index ] intValue ] == row )
@@ -511,8 +521,6 @@ static NSArray *searchWhatArray;
  */
 - (void) awakeFromNib
 {
-   int index;
-
    if( [ [ self document ] fileName ] != nil )
    {
       [ self loadSavedWindowState ];
@@ -524,12 +532,10 @@ static NSArray *searchWhatArray;
       [ self setupDefaultTableViewColumns ];
 
    [ self updateCornerMenu ];
-   [ documentView setDrawsGrid:NO ];
-   [ documentView setDrawsGrid:YES ];
    [ documentView setStripeColor:[ NSColor colorWithCalibratedRed:0.93
-                                            green:0.95
-                                            blue:1.0
-                                            alpha:1.0 ] ];
+                                                            green:0.95
+                                                             blue:1.0
+                                                            alpha:1.0 ] ];
    [ documentView setDoubleAction:@selector( viewEntry: ) ];
    previouslySelectedColumn = [ documentView tableColumnWithIdentifier:
                                                   [ [ self document ] sortKey ] ];
@@ -545,17 +551,14 @@ static NSArray *searchWhatArray;
    [ [ documentView cornerView ] setMenu:cmmTableHeader ];
    [ [ documentView headerView ] setMenu:cmmTableHeader ];
    [ self setTableViewSpacing ];
-   [ documentSearch setObjectValue:defaultSearchString ];
    [ self refreshWindow ];
-   [ searchWhat setAutoenablesItems:NO ];
-   [ [ searchWhat itemAtIndex:0 ] setEnabled:NO ];
-   for( index = 1; index < [ searchWhat numberOfItems ]; index++ )
-      [ [ searchWhat itemAtIndex:index ] setEnabled:YES ];
    [ [ NSNotificationCenter defaultCenter ]
      addObserver:self
      selector:@selector( prefsDidChange: )
      name:CSApplicationDidChangePrefs
      object:nil ];
+   [ [ searchField cell ]
+     setPlaceholderString:NSLocalizedString( [ searchWhatArray objectAtIndex:CSWinCtrlMainTag_Name ], nil ) ];
 }
 
 
@@ -580,7 +583,7 @@ static NSArray *searchWhatArray;
 /*
  * Tell the document to delete certain entries
  */
-- (IBAction) deleteEntry:(id)sender
+- (IBAction) delete:(id)sender
 {
    NSString *sheetQuestion;
    SEL delSelector;
@@ -601,17 +604,6 @@ static NSArray *searchWhatArray;
    else
       [ [ self document ]
         deleteEntriesWithNamesInArray:[ self getSelectedNames ] ];
-}
-
-
-/*
- * Reset the search field
- */
-- (IBAction) resetSearch:(id)sender
-{
-   searchFieldModified = NO;
-   [ documentSearch setStringValue:@"" ];
-   [ self refreshWindow ];
 }
 
 
@@ -641,6 +633,21 @@ static NSArray *searchWhatArray;
    [ documentView reloadData ];
    [ documentView deselectAll:self ];
    [ self updateStatusField ];
+}
+
+
+/*
+ * Select which category to search
+ */
+- (IBAction) limitSearch:(id)sender
+{
+   NSMenuItem *previousCategoryItem = [ [ sender menu ] itemWithTag:currentSearchCategory ];
+   [ previousCategoryItem setState:NSOffState ];
+   currentSearchCategory = [ sender tag ];
+   [ sender setState:NSOnState ];
+   [ [ searchField cell ]
+     setPlaceholderString:NSLocalizedString( [ searchWhatArray objectAtIndex:currentSearchCategory ], nil ) ];
+   [ self refreshWindow ];
 }
 
 
@@ -1001,34 +1008,13 @@ static NSArray *searchWhatArray;
 
 
 /*
- * This happens when the search text field is focused; we simply clear the
- * search field if it hasn't been modified yet (clearing the gray "search")
- */
-- (void) textFieldDidBecomeFirstResponder:(BLBTextField *)textField
-{
-   if( [ textField isEqual:documentSearch ] && !searchFieldModified )
-      [ documentSearch setStringValue:@"" ];
-}
-
-
-/*
  * When the search field value is changed; set that the field is modified if
  * it has, setup filtering, and refresh the view
  */
 - (void) controlTextDidChange:(NSNotification *)aNotification
 {
-   NSString *searchString;
-
-   if( [ [ aNotification object ] isEqual:documentSearch ] )
-   {
-      searchString = [ documentSearch stringValue ];
-      if( searchString != nil && [ searchString length ] > 0 )
-         searchFieldModified = YES;
-      else
-         searchFieldModified = NO;
-      [ self filterView ];
+   if( [ [ aNotification object ] isEqual:searchField ] )
       [ self refreshWindow ];
-   }
 }
 
 
