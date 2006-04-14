@@ -833,20 +833,7 @@ static NSArray *searchWhatArray;
 - (BOOL) tableView:(BLBTableView *)tableView
    didReceiveKeyDownEvent:(NSEvent *)theEvent
 {
-   NSNumber *rowForKey = [ [ self document ] firstRowBeginningWithString:[ theEvent characters ]
-                                                              ignoreCase:YES
-                                                                  forKey:CSDocModelKey_Name ];
-   if( rowForKey != nil )
-   {
-      int filteredRow = [ self filteredRowForRow:[ rowForKey intValue ] ];
-      if( filteredRow >= 0 )
-      {
-         [ tableView selectRow:filteredRow byExtendingSelection:NO ];
-         [ tableView scrollRowToVisible:filteredRow ];
-         return YES;
-      }
-   }
-   else if( [ [ theEvent characters ] characterAtIndex:0 ] == ' ' )
+   if( [ [ theEvent characters ] characterAtIndex:0 ] == ' ' )
    {
       NSSize contentViewSize = [ [ tableView enclosingScrollView ] contentSize ];
       float amtToKeepVisible = [ [ tableView enclosingScrollView ] verticalPageScroll ];
@@ -854,6 +841,22 @@ static NSArray *searchWhatArray;
                                                     0,
                                                     contentViewSize.height - amtToKeepVisible ) ];
       return YES;
+   }
+   else
+   {
+      NSNumber *rowForKey = [ [ self document ] firstRowBeginningWithString:[ theEvent characters ]
+                                                                 ignoreCase:YES
+                                                                     forKey:CSDocModelKey_Name ];
+      if( rowForKey != nil )
+      {
+         int filteredRow = [ self filteredRowForRow:[ rowForKey intValue ] ];
+         if( filteredRow >= 0 )
+         {
+            [ tableView selectRow:filteredRow byExtendingSelection:NO ];
+            [ tableView scrollRowToVisible:filteredRow ];
+            return YES;
+         }
+      }
    }
 
    return NO;
