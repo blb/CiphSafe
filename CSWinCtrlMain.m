@@ -157,15 +157,15 @@ static NSArray *searchWhatArray;
              integerForKey:CSPrefDictKey_CellSpacing ] )
    {
       case 0:   // Small
-         newSpacing = NSMakeSize( 3, 2 );
+         newSpacing = NSMakeSize( 3.0, 2.0 );
          break;
          
       case 1:   // Medium
-         newSpacing = NSMakeSize( 5, 2 );
+         newSpacing = NSMakeSize( 5.0, 2.0 );
          break;
          
       case 2:   // Large
-         newSpacing = NSMakeSize( 7, 3 );
+         newSpacing = NSMakeSize( 7.0, 3.0 );
          break;
    }
    [ documentView setIntercellSpacing:newSpacing ];
@@ -317,6 +317,13 @@ static NSArray *searchWhatArray;
    [ self setDisplayOfColumnID:@"account" enabled:YES ];
    [ self setDisplayOfColumnID:@"url" enabled:YES ];
    [ self setDisplayOfColumnID:@"notes" enabled:YES ];
+   // Without resizing, the columns are oddly sized...
+   NSArray *tableColumns = [ documentView tableColumns ];
+   NSEnumerator *colEnum = [ tableColumns objectEnumerator ];
+   id aColumn;
+   while( ( aColumn = [ colEnum nextObject ] ) != nil )
+      [ aColumn setWidth:120 ];
+   [ documentView sizeToFit ];
 }
 
 
