@@ -86,6 +86,8 @@ int sortEntries( id dict1, id dict2, void *context );
 
 @implementation CSDocModel
 
+static NSArray *keyArray;
+
 + (void) initialize
 {
    CSDocModelCategory_General = CSDOCMODEL_LOC_CATGENERAL;
@@ -93,6 +95,9 @@ int sortEntries( id dict1, id dict2, void *context );
    CSDocModelCategory_Forum = CSDOCMODEL_LOC_CATFORUM;
    CSDocModelCategory_Retail = CSDOCMODEL_LOC_CATRETAIL;
    CSDocModelCategory_OtherWeb = CSDOCMODEL_LOC_CATOTHERWEB;
+   keyArray = [ [ NSArray alloc ] initWithObjects:CSDocModelKey_Name, CSDocModelKey_Acct,
+                                                  CSDocModelKey_Passwd, CSDocModelKey_URL,
+                                                  CSDocModelKey_Category, CSDocModelKey_Notes, nil ];
 }
 
 
@@ -341,6 +346,21 @@ int sortEntries( id dict1, id dict2, void *context );
       result = @"";
 
    return result;
+}
+
+
+/*
+ * Return the string value for an entire row
+ */
+- (NSString *) stringForEntryAtRow:(int)row
+{
+   NSMutableString *entryString = [ NSMutableString string ];
+   NSEnumerator *entryEnum = [ keyArray objectEnumerator ];
+   id someKey;
+   while( ( someKey = [ entryEnum nextObject ] ) != nil )
+      [ entryString appendString:[ self stringForKey:someKey atRow:row ] ];
+
+   return entryString;
 }
 
 
@@ -657,19 +677,18 @@ int sortEntries( id dict1, id dict2, void *context );
               ignoreCase:(BOOL)ignoreCase
               forKey:(NSString *)key
 {
-   unsigned compareOptions;
-   NSMutableArray *retval;
-   int index;
-   NSRange searchResult;
-
-   compareOptions = 0;
-   retval = [ NSMutableArray arrayWithCapacity:10 ];
+   unsigned compareOptions = 0;
+   NSMutableArray *retval = [ NSMutableArray arrayWithCapacity:10 ];
    if( ignoreCase )
       compareOptions = NSCaseInsensitiveSearch;
+   int index;
    for( index = 0; index < [ self entryCount ]; index++ )
    {
-      searchResult = [ [ self stringForKey:key atRow:index ]
-                       rangeOfString:findMe options:compareOptions ];
+      NSRange searchResult;
+      if( key == nil )
+         searchResult = [ [ self stringForEntryAtRow:index ] rangeOfString:findMe options:compareOptions ];
+      else
+         searchResult = [ [ self stringForKey:key atRow:index ] rangeOfString:findMe options:compareOptions ];
       if( searchResult.location != NSNotFound )
          [ retval addObject:[ NSNumber numberWithInt:index ] ];
 
