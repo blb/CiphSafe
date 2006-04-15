@@ -98,6 +98,7 @@ extern NSString * const CSDocModelNotificationInfoKey_DeletedNames;
 // Entry access
 - (int) entryCount;
 - (NSString *) stringForKey:(NSString *)key atRow:(int)row;
+- (NSString *) stringForEntryAtRow:(int)row;
 - (NSData *) RTFDNotesAtRow:(int)row;
 - (NSData *) RTFNotesAtRow:(int)row;
 - (NSAttributedString *) RTFDStringNotesAtRow:(int)row;
