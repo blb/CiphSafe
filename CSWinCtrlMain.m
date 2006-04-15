@@ -75,12 +75,13 @@
 #define CSWINCTRLMAIN_LOC_NEWCATEGORY NSLocalizedString( @"New Category", @"" )
 
 // Menu tag mappings
-const int CSWinCtrlMainTag_Name = 0;
-const int CSWinCtrlMainTag_Acct = 1;
-const int CSWinCtrlMainTag_Passwd = 2;
-const int CSWinCtrlMainTag_URL = 3;
-const int CSWinCtrlMainTag_Category = 4;
-const int CSWinCtrlMainTag_Notes = 5;
+const int CSWinCtrlMainTag_All = 0;
+const int CSWinCtrlMainTag_Name = 1;
+const int CSWinCtrlMainTag_Acct = 2;
+const int CSWinCtrlMainTag_Passwd = 3;
+const int CSWinCtrlMainTag_URL = 4;
+const int CSWinCtrlMainTag_Category = 5;
+const int CSWinCtrlMainTag_Notes = 6;
 
 
 @implementation CSWinCtrlMain
@@ -116,7 +117,8 @@ static NSArray *searchWhatArray;
                                                  CSDocModelKey_Category,
                                                  CSDocModelKey_Notes,
                                                  nil ];
-   searchWhatArray = [ [ NSArray alloc ] initWithObjects:CSDocModelKey_Name,
+   searchWhatArray = [ [ NSArray alloc ] initWithObjects:@"all",
+                                                         CSDocModelKey_Name,
                                                          CSDocModelKey_Acct,
                                                          CSDocModelKey_Passwd,
                                                          CSDocModelKey_URL,
@@ -388,11 +390,15 @@ static NSArray *searchWhatArray;
 {
    NSString *searchString = [ searchField stringValue ];
    if( searchString != nil && [ searchString length ] > 0 )
+   {
+      NSString *searchKey = [ searchWhatArray objectAtIndex:currentSearchCategory ];
+      if( [ searchKey isEqualToString:@"all" ] )   // For all, use a nil key
+         searchKey = nil;
       [ self setSearchResultList:[ [ self document ]
                                    rowsMatchingString:searchString
                                            ignoreCase:YES
-                                               forKey:[ searchWhatArray
-                                                        objectAtIndex:currentSearchCategory ] ] ];
+                                               forKey:searchKey ] ];
+   }
    else
       [ self setSearchResultList:nil ];
 }
