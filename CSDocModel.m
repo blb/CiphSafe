@@ -47,12 +47,6 @@ NSString * const CSDocModelKey_URL = @"url";
 NSString * const CSDocModelKey_Category = @"category";
 NSString * const CSDocModelKey_Notes = @"notes";
 
-NSString *CSDocModelCategory_General;
-NSString *CSDocModelCategory_Banking;
-NSString *CSDocModelCategory_Forum;
-NSString *CSDocModelCategory_Retail;
-NSString *CSDocModelCategory_OtherWeb;
-
 NSString * const CSDocModelDidChangeSortNotification =
    @"CSDocModelDidChangeSortNotification";
 NSString * const CSDocModelDidAddEntryNotification = 
@@ -74,11 +68,6 @@ NSString * const CSDocModelNotificationInfoKey_DeletedNames =
 #define CSDOCMODEL_LOC_ADD NSLocalizedString( @"Add", @"" )
 #define CSDOCMODEL_LOC_CHANGE NSLocalizedString( @"Change", @"" )
 #define CSDOCMODEL_LOC_DELETE NSLocalizedString( @"Delete", @"" )
-#define CSDOCMODEL_LOC_CATGENERAL NSLocalizedString( @"General", @"" )
-#define CSDOCMODEL_LOC_CATBANKING NSLocalizedString( @"Banking", @"" )
-#define CSDOCMODEL_LOC_CATFORUM NSLocalizedString( @"Forum", @"" )
-#define CSDOCMODEL_LOC_CATRETAIL NSLocalizedString( @"Retail", @"" )
-#define CSDOCMODEL_LOC_CATOTHERWEB NSLocalizedString( @"Other Web", @"" )
 
 // Used to sort the array
 int sortEntries( id dict1, id dict2, void *context );
@@ -90,11 +79,6 @@ static NSArray *keyArray;
 
 + (void) initialize
 {
-   CSDocModelCategory_General = CSDOCMODEL_LOC_CATGENERAL;
-   CSDocModelCategory_Banking = CSDOCMODEL_LOC_CATBANKING;
-   CSDocModelCategory_Forum = CSDOCMODEL_LOC_CATFORUM;
-   CSDocModelCategory_Retail = CSDOCMODEL_LOC_CATRETAIL;
-   CSDocModelCategory_OtherWeb = CSDOCMODEL_LOC_CATOTHERWEB;
    keyArray = [ [ NSArray alloc ] initWithObjects:CSDocModelKey_Name, CSDocModelKey_Acct,
                                                   CSDocModelKey_Passwd, CSDocModelKey_URL,
                                                   CSDocModelKey_Category, CSDocModelKey_Notes, nil ];

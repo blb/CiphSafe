@@ -45,13 +45,6 @@ extern NSString * const CSDocModelKey_URL;
 extern NSString * const CSDocModelKey_Category;
 extern NSString * const CSDocModelKey_Notes;
 
-// Builtin categories (General is default)
-extern NSString *CSDocModelCategory_General;
-extern NSString *CSDocModelCategory_Banking;
-extern NSString *CSDocModelCategory_Forum;
-extern NSString *CSDocModelCategory_Retail;
-extern NSString *CSDocModelCategory_OtherWeb;
-
 // Notifications
 extern NSString * const CSDocModelDidChangeSortNotification;
 extern NSString * const CSDocModelDidAddEntryNotification;
