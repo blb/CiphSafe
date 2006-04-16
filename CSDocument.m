@@ -596,13 +596,11 @@
 
    if( [ [ NSUserDefaults standardUserDefaults ]
          boolForKey:CSPrefDictKey_IncludeDefaultCategories ] )
-      categories = [ NSMutableArray arrayWithObjects:
-                                       CSDocModelCategory_General,
-                                       CSDocModelCategory_Banking,
-                                       CSDocModelCategory_Forum,
-                                       CSDocModelCategory_Retail,
-                                       CSDocModelCategory_OtherWeb,
-                                       nil ];
+   {
+      NSString *defaultCategoriesValuesPath = [ [ NSBundle mainBundle ] pathForResource:@"DefaultCategories" 
+                                                                                 ofType:@"plist" ];
+      categories = [ NSMutableArray arrayWithContentsOfFile:defaultCategoriesValuesPath ];
+   }
    else
       categories = [ NSMutableArray arrayWithCapacity:10 ];
    for( index = 0; index < [ self entryCount ]; index++ )
