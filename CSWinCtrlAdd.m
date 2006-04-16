@@ -80,7 +80,7 @@
    [ accountText setStringValue:@"" ];
    [ passwordText setStringValue:@"" ];
    [ urlText setStringValue:@"" ];
-   [ category setStringValue:CSDocModelCategory_General ];
+   [ category selectItemAtIndex:0 ];
    [ notes setString:@"" ];
    [ [ notes undoManager ] removeAllActions ];
    [ mainButton setEnabled:NO ];
@@ -151,8 +151,7 @@
 
 - (BOOL) categoryChanged
 {
-   return ![ [ category stringValue ]
-             isEqualToString:CSDocModelCategory_General ];
+   return [ category indexOfSelectedItem ] != 0;
 }
 
 - (BOOL) notesChanged
