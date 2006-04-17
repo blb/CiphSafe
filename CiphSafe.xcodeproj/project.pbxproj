@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6412E63609F3619000F421C0 /* DefaultPrefs.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6412E63509F3619000F421C0 /* DefaultPrefs.plist */; };
 		6478D27D09F2EF020023B67B /* DefaultCategories.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6478D27C09F2EF020023B67B /* DefaultCategories.plist */; };
 		64D6E3AA09E99F2400904206 /* CiphSafe Help in Resources */ = {isa = PBXBuildFile; fileRef = 64D6E39B09E99F2400904206 /* CiphSafe Help */; };
 		64D6E3D409E9B25500904206 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8D15AC360486D014006FF6A4 /* Info.plist */; };
@@ -65,6 +66,7 @@
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		32DBCF750370BD2300C91783 /* CiphSafe_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CiphSafe_Prefix.pch; sourceTree = "<group>"; };
+		6412E63509F3619000F421C0 /* DefaultPrefs.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = DefaultPrefs.plist; sourceTree = "<group>"; };
 		6478D23A09F2D1890023B67B /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = English; path = English.lproj/DefaultCategories.plist; sourceTree = "<group>"; };
 		64D6E39C09E99F2400904206 /* English */ = {isa = PBXFileReference; lastKnownFileType = folder; name = English; path = "English.lproj/CiphSafe Help"; sourceTree = "<group>"; };
 		64FCAD9C09E870ED00F59756 /* BLBTableView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = BLBTableView.h; sourceTree = "<group>"; };
@@ -204,6 +206,7 @@
 				64FCADBC09E870ED00F59756 /* sortArrowDown.tiff */,
 				64FCADBD09E870ED00F59756 /* sortArrowUp.tiff */,
 				6478D27C09F2EF020023B67B /* DefaultCategories.plist */,
+				6412E63509F3619000F421C0 /* DefaultPrefs.plist */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -325,6 +328,7 @@
 				64D6E3AA09E99F2400904206 /* CiphSafe Help in Resources */,
 				64D6E3D409E9B25500904206 /* Info.plist in Resources */,
 				6478D27D09F2EF020023B67B /* DefaultCategories.plist in Resources */,
+				6412E63609F3619000F421C0 /* DefaultPrefs.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
