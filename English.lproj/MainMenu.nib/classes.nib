@@ -1,38 +1,10 @@
 {
     IBClasses = (
         {
-            ACTIONS = {
-                closeAll = id; 
-                openPrefs = id; 
-                prefsAutoOpenClicked = id; 
-                prefsAutoOpenSelectPath = id; 
-                prefsCancel = id; 
-                prefsCloseAfterTimeoutClicked = id; 
-                prefsSave = id; 
-            }; 
+            ACTIONS = {closeAll = id; prefsAutoOpenSelectPath = id; }; 
             CLASS = CSAppController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {
-                editMenuSetCategory = NSMenuItem; 
-                prefsAlphanumOnly = NSButton; 
-                prefsAutoOpen = NSButton; 
-                prefsAutoOpenName = NSTextField; 
-                prefsAutoOpenSelect = NSButton; 
-                prefsCellSpacing = NSPopUpButton; 
-                prefsClearClipboard = NSButton; 
-                prefsCloseAdd = NSButton; 
-                prefsCloseAfterTimeout = NSButton; 
-                prefsCloseEdit = NSButton; 
-                prefsConfirmDelete = NSButton; 
-                prefsCreateNew = NSButton; 
-                prefsGenSize = NSTextField; 
-                prefsIncludeDefaultCategories = NSButton; 
-                prefsIncludePasswd = NSButton; 
-                prefsKeepBackup = NSButton; 
-                prefsTimeout = NSTextField; 
-                prefsWarnShort = NSButton; 
-                prefsWindow = NSWindow; 
-            }; 
+            OUTLETS = {editMenuSetCategory = NSMenuItem; prefsWindow = NSWindow; }; 
             SUPERCLASS = NSObject; 
         }, 
         {

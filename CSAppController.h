@@ -55,9 +55,6 @@ extern NSString * const CSPrefDictKey_IncludeDefaultCategories;
 // Name of our internal pasteboard type
 extern NSString * const CSDocumentPboardType;
 
-// Notifications sent
-extern NSString * const CSApplicationDidChangePrefs;
-
 @interface CSAppController : NSObject
 {
    int lastPBChangeCount;
@@ -65,25 +62,6 @@ extern NSString * const CSApplicationDidChangePrefs;
    IBOutlet NSMenuItem *editMenuSetCategory;
    // Preferences window
    IBOutlet NSWindow *prefsWindow;
-   // Interface tab
-   IBOutlet NSButton *prefsCloseAdd;
-   IBOutlet NSButton *prefsCloseEdit;
-   IBOutlet NSButton *prefsConfirmDelete;
-   IBOutlet NSButton *prefsWarnShort;
-   IBOutlet NSButton *prefsCreateNew;
-   IBOutlet NSButton *prefsAutoOpen;
-   IBOutlet NSTextField *prefsAutoOpenName;
-   IBOutlet NSButton *prefsAutoOpenSelect;
-   IBOutlet NSPopUpButton *prefsCellSpacing;
-   IBOutlet NSButton *prefsKeepBackup;
-   IBOutlet NSButton *prefsIncludeDefaultCategories;
-   // Security tab
-   IBOutlet NSButton *prefsIncludePasswd;
-   IBOutlet NSButton *prefsCloseAfterTimeout;
-   IBOutlet NSTextField *prefsTimeout;
-   IBOutlet NSTextField *prefsGenSize;
-   IBOutlet NSButton *prefsAlphanumOnly;
-   IBOutlet NSButton *prefsClearClipboard;
 }
 
 // Note the general pasteboard's current change count
@@ -93,12 +71,7 @@ extern NSString * const CSApplicationDidChangePrefs;
 - (id <NSMenuItem>) editMenuSetCategoryMenuItem;
 
 // Actions for the prefs window
-- (IBAction) openPrefs:(id)sender;
-- (IBAction) prefsSave:(id)sender;
-- (IBAction) prefsCancel:(id)sender;
-- (IBAction) prefsAutoOpenClicked:(id)sender;
 - (IBAction) prefsAutoOpenSelectPath:(id)sender;
-- (IBAction) prefsCloseAfterTimeoutClicked:(id)sender;
 
 // Close all open documents
 - (IBAction) closeAll:(id)sender;

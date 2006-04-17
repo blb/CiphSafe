@@ -49,16 +49,12 @@ NSString * const CSPrefDictKey_AlphanumOnly = @"CSPrefDictKey_AlphanumOnly";
 NSString * const CSPrefDictKey_IncludePasswd = @"CSPrefDictKey_IncludePasswd";
 NSString * const CSPrefDictKey_AutoOpen = @"CSPrefDictKey_AutoOpen";
 NSString * const CSPrefDictKey_AutoOpenPath = @"CSPrefDictKey_AutoOpenPath";
-NSString * const CSPrefDictKey_CloseAfterTimeout =
-   @"CSPrefDictKey_CloseAfterTimeout";
+NSString * const CSPrefDictKey_CloseAfterTimeout = @"CSPrefDictKey_CloseAfterTimeout";
 NSString * const CSPrefDictKey_CloseTimeout = @"CSPrefDictKey_CloseTimeout";
 NSString * const CSPrefDictKey_CellSpacing = @"CSPrefDictKey_CellSpacing";
-NSString * const CSPrefDictKey_IncludeDefaultCategories =
-   @"CSPrefDictKey_IncludeDefaultCategories";
+NSString * const CSPrefDictKey_IncludeDefaultCategories = @"CSPrefDictKey_IncludeDefaultCategories";
 
 NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
-
-NSString * const CSApplicationDidChangePrefs = @"CSApplicationDidChangePrefs";
 
 
 @implementation CSAppController
@@ -70,43 +66,12 @@ static NSString *MENUSPACE = @"   ";
  */
 + (void) initialize
 {
-   NSDictionary *appDefaults;
-   NSUserDefaults *userDefaults;
-
-   appDefaults = [ NSDictionary dictionaryWithObjectsAndKeys:
-                                   @"NO",
-                                      CSPrefDictKey_SaveBackup,
-                                   @"NO",
-                                      CSPrefDictKey_CloseAdd,
-                                   @"NO",
-                                      CSPrefDictKey_CloseEdit,
-                                   @"YES",
-                                      CSPrefDictKey_ConfirmDelete,
-                                   @"YES",
-                                      CSPrefDictKey_ClearClipboard,
-                                   @"YES",
-                                      CSPrefDictKey_WarnShort,
-                                   @"YES",
-                                      CSPrefDictKey_CreateNew,
-                                   @"8",
-                                      CSPrefDictKey_GenSize,
-                                   @"NO",
-                                      CSPrefDictKey_AlphanumOnly,
-                                   @"NO",
-                                      CSPrefDictKey_IncludePasswd,
-                                   @"NO",
-                                      CSPrefDictKey_AutoOpen,
-                                   @"NO",
-                                      CSPrefDictKey_CloseAfterTimeout,
-                                   @"10",
-                                      CSPrefDictKey_CloseTimeout,
-                                   @"0",
-                                      CSPrefDictKey_CellSpacing,
-                                   @"YES",
-                                      CSPrefDictKey_IncludeDefaultCategories,
-                                   nil ];
-   userDefaults = [ NSUserDefaults standardUserDefaults ];
-   [ userDefaults registerDefaults:appDefaults ];
+   NSString *defaultPrefsPath = [ [ NSBundle mainBundle ] pathForResource:@"DefaultPrefs"
+                                                                   ofType:@"plist" ];
+   NSDictionary *defaultPrefs = [ NSDictionary dictionaryWithContentsOfFile:defaultPrefsPath ];
+   NSUserDefaults *userDefaults = [ NSUserDefaults standardUserDefaults ];
+   [ userDefaults registerDefaults:defaultPrefs ];
+   [ [ NSUserDefaultsController sharedUserDefaultsController ] setInitialValues:defaultPrefs ];
    // Sanity checks
    if( [ userDefaults integerForKey:CSPrefDictKey_GenSize ] < 1 ||
        [ userDefaults integerForKey:CSPrefDictKey_GenSize ] > 255 )
@@ -251,64 +216,6 @@ static NSString *MENUSPACE = @"   ";
 
 
 /*
- * Open panel to select an autoopen file ended
- */
-- (void) selectPathSheetDidEnd:(NSOpenPanel *)sheet
-                    returnCode:(int)returnCode
-                   contextInfo:(void *)contextInfo
-{
-   if( returnCode == NSOKButton )
-      [ prefsAutoOpenName setStringValue:[ [ sheet filenames ]
-                                            objectAtIndex:0 ] ];
-}
-
-
-/*
- * Enable/disable autoopen controls, as appropriate
- */
-- (void) configureAutoOpenControls
-{
-   BOOL enableLinkedControls;
-   
-   enableLinkedControls = NO;
-   if( [ prefsAutoOpen state ] == NSOnState )
-      enableLinkedControls = YES;
-   [ prefsAutoOpenName setEnabled:enableLinkedControls ];
-   [ prefsAutoOpenSelect setEnabled:enableLinkedControls ];
-}
-
-
-/*
- * Enable/disable timeout controls
- */
-- (void) configureTimeoutControls
-{
-   [ prefsTimeout setEnabled:
-      ( [ prefsCloseAfterTimeout state ] == NSOnState ) ];
-}
-
-
-/*
- * Set the button's state based on the user default from the given key
- */
-- (void) setStateOfButton:(NSButton *)button fromKey:(NSString *)key
-{
-   [ button setState:( [ [ NSUserDefaults standardUserDefaults ]
-                         boolForKey:key ] ? NSOnState : NSOffState ) ];
-}
-
-
-/*
- * Set the user default for the given key based on the button state
- */
-- (void) setPrefKey:(NSString *)key fromButton:(NSButton *)button
-{
-   [ [ NSUserDefaults standardUserDefaults ]
-     setBool:( ( [ button state ] == NSOnState ) ? YES : NO ) forKey:key ];
-}
-
-
-/*
  * Listen for additions to the window menu (to rearrange it), and record
  * the current pasteboard changecount, but one less since we haven't
  * touched it yet
@@ -411,138 +318,15 @@ static NSString *MENUSPACE = @"   ";
 
 
 /*
- * Preferences-related methods
+ * Open panel to select an autoopen file ended
  */
-/*
- * Open the preferences window
- */
-- (IBAction) openPrefs:(id)sender
+- (void) selectPathSheetDidEnd:(NSOpenPanel *)sheet
+                    returnCode:(int)returnCode
+                   contextInfo:(void *)contextInfo
 {
-   NSUserDefaults *userDefaults;
-   NSString *autoOpenPath;
-
-   userDefaults = [ NSUserDefaults standardUserDefaults ];
-   // Interface tab
-   [ self setStateOfButton:prefsCloseAdd fromKey:CSPrefDictKey_CloseAdd ];
-   [ self setStateOfButton:prefsCloseEdit fromKey:CSPrefDictKey_CloseEdit ];
-   [ self setStateOfButton:prefsConfirmDelete 
-          fromKey:CSPrefDictKey_ConfirmDelete ];
-   [ self setStateOfButton:prefsWarnShort fromKey:CSPrefDictKey_WarnShort ];
-   [ self setStateOfButton:prefsCreateNew fromKey:CSPrefDictKey_CreateNew ];
-
-   [ self setStateOfButton:prefsAutoOpen fromKey:CSPrefDictKey_AutoOpen ];
-   autoOpenPath = [ userDefaults stringForKey:CSPrefDictKey_AutoOpenPath ];
-   if( autoOpenPath != nil )
-      [ prefsAutoOpenName setStringValue:autoOpenPath ];
-   [ self configureAutoOpenControls ];
-
-   [ prefsCellSpacing selectItemAtIndex:
-                       [ userDefaults integerForKey:CSPrefDictKey_CellSpacing ] ];
-
-
-   [ self setStateOfButton:prefsKeepBackup fromKey:CSPrefDictKey_SaveBackup ];
-   [ self setStateOfButton:prefsIncludeDefaultCategories
-          fromKey:CSPrefDictKey_IncludeDefaultCategories ];
-
-   // Security tab
-   [ self setStateOfButton:prefsIncludePasswd
-          fromKey:CSPrefDictKey_IncludePasswd ];
-
-   [ self setStateOfButton:prefsCloseAfterTimeout
-          fromKey:CSPrefDictKey_CloseAfterTimeout ];
-   [ prefsTimeout setIntValue:
-                      [ userDefaults integerForKey:CSPrefDictKey_CloseTimeout ] ];
-   [ self configureTimeoutControls ];
-
-   [ prefsGenSize setIntValue:
-                      [ userDefaults integerForKey:CSPrefDictKey_GenSize ] ];
-   [ self setStateOfButton:prefsAlphanumOnly
-          fromKey:CSPrefDictKey_AlphanumOnly ];
-   [ self setStateOfButton:prefsClearClipboard
-          fromKey:CSPrefDictKey_ClearClipboard ];
-
-   [ prefsWindow makeKeyAndOrderFront:self ];
-}
-
-
-/*
- * Close preferences window, saving changes
- */
-- (IBAction) prefsSave:(id)sender
-{
-   NSUserDefaults *userDefaults;
-   NSString *autoOpenPath;
-
-   [ prefsGenSize validateEditing ];
-   if( [ prefsGenSize intValue ] != 0 )
-   {
-      userDefaults = [ NSUserDefaults standardUserDefaults ];
-      // Interface tab
-      [ self setPrefKey:CSPrefDictKey_CloseAdd fromButton:prefsCloseAdd ];
-      [ self setPrefKey:CSPrefDictKey_CloseEdit fromButton:prefsCloseEdit ];
-      [ self setPrefKey:CSPrefDictKey_ConfirmDelete
-             fromButton:prefsConfirmDelete ];
-      [ self setPrefKey:CSPrefDictKey_WarnShort fromButton:prefsWarnShort ];
-      [ self setPrefKey:CSPrefDictKey_CreateNew fromButton:prefsCreateNew ];
-
-      autoOpenPath = [ prefsAutoOpenName stringValue ];
-      if( autoOpenPath == nil || [ autoOpenPath length ] == 0 )
-      {
-         [ userDefaults setBool:NO forKey:CSPrefDictKey_AutoOpen ];
-         [ userDefaults setObject:nil forKey:CSPrefDictKey_AutoOpenPath ];
-      }
-      else
-      {
-         [ self setPrefKey:CSPrefDictKey_AutoOpen fromButton:prefsAutoOpen ];
-         [ userDefaults setObject:autoOpenPath
-                        forKey:CSPrefDictKey_AutoOpenPath ];
-      }
-
-      [ userDefaults setInteger:[ prefsCellSpacing indexOfSelectedItem ]
-                     forKey:CSPrefDictKey_CellSpacing ];
-      [ self setPrefKey:CSPrefDictKey_SaveBackup fromButton:prefsKeepBackup ];
-      [ self setPrefKey:CSPrefDictKey_IncludeDefaultCategories
-             fromButton:prefsIncludeDefaultCategories ];
-
-      // Security tab
-      [ self setPrefKey:CSPrefDictKey_IncludePasswd
-             fromButton:prefsIncludePasswd ];
-      [ self setPrefKey:CSPrefDictKey_CloseAfterTimeout
-             fromButton:prefsCloseAfterTimeout ];
-      [ userDefaults setInteger:[ prefsTimeout intValue ]
-                     forKey:CSPrefDictKey_CloseTimeout ];
-      [ userDefaults setInteger:[ prefsGenSize intValue ]
-                     forKey:CSPrefDictKey_GenSize ];
-      [ self setPrefKey:CSPrefDictKey_AlphanumOnly
-             fromButton:prefsAlphanumOnly ];
-      [ self setPrefKey:CSPrefDictKey_ClearClipboard
-             fromButton:prefsClearClipboard ];
-
-      [ prefsWindow orderOut:self ];
-      [ [ NSNotificationCenter defaultCenter ]
-        postNotificationName:CSApplicationDidChangePrefs object:self ];
-   }
-   else
-      NSBeep();
-}
-
-
-/*
- * Close preferences window, ignoring changes
- */
-- (IBAction) prefsCancel:(id)sender
-{
-   [ prefsWindow orderOut:self ];
-}
-
-
-/*
- * Checkbox to autoopen a document was clicked, so either enable or disable
- * its associated controls
- */
-- (IBAction) prefsAutoOpenClicked:(id)sender
-{
-   [ self configureAutoOpenControls ];
+   if( returnCode == NSOKButton )
+      [ [ NSUserDefaults standardUserDefaults ] setObject:[ [ sheet filenames ] objectAtIndex:0 ]
+                                                   forKey:CSPrefDictKey_AutoOpenPath ];
 }
 
 
@@ -552,30 +336,18 @@ static NSString *MENUSPACE = @"   ";
  */
 - (IBAction) prefsAutoOpenSelectPath:(id)sender
 {
-   NSOpenPanel *openPanel;
-   SEL didEndSel;
-
-   didEndSel = @selector( selectPathSheetDidEnd:returnCode:contextInfo: );
-   openPanel = [ NSOpenPanel openPanel ];
+   NSOpenPanel *openPanel = [ NSOpenPanel openPanel ];
    [ openPanel setCanChooseFiles:YES ];
    [ openPanel setCanChooseDirectories:NO ];
    [ openPanel setAllowsMultipleSelection:NO ];
    [ openPanel beginSheetForDirectory:nil
-               file:[ prefsAutoOpenName stringValue ]
-               types:[ NSArray arrayWithObject:@"csd" ]
-               modalForWindow:prefsWindow
-               modalDelegate:self
-               didEndSelector:didEndSel
-               contextInfo:NULL ];
-}
-
-
-/*
- * When the close after timeout checkbox is checked/unchecked
- */
-- (IBAction) prefsCloseAfterTimeoutClicked:(id)sender
-{
-   [ self configureTimeoutControls ];
+                                 file:[ [ NSUserDefaults standardUserDefaults ]
+                                        objectForKey:CSPrefDictKey_AutoOpenPath ]
+                                types:[ NSArray arrayWithObject:@"csd" ]
+                       modalForWindow:prefsWindow
+                        modalDelegate:self
+                       didEndSelector:@selector( selectPathSheetDidEnd:returnCode:contextInfo: )
+                          contextInfo:NULL ];
 }
 
 
@@ -617,8 +389,8 @@ static NSString *MENUSPACE = @"   ";
 {
    [ [ NSDocumentController sharedDocumentController ]
      closeAllDocumentsWithDelegate:self
-     didCloseAllSelector:@selector( docController:didCloseAll:contextInfo: )
-     contextInfo:NULL ];
+               didCloseAllSelector:@selector( docController:didCloseAll:contextInfo: )
+                       contextInfo:NULL ];
 }
 
 @end

@@ -322,7 +322,7 @@ static NSArray *searchWhatArray;
    NSEnumerator *colEnum = [ tableColumns objectEnumerator ];
    id aColumn;
    while( ( aColumn = [ colEnum nextObject ] ) != nil )
-      [ aColumn setWidth:120 ];
+      [ aColumn setWidth:100 ];
    [ documentView sizeToFit ];
 }
 
@@ -565,13 +565,26 @@ static NSArray *searchWhatArray;
    [ [ documentView headerView ] setMenu:cmmTableHeader ];
    [ self setTableViewSpacing ];
    [ self refreshWindow ];
-   [ [ NSNotificationCenter defaultCenter ]
-     addObserver:self
-     selector:@selector( prefsDidChange: )
-     name:CSApplicationDidChangePrefs
-     object:nil ];
    [ [ searchField cell ]
      setPlaceholderString:NSLocalizedString( [ searchWhatArray objectAtIndex:CSWinCtrlMainTag_Name ], nil ) ];
+   NSUserDefaults *stdDefaults = [ NSUserDefaults standardUserDefaults ];
+   [ stdDefaults addObserver:self forKeyPath:CSPrefDictKey_CellSpacing options:0 context:NULL ];
+   [ stdDefaults addObserver:self forKeyPath:CSPrefDictKey_IncludeDefaultCategories options:0 context:NULL ];
+}
+
+
+/*
+ * Handle when certain observed items are updated
+ */
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object 
+                        change:(NSDictionary *)change
+                       context:(void *)context
+{
+   if( [ keyPath isEqualToString:CSPrefDictKey_CellSpacing ] )
+      [ self setTableViewSpacing ];
+   else if( [ keyPath isEqualToString:CSPrefDictKey_IncludeDefaultCategories ] )
+      [ self updateSetCategoryMenu ];
 }
 
 
@@ -1070,16 +1083,8 @@ static NSArray *searchWhatArray;
 - (void) windowWillClose:(NSNotification *)notification
 {
    [ self setSearchResultList:nil ];
-}
-
-
-/*
- * When preferences change
- */
-- (void) prefsDidChange:(NSNotification *)aNotification
-{
-   [ self updateSetCategoryMenu ];
-   [ self setTableViewSpacing ];
+   [ stdDefaults removeObserver:self forKeyPath:CSPrefDictKey_CellSpacing ];
+   [ stdDefaults removeObserver:self forKeyPath:CSPrefDictKey_IncludeDefaultCategories ];
 }
 
 @end

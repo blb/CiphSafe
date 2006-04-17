@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN"
+ "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+   <key>CSPrefDictKey_SaveBackup</key>
+   <false/>
+   <key>CSPrefDictKey_CloseAdd</key>
+   <false/>
+   <key>CSPrefDictKey_CloseEdit</key>
+   <false/>
+   <key>CSPrefDictKey_ConfirmDelete</key>
+   <true/>
+   <key>CSPrefDictKey_ClearClipboard</key>
+   <true/>
+   <key>CSPrefDictKey_WarnShort</key>
+   <true/>
+   <key>CSPrefDictKey_CreateNew</key>
+   <true/>
+   <key>CSPrefDictKey_GenSize</key>
+   <integer>8</integer>
+   <key>CSPrefDictKey_AlphanumOnly</key>
+   <false/>
+   <key>CSPrefDictKey_IncludePasswd</key>
+   <false/>
+   <key>CSPrefDictKey_AutoOpen</key>
+   <false/>
+   <key>CSPrefDictKey_CloseAfterTimeout</key>
+   <false/>
+   <key>CSPrefDictKey_CloseTimeout</key>
+   <integer>10</integer>
+   <key>CSPrefDictKey_CellSpacing</key>
+   <integer>0</integer>
+   <key>CSPrefDictKey_IncludeDefaultCategories</key>
+   <true/>
+</dict>
+</plist>
