@@ -1083,6 +1083,7 @@ static NSArray *searchWhatArray;
 - (void) windowWillClose:(NSNotification *)notification
 {
    [ self setSearchResultList:nil ];
+   NSUserDefaults *stdDefaults = [ NSUserDefaults standardUserDefaults ];
    [ stdDefaults removeObserver:self forKeyPath:CSPrefDictKey_CellSpacing ];
    [ stdDefaults removeObserver:self forKeyPath:CSPrefDictKey_IncludeDefaultCategories ];
 }
