@@ -4,7 +4,11 @@
             ACTIONS = {closeAll = id; prefsAutoOpenSelectPath = id; }; 
             CLASS = CSAppController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {editMenuSetCategory = NSMenuItem; prefsWindow = NSWindow; }; 
+            OUTLETS = {
+                editMenuSetCategory = NSMenuItem; 
+                prefsGenPasswdLen = id; 
+                prefsWindow = NSWindow; 
+            }; 
             SUPERCLASS = NSObject; 
         }, 
         {

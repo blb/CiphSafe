@@ -245,9 +245,7 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
             NULL, CSWINCTRLPASSPHRASE_LOC_NOMATCH );
       }
       else if( ( [ [ passphrasePhrase2 stringValue ] length ] <
-                 CSWINCTRLPASSPHRASE_SHORT_PASSPHRASE ) &&
-               [ [ NSUserDefaults standardUserDefaults ]
-                 boolForKey:CSPrefDictKey_WarnShort ] )
+                 CSWINCTRLPASSPHRASE_SHORT_PASSPHRASE ) )
       {
          // Warn if it is short and the user pref is enabled
          NSBeginAlertSheet( CSWINCTRLPASSPHRASE_LOC_SHORTPHRASE,

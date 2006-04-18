@@ -42,7 +42,6 @@ NSString * const CSPrefDictKey_CloseAdd = @"CSPrefDictKey_CloseAdd";
 NSString * const CSPrefDictKey_CloseEdit = @"CSPrefDictKey_CloseEdit";
 NSString * const CSPrefDictKey_ConfirmDelete = @"CSPrefDictKey_ConfirmDelete";
 NSString * const CSPrefDictKey_ClearClipboard = @"CSPrefDictKey_ClearClipboard";
-NSString * const CSPrefDictKey_WarnShort = @"CSPrefDictKey_WarnShort";
 NSString * const CSPrefDictKey_CreateNew = @"CSPrefDictKey_CreateNew";
 NSString * const CSPrefDictKey_GenSize = @"CSPrefDictKey_GenSize";
 NSString * const CSPrefDictKey_AlphanumOnly = @"CSPrefDictKey_AlphanumOnly";
