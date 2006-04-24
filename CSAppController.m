@@ -36,6 +36,8 @@
 #import "CSDocument.h"
 #import "CSWinCtrlEntry.h"
 #import "CSWinCtrlMain.h"
+#include <CoreFoundation/CoreFoundation.h>
+
 
 NSString * const CSPrefDictKey_SaveBackup = @"CSPrefDictKey_SaveBackup";
 NSString * const CSPrefDictKey_CloseAdd = @"CSPrefDictKey_CloseAdd";
@@ -59,6 +61,27 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 @implementation CSAppController
 
 static NSString *MENUSPACE = @"   ";
+static CFAllocatorRef ciphSafeCFAllocator;
+static CFAllocatorRef originalCFAllocator;
+
+
+/*
+ * These are the custom CoreFoundation allocator functions
+ */
+void *ciphSafeCFReallocate( void *ptr, CFIndex newsize, CFOptionFlags hint, void *info )
+{
+//   return realloc( ptr, newsize );
+   return CFAllocatorReallocate( originalCFAllocator, ptr, newsize, hint );
+}
+
+
+void ciphSafeCFDeallocate( void *ptr, void *info )
+{
+//   free( ptr );
+//   return;
+   CFAllocatorDeallocate( originalCFAllocator, ptr );
+}
+
 
 /*
  * Setup up default defaults
@@ -78,6 +101,20 @@ static NSString *MENUSPACE = @"   ";
    if( [ userDefaults integerForKey:CSPrefDictKey_CloseTimeout ] < 1 ||
        [ userDefaults integerForKey:CSPrefDictKey_CloseTimeout ] > 3600 )
       [ userDefaults setInteger:10 forKey:CSPrefDictKey_CloseTimeout ];
+   /*
+   // Create CoreFoundation custom allocator so we can clear memory on deallocation
+   originalCFAllocator = CFAllocatorGetDefault();
+   CFRetain( originalCFAllocator );
+   CFAllocatorContext originalContext;
+   CFAllocatorGetContext( originalCFAllocator, &originalContext );
+   
+   CFAllocatorContext allocContext;
+   memcpy( &allocContext, &originalContext, sizeof( CFAllocatorContext ) );
+   allocContext.reallocate = ciphSafeCFReallocate;
+   allocContext.deallocate = ciphSafeCFDeallocate;
+   ciphSafeCFAllocator = CFAllocatorCreate( NULL, &allocContext );
+   CFAllocatorSetDefault( ciphSafeCFAllocator );
+    */
 }
 
 
