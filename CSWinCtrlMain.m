@@ -74,6 +74,10 @@
            @"be useful", @"" )
 #define CSWINCTRLMAIN_LOC_NEWCATEGORY NSLocalizedString( @"New Category", @"" )
 
+// Accessory view export type tags
+const int CSWinCtrlMainExportType_CSV = 0;
+const int CSWinCtrlMainExportType_XML = 1;
+
 // Menu tag mappings
 const int CSWinCtrlMainTag_All = 0;
 const int CSWinCtrlMainTag_Name = 1;
@@ -1036,6 +1040,24 @@ static NSArray *searchWhatArray;
                                     CSWINCTRLMAIN_LOC_NEEDCOLTEXT );
    }
    [ self updateCornerMenu ];
+}
+
+
+/*
+ * Return the export accessory view from the NIB
+ */
+- (NSView *) exportAccessoryView
+{
+   return exportAccessoryView;
+}
+
+
+/*
+ * Return the export accessory view's popup button
+ */
+- (NSPopUpButton *) exportType
+{
+   return exportType;
 }
 
 

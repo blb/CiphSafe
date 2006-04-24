@@ -35,6 +35,14 @@
 #import <Cocoa/Cocoa.h>
 #import "BLBTableView.h"
 
+
+/*
+ * Tag values for the selection in the export accessory view type selector
+ */
+extern const int CSWinCtrlMainExportType_CSV;
+extern const int CSWinCtrlMainExportType_XML;
+
+
 @interface CSWinCtrlMain : NSWindowController
 {
    NSTableColumn *previouslySelectedColumn;
@@ -52,6 +60,10 @@
    // New Category window
    IBOutlet NSPanel *newCategoryWindow;
    IBOutlet NSTextField *newCategory;
+
+   // Accessory view for export save panel
+   IBOutlet NSView *exportAccessoryView;
+   IBOutlet NSPopUpButton *exportType;
 }
 
 // Actions from the main window
@@ -78,5 +90,9 @@
 
 // Search field stuff
 - (IBAction) limitSearch:(id)sender;
+
+// Provide access to the export accessory view
+- (NSView *) exportAccessoryView;
+- (NSPopUpButton *) exportType;
 
 @end
