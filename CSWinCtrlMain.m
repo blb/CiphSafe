@@ -451,22 +451,21 @@ static NSArray *searchWhatArray;
 
 
 /*
- * Convert an array of row numbers to an array of names
+ * Convert an index set of row numbers to an array of names
  */
-- (NSArray *) namesFromRows:(NSArray *)rows
+- (NSArray *) namesFromIndexes:(NSIndexSet *)indexes
 {
-   NSMutableArray *nameArray;
-   NSEnumerator *rowEnumerator;
-   id nextRow;
-   
-   nameArray = [ NSMutableArray arrayWithCapacity:[ rows count ] ];
-   rowEnumerator = [ rows objectEnumerator ];
-   while( ( nextRow = [ rowEnumerator nextObject ] ) != nil )
+   NSMutableArray *nameArray = [ NSMutableArray arrayWithCapacity:[ indexes count ] ];
+   unsigned int rowIndex;
+   for( rowIndex = [ indexes firstIndex ];
+        rowIndex != NSNotFound;
+        rowIndex = [ indexes indexGreaterThanIndex:rowIndex ] )
+   {
       [ nameArray addObject:[ [ self document ]
                               stringForKey:CSDocModelKey_Name
-                                     atRow:[ self rowForFilteredRow:
-                                        [ nextRow intValue ] ] ] ];
-   
+                                     atRow:[ self rowForFilteredRow:rowIndex ] ] ];
+   }
+
    return nameArray;
 }
 
@@ -476,8 +475,7 @@ static NSArray *searchWhatArray;
  */
 - (NSArray *) getSelectedNames
 {
-   return [ self namesFromRows:[ [ documentView selectedRowEnumerator ]
-      allObjects ] ];
+   return [ self namesFromIndexes:[ documentView selectedRowIndexes ] ];
 }
 
 
@@ -820,12 +818,11 @@ static NSArray *searchWhatArray;
 /*
  * Support dragging of tableview rows
  */
-- (BOOL) tableView:(NSTableView *)tv
-         writeRows:(NSArray *)rows
-         toPasteboard:(NSPasteboard *)pboard
+- (BOOL)      tableView:(NSTableView *)aTableView
+   writeRowsWithIndexes:(NSIndexSet *)rowIndexes
+           toPasteboard:(NSPasteboard*)pboard
 {
-   return [ [ self document ] copyNames:[ self namesFromRows:rows ]
-                              toPasteboard:pboard ];
+   return [ [ self document ] copyNames:[ self namesFromIndexes:rowIndexes ] toPasteboard:pboard ];
 }
 
 
