@@ -334,17 +334,17 @@ static NSArray *keyArray;
 
 
 /*
- * Return the string value for an entire row
+ * Return an array of strings for the entry at the given row
  */
-- (NSString *) stringForEntryAtRow:(int)row
+- (NSArray *) stringArrayForEntryAtRow:(int)row
 {
-   NSMutableString *entryString = [ NSMutableString string ];
+   NSMutableArray *stringArray = [ NSMutableArray arrayWithCapacity:6 ];
    NSEnumerator *entryEnum = [ keyArray objectEnumerator ];
    id someKey;
    while( ( someKey = [ entryEnum nextObject ] ) != nil )
-      [ entryString appendString:[ self stringForKey:someKey atRow:row ] ];
+      [ stringArray addObject:[ self stringForKey:someKey atRow:row ] ];
 
-   return entryString;
+   return stringArray;
 }
 
 
@@ -670,7 +670,8 @@ static NSArray *keyArray;
    {
       NSRange searchResult;
       if( key == nil )
-         searchResult = [ [ self stringForEntryAtRow:index ] rangeOfString:findMe options:compareOptions ];
+         searchResult = [ [ [ self stringArrayForEntryAtRow:index ] componentsJoinedByString:@" " ]
+                          rangeOfString:findMe options:compareOptions ];
       else
          searchResult = [ [ self stringForKey:key atRow:index ] rangeOfString:findMe options:compareOptions ];
       if( searchResult.location != NSNotFound )
