@@ -471,11 +471,20 @@ static NSArray *searchWhatArray;
 
 
 /*
+ * Return a set of the selected row indices
+ */
+- (NSIndexSet *) selectedRowIndexes
+{
+   return [ documentView selectedRowIndexes ];
+}
+
+
+/*
  * Return an array of the names for selected rows in the table view
  */
 - (NSArray *) getSelectedNames
 {
-   return [ self namesFromIndexes:[ documentView selectedRowIndexes ] ];
+   return [ self namesFromIndexes:[ self selectedRowIndexes ] ];
 }
 
 

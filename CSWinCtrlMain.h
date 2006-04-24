@@ -91,6 +91,9 @@ extern const int CSWinCtrlMainExportType_XML;
 // Search field stuff
 - (IBAction) limitSearch:(id)sender;
 
+// List of selected items indices
+- (NSIndexSet *) selectedRowIndexes;
+
 // Provide access to the export accessory view
 - (NSView *) exportAccessoryView;
 - (NSPopUpButton *) exportType;
