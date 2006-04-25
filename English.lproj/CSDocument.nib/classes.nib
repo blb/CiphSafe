@@ -20,6 +20,7 @@
         {
             ACTIONS = {
                 addEntry = id; 
+                changeExportFileType = id; 
                 cmmCopyField = id; 
                 cmmOpenURL = id; 
                 cornerSelectField = id; 
@@ -39,6 +40,9 @@
                 documentStatus = NSTextField; 
                 documentView = BLBTableView; 
                 documentViewButton = NSButton; 
+                exportAccessoryView = NSView; 
+                exportCSVHeader = NSButton; 
+                exportType = NSPopUpButton; 
                 newCategory = NSTextField; 
                 newCategoryWindow = NSPanel; 
                 searchField = NSSearchField; 
