@@ -11,6 +11,7 @@
 		6478D27D09F2EF020023B67B /* DefaultCategories.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6478D27C09F2EF020023B67B /* DefaultCategories.plist */; };
 		64D6E3AA09E99F2400904206 /* CiphSafe Help in Resources */ = {isa = PBXBuildFile; fileRef = 64D6E39B09E99F2400904206 /* CiphSafe Help */; };
 		64D6E3D409E9B25500904206 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8D15AC360486D014006FF6A4 /* Info.plist */; };
+		64F0C7E609F486390027748E /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64F0C7BB09F486390027748E /* CoreFoundation.framework */; };
 		64FCADBE09E870ED00F59756 /* BLBTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 64FCAD9D09E870ED00F59756 /* BLBTableView.m */; };
 		64FCADC009E870ED00F59756 /* CiphSafe.icns in Resources */ = {isa = PBXBuildFile; fileRef = 64FCADA009E870ED00F59756 /* CiphSafe.icns */; };
 		64FCADC109E870ED00F59756 /* CSAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 64FCADA209E870ED00F59756 /* CSAppController.m */; };
@@ -69,6 +70,7 @@
 		6412E63509F3619000F421C0 /* DefaultPrefs.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = DefaultPrefs.plist; sourceTree = "<group>"; };
 		6478D23A09F2D1890023B67B /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = English; path = English.lproj/DefaultCategories.plist; sourceTree = "<group>"; };
 		64D6E39C09E99F2400904206 /* English */ = {isa = PBXFileReference; lastKnownFileType = folder; name = English; path = "English.lproj/CiphSafe Help"; sourceTree = "<group>"; };
+		64F0C7BB09F486390027748E /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		64FCAD9C09E870ED00F59756 /* BLBTableView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = BLBTableView.h; sourceTree = "<group>"; };
 		64FCAD9D09E870ED00F59756 /* BLBTableView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = BLBTableView.m; sourceTree = "<group>"; };
 		64FCADA009E870ED00F59756 /* CiphSafe.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = CiphSafe.icns; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
 				64FCAE1F09E8732200F59756 /* libcrypto.dylib in Frameworks */,
 				64FCAE2109E8734200F59756 /* libssl.dylib in Frameworks */,
+				64F0C7E609F486390027748E /* CoreFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,6 +132,7 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				64F0C7BB09F486390027748E /* CoreFoundation.framework */,
 				1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */,
 				64FCAE2009E8734200F59756 /* libssl.dylib */,
 				64FCAE1E09E8732200F59756 /* libcrypto.dylib */,
