@@ -1059,11 +1059,21 @@ static NSArray *searchWhatArray;
 
 
 /*
- * Return the export accessory view's popup button
+ * Return the export accessory view's popup button's selection (see the CSWinCtrlMainExportType_*
+ * constants)
  */
-- (NSPopUpButton *) exportType
+- (int) exportType
 {
-   return exportType;
+   return [ exportType selectedTag ];
+}
+
+
+/*
+ * Return if the export CSV header checkbox is checked
+ */
+- (BOOL) exportCSVHeader
+{
+   return ( [ exportCSVHeader state ] == NSOnState );
 }
 
 

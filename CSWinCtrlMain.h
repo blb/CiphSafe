@@ -64,6 +64,7 @@ extern const int CSWinCtrlMainExportType_XML;
    // Accessory view for export save panel
    IBOutlet NSView *exportAccessoryView;
    IBOutlet NSPopUpButton *exportType;
+   IBOutlet NSButton *exportCSVHeader;
 }
 
 // Actions from the main window
@@ -96,6 +97,7 @@ extern const int CSWinCtrlMainExportType_XML;
 
 // Provide access to the export accessory view
 - (NSView *) exportAccessoryView;
-- (NSPopUpButton *) exportType;
+- (int) exportType;
+- (BOOL) exportCSVHeader;
 
 @end
