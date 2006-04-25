@@ -415,9 +415,9 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>64EC753309FDFEB30063DFA3</string>
+				<string>64F7895409FE12AC007E847C</string>
 				<string>1CE0B1FE06471DED0097A5F4</string>
-				<string>64EC753409FDFEB30063DFA3</string>
+				<string>64F7895509FE12AC007E847C</string>
 				<string>1CE0B20306471E060097A5F4</string>
 				<string>1CE0B20506471E060097A5F4</string>
 			</array>
@@ -536,7 +536,7 @@
 	<key>StatusbarIsVisible</key>
 	<true/>
 	<key>TimeStamp</key>
-	<real>167640755.17076099</real>
+	<real>167645868.89781299</real>
 	<key>ToolbarDisplayMode</key>
 	<integer>1</integer>
 	<key>ToolbarIsVisible</key>
@@ -551,7 +551,6 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>1C530D57069F1CE1000CFCEE</string>
 		<string>1C0AD2B3069F1EA900FABCE6</string>
 		<string>64FCAE2809E8744700F59756</string>
 		<string>/Users/blb/devel/build/CiphSafe/update104/CiphSafe.xcodeproj</string>
@@ -600,7 +599,7 @@
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXBuildLogShowsTranscriptDefaultKey</key>
-								<string>{{0, 116}, {500, 338}}</string>
+								<string>{{0, 130}, {500, 324}}</string>
 								<key>PBXProjectModuleGUID</key>
 								<string>XCMainBuildResultsModuleGUID</string>
 								<key>PBXProjectModuleLabel</key>
@@ -638,7 +637,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>64FCAE2809E8744700F59756</string>
-				<string>64EC747A09FD8A370063DFA3</string>
+				<string>64F7893209FE0F7D007E847C</string>
 				<string>1CD0528F0623707200166675</string>
 				<string>XCMainBuildResultsModuleGUID</string>
 			</array>
@@ -1002,9 +1001,9 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1C0AD2B3069F1EA900FABCE6</string>
-				<string>64EC747B09FD8A370063DFA3</string>
+				<string>64F7895109FE12A1007E847C</string>
 				<string>1CD0528B0623707200166675</string>
-				<string>64EC747C09FD8A370063DFA3</string>
+				<string>64F7895209FE12A1007E847C</string>
 			</array>
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.run</string>
