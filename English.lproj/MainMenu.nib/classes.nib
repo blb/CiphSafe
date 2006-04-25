@@ -12,7 +12,14 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {addEntry = id; changePassphrase = id; deselectAll = id; setCategory = id; }; 
+            ACTIONS = {
+                addEntry = id; 
+                changePassphrase = id; 
+                deselectAll = id; 
+                exportDocument = id; 
+                exportSelectedItems = id; 
+                setCategory = id; 
+            }; 
             CLASS = FirstResponder; 
             LANGUAGE = ObjC; 
             SUPERCLASS = NSObject; 
