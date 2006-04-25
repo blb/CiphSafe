@@ -155,7 +155,7 @@ static NSArray *searchWhatArray;
  */
 - (void) setTableViewSpacing
 {
-   NSSize newSpacing;
+   NSSize newSpacing = NSMakeSize( 3.0, 2.0 );
    
    switch( [ [ NSUserDefaults standardUserDefaults ]
              integerForKey:CSPrefDictKey_CellSpacing ] )

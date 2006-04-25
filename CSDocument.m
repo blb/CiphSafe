@@ -483,7 +483,7 @@
          entriesToExport = [ mainWindowController selectedRowIndexes ];
       else
          entriesToExport = [ NSIndexSet indexSetWithIndexesInRange:NSMakeRange( 0, [ self entryCount ] ) ];
-      NSData *myData;
+      NSData *myData = nil;
       if( [ mainWindowController exportType ] == CSWinCtrlMainExportType_CSV )
          myData = [ self generateCSVDataForIndexes:entriesToExport
                                         withHeader:[ mainWindowController exportCSVHeader ] ];
