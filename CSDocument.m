@@ -428,6 +428,115 @@
 
 
 /*
+ * Return CSV data for the given rows, wrapped in an NSData
+ */
+- (NSData *) generateCSVDataForIndexes:(NSIndexSet *)indexes withHeader:(BOOL)includeHeader
+{
+   NSMutableData *csvData = [ NSMutableData data ];
+   if( includeHeader )
+      [ csvData appendData:[ [ NSString stringWithFormat:@"\"%@\",\"%@\",\"%@\",\"%@\",\"%@\",\"%@\"\n",
+                                                         NSLocalizedString( CSDocModelKey_Name, @"" ),
+                                                         NSLocalizedString( CSDocModelKey_Acct, @"" ),
+                                                         NSLocalizedString( CSDocModelKey_Passwd, @"" ),
+                                                         NSLocalizedString( CSDocModelKey_URL, @"" ),
+                                                         NSLocalizedString( CSDocModelKey_Category, @"" ),
+                                                         NSLocalizedString( CSDocModelKey_Notes, @"" ) ]
+                             dataUsingEncoding:NSUTF8StringEncoding ] ];
+   unsigned int rowIndex;
+   for( rowIndex = [ indexes firstIndex ];
+        rowIndex != NSNotFound;
+        rowIndex = [ indexes indexGreaterThanIndex:rowIndex ] )
+   {
+      NSArray *entryArray = [ [ self model ] stringArrayForEntryAtRow:rowIndex ];
+      NSMutableString *entryString = [ NSMutableString string ];
+      NSEnumerator *arrayEnum = [ entryArray objectEnumerator ];
+      NSString *entryField;
+      while( ( entryField = [ arrayEnum nextObject ] ) != nil )
+      {
+         NSMutableString *newString = [ NSMutableString stringWithString:entryField ];
+         [ newString replaceOccurrencesOfString:@"\""
+                                     withString:@"\"\""
+                                        options:0
+                                          range:NSMakeRange( 0, [ newString length ] ) ];
+         if( [ entryString length ] > 0 )
+            [ entryString appendString:@"," ];
+         if( [ newString length ] > 0 )
+            [ entryString appendFormat:@"\"%@\"", newString ];
+      }
+      [ entryString appendString:@"\n" ];
+      [ csvData appendData:[ entryString dataUsingEncoding:NSUTF8StringEncoding ] ];
+   }
+
+   return csvData;
+}
+
+
+/*
+ * Handle the actual export
+ */
+- (void) exportPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+   if( returnCode == NSOKButton )
+   {
+      NSIndexSet *entriesToExport;
+      if( exportIsSelectedItemsOnly )
+         entriesToExport = [ mainWindowController selectedRowIndexes ];
+      else
+         entriesToExport = [ NSIndexSet indexSetWithIndexesInRange:NSMakeRange( 0, [ self entryCount ] ) ];
+      NSData *myData;
+      if( [ mainWindowController exportType ] == CSWinCtrlMainExportType_CSV )
+         myData = [ self generateCSVDataForIndexes:entriesToExport
+                                        withHeader:[ mainWindowController exportCSVHeader ] ];
+      else
+         NSLog( @"Not yet implemented" );
+      NSDictionary *fileAttr = [ NSDictionary dictionaryWithObject:[ NSNumber numberWithUnsignedLong:0600 ]
+                                                            forKey:NSFilePosixPermissions ];
+      [ [ NSFileManager defaultManager ] createFileAtPath:[ sheet filename ]
+                                                 contents:myData
+                                               attributes:fileAttr ];
+   }
+}
+
+
+/*
+ * Run the save panel for exporting
+ */
+- (void) startExportPanel
+{
+   NSSavePanel *savePanel = [ NSSavePanel savePanel ];
+   [ savePanel setAccessoryView:[ mainWindowController exportAccessoryView ] ];
+   [ savePanel setCanCreateDirectories:YES ];
+   [ savePanel setAllowsOtherFileTypes:YES ];
+   [ savePanel beginSheetForDirectory:nil
+                                 file:nil
+                       modalForWindow:[ mainWindowController window ]
+                        modalDelegate:self
+                       didEndSelector:@selector( exportPanelDidEnd:returnCode:contextInfo: )
+                          contextInfo:NULL ];   
+}
+
+
+/*
+ * Export entire document to some text-ish format
+ */
+- (IBAction) exportDocument:(id)sender
+{
+   exportIsSelectedItemsOnly = NO;
+   [ self startExportPanel ];
+}
+
+
+/*
+ * Export selected items to some text-ish format
+ */
+- (IBAction) exportSelectedItems:(id)sender
+{
+   exportIsSelectedItemsOnly = YES;
+   [ self startExportPanel ];
+}
+
+
+/*
  * Return just the main window controller
  */
 - (CSWinCtrlMain *) mainWindowController
@@ -441,19 +550,16 @@
  */
 - (BOOL) validateMenuItem:(NSMenuItem *)menuItem
 {
-   SEL menuItemAction;
-   BOOL retval;
-
-   menuItemAction = [ menuItem action ];
+   SEL menuItemAction = [ menuItem action ];
 
    if( menuItemAction == @selector( changePassphrase: ) )
-      retval = ( bfKey != nil );
+      return ( bfKey != nil );
    else if( menuItemAction == @selector( revertDocumentToSaved: ) )
-      retval = [ self isDocumentEdited ];
+      return [ self isDocumentEdited ];
+   else if( menuItemAction == @selector( exportSelectedItems: ) )
+      return ( [ [ [ self mainWindowController ] selectedRowIndexes ] count ] > 0 );
    else
-      retval = [ super validateMenuItem:menuItem ];
-
-   return retval;
+      return [ super validateMenuItem:menuItem ];
 }
 
 

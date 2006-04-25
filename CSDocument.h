@@ -45,10 +45,13 @@
    CSWinCtrlMain *mainWindowController;
    CSWinCtrlPassphrase *passphraseWindowController;
    NSInvocation *getKeyInvocation;
+   BOOL exportIsSelectedItemsOnly;
 }
 
 // Actions from the menu
 - (IBAction) changePassphrase:(id)sender;
+- (IBAction) exportDocument:(id)sender;
+- (IBAction) exportSelectedItems:(id)sender;
 
 // Return just the main window controller
 - (CSWinCtrlMain *) mainWindowController;
