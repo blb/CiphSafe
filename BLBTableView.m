@@ -113,6 +113,7 @@
    {
       [ stripeColor autorelease ];
       stripeColor = [ newStripeColor retain ];
+      [ self setNeedsDisplay:YES ];
    }
 }
 
