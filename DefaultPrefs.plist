@@ -31,5 +31,9 @@
    <integer>0</integer>
    <key>CSPrefDictKey_IncludeDefaultCategories</key>
    <true/>
+   <key>CSPrefDictKey_TableAltBackground</key>
+   <data>
+   BAt0eXBlZHN0cmVhbYED6IQBQISEhAdOU0NvbG9yAISECE5TT2JqZWN0AIWEAWMBhARmZmZmgz9t7e6DP3Ly8wEBhg==
+   </data>
 </dict>
 </plist>
