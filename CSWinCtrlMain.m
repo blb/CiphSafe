@@ -556,10 +556,6 @@ static NSArray *searchWhatArray;
       [ self setupDefaultTableViewColumns ];
 
    [ self updateCornerMenu ];
-   [ documentView setStripeColor:[ NSColor colorWithCalibratedRed:0.93
-                                                            green:0.95
-                                                             blue:1.0
-                                                            alpha:1.0 ] ];
    [ documentView setDoubleAction:@selector( viewEntry: ) ];
    previouslySelectedColumn = [ documentView tableColumnWithIdentifier:
                                                   [ [ self document ] sortKey ] ];
@@ -579,7 +575,17 @@ static NSArray *searchWhatArray;
    [ [ searchField cell ]
      setPlaceholderString:NSLocalizedString( [ searchWhatArray objectAtIndex:CSWinCtrlMainTag_Name ], nil ) ];
    NSUserDefaults *stdDefaults = [ NSUserDefaults standardUserDefaults ];
+   NSColor *stripeColor = [ NSUnarchiver unarchiveObjectWithData:
+                                            [ stdDefaults objectForKey:CSPrefDictKey_TableAltBackground ] ];
+   if( stripeColor == nil )
+      [ documentView setStripeColor:[ NSColor colorWithCalibratedRed:0.93
+                                                               green:0.95
+                                                                blue:1.0
+                                                               alpha:1.0 ] ];
+   else
+      [ documentView setStripeColor:stripeColor ];
    [ stdDefaults addObserver:self forKeyPath:CSPrefDictKey_CellSpacing options:0 context:NULL ];
+   [ stdDefaults addObserver:self forKeyPath:CSPrefDictKey_TableAltBackground options:0 context:NULL ];
    [ stdDefaults addObserver:self forKeyPath:CSPrefDictKey_IncludeDefaultCategories options:0 context:NULL ];
 }
 
@@ -596,6 +602,13 @@ static NSArray *searchWhatArray;
       [ self setTableViewSpacing ];
    else if( [ keyPath isEqualToString:CSPrefDictKey_IncludeDefaultCategories ] )
       [ self updateSetCategoryMenu ];
+   else if( [ keyPath isEqualToString:CSPrefDictKey_TableAltBackground ] )
+   {
+      NSColor *stripeColor = [ NSUnarchiver unarchiveObjectWithData:
+                                               [ [ NSUserDefaults standardUserDefaults ]
+                                                 objectForKey:CSPrefDictKey_TableAltBackground ] ];
+      [ documentView setStripeColor:stripeColor ];
+   }
 }
 
 
