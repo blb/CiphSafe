@@ -49,6 +49,7 @@ extern NSString * const CSPrefDictKey_AutoOpenPath;
 extern NSString * const CSPrefDictKey_CloseAfterTimeout;
 extern NSString * const CSPrefDictKey_CloseTimeout;
 extern NSString * const CSPrefDictKey_CellSpacing;
+extern NSString * const CSPrefDictKey_TableAltBackground;
 extern NSString * const CSPrefDictKey_IncludeDefaultCategories;
 
 // Name of our internal pasteboard type

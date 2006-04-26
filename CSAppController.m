@@ -53,6 +53,7 @@ NSString * const CSPrefDictKey_AutoOpenPath = @"CSPrefDictKey_AutoOpenPath";
 NSString * const CSPrefDictKey_CloseAfterTimeout = @"CSPrefDictKey_CloseAfterTimeout";
 NSString * const CSPrefDictKey_CloseTimeout = @"CSPrefDictKey_CloseTimeout";
 NSString * const CSPrefDictKey_CellSpacing = @"CSPrefDictKey_CellSpacing";
+NSString * const CSPrefDictKey_TableAltBackground = @"CSPrefDictKey_TableAltBackground";
 NSString * const CSPrefDictKey_IncludeDefaultCategories = @"CSPrefDictKey_IncludeDefaultCategories";
 
 NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
