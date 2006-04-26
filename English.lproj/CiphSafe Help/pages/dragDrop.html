@@ -2,18 +2,18 @@
 	http://www.andymatuschak.org
 	andy@andymatuschak.org
 	Version 1.0
-
+	
 	Adapted from the Safari help book--thanks, Apple!
 	Adapted more directly from Pixen's help book.
 	Licensed under MIT. -->
-
+	
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/sgml/loosedtd.html">
 <html>
 <head>
-   <title>Using Import and Export</title>
+   <title>Using Drag and Drop</title>
    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-   <meta name="keywords" content="import, export, csv, comma, xml">
-   <meta name="description" content="Learn how to import and export data">
+   <meta name="keywords" content="drag, drop, copy, move">
+   <meta name="description" content="Learn how to drag and drop entries">
    <link media="all" rel="stylesheet" href="../css/topicPage.css" />
 </head>
 <body>
@@ -31,26 +31,33 @@
       <img class="icon" src="../gfx/icon32.png" alt="CiphSafe Icon" />
    </div>
    <div id="pagetitle">
-      <h1>Using Import and Export</h1>
+      <h1>Using Drag and Drop</h1>
    </div>
    <p>
-      Data can be imported from and exported to both comma-separated
-      values (CSV) and XML file formats.  Exporting is the simpler of
-      the two, either export all entries from a document or selected
-      entries then selecting a format and filename.
-   </p>
-   <p>
-      <img src="../gfx/orngbullet.gif" alt="bullet" height="8" width="8" border="0">
-      <a href="exportTask.html">Exporting data</a>
+      Drag and drop is simple with CiphSafe, as it should be.  There are
+      only a few bits you may need to know:
+      <ul>
+         <li>
+            when dragging to another CiphSafe document, all fields are
+            preserved properly
+         </li>
+         <li>
+            when going to another application, the password is included
+            only if the preference <em>Include password on copy/drag to other
+            app</em> is enabled under the Security tab
+         </li>
+         <li>
+            when going to another application, CiphSafe will offer two
+            formats: plain text and RTF.  If the application handles RTF
+            (e.g., TextEdit with an RTF document), the notes section will
+            be properly preserved.  Formatting will be lost if the plain
+            text version is accepted by the destination application.
+         </li>
+      </ul>
    </p>
 
-   <p>
-      Importing data is a bit more involved as you may need to help
-      CiphSafe in determining which bits map into which fields.
-   </p>
-   <p>
-      <img src="../gfx/orngbullet.gif" alt="bullet" height="8" width="8" border="0">
-      <a href="importTask.html">Importing data</a>
+   <p style="text-align: center;">
+      <img src="../gfx/dragScreenshot.png" alt="drag demo" />
    </p>
 
    <h2 class="seealso">See also</h2>
