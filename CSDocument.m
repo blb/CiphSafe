@@ -51,6 +51,10 @@
 #define CSDOCUMENT_NAME @"CiphSafe Document"
 
 
+NSString * const CSDocumentXML_RootNode = @"document";
+NSString * const CSDocumentXML_EntryNode = @"entry";
+
+
 @implementation CSDocument
 
 /*
@@ -472,6 +476,56 @@
 
 
 /*
+ * Return XML data for the document, with the notes field converter to plain text when plainText is YES
+ */
+- (NSXMLDocument *) xmlDocumentForIndexes:(NSIndexSet *)indexes plainText:(BOOL)plainText
+{
+   NSXMLElement *rootElement = [ NSXMLNode elementWithName:CSDocumentXML_RootNode ];
+   NSArray *keyArray = [ NSArray arrayWithObjects:CSDocModelKey_Name, CSDocModelKey_Acct,
+                                                  CSDocModelKey_Passwd, CSDocModelKey_URL,
+                                                  CSDocModelKey_Category, CSDocModelKey_Notes, nil ];
+   unsigned int rowIndex;
+   for( rowIndex = [ indexes firstIndex ];
+        rowIndex != NSNotFound;
+        rowIndex = [ indexes indexGreaterThanIndex:rowIndex ] )
+   {
+      NSXMLElement *entryElement = [ NSXMLNode elementWithName:CSDocumentXML_EntryNode ];
+
+      NSEnumerator *keyEnum = [ keyArray objectEnumerator ];
+      NSString *key;
+      while( ( key = [ keyEnum nextObject ] ) != nil )
+      {
+         NSXMLNode *childElement;
+         if( [ key isEqualToString:CSDocModelKey_Notes ] && !plainText )
+         {
+            childElement = [ NSXMLNode elementWithName:key ];
+            [ childElement setObjectValue:[ [ self model ] RTFDNotesAtRow:rowIndex ] ];
+         }
+         else
+            childElement = [ NSXMLNode elementWithName:key
+                                           stringValue:[ [ self model ] stringForKey:key atRow:rowIndex ] ];
+         [ entryElement addChild:childElement ];
+      }
+      [ rootElement addChild:entryElement ];
+   }
+   NSXMLDocument *xmlDoc = [ [ NSXMLDocument alloc ] initWithRootElement:rootElement ];
+   [ xmlDoc setVersion:@"1.0" ];
+   [ xmlDoc setCharacterEncoding:@"UTF-8" ];
+
+   return [ xmlDoc autorelease ];
+}
+
+
+/*
+ * Return data representation of the given entries as XML
+ */
+- (NSData *) generateXMLDataForIndexes:(NSIndexSet *)indexes
+{
+   return [ [ self xmlDocumentForIndexes:indexes plainText:YES ] XMLDataWithOptions:NSXMLNodePrettyPrint ];
+}
+
+
+/*
  * Handle the actual export
  */
 - (void) exportPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
@@ -488,7 +542,7 @@
          myData = [ self generateCSVDataForIndexes:entriesToExport
                                         withHeader:[ mainWindowController exportCSVHeader ] ];
       else
-         NSLog( @"Not yet implemented" );
+         myData = [ self generateXMLDataForIndexes:entriesToExport ];
       NSDictionary *fileAttr = [ NSDictionary dictionaryWithObject:[ NSNumber numberWithUnsignedLong:0600 ]
                                                             forKey:NSFilePosixPermissions ];
       [ [ NSFileManager defaultManager ] createFileAtPath:[ sheet filename ]
