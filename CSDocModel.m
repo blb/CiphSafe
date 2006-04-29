@@ -109,7 +109,10 @@ static NSArray *keyArray;
 {
    sortKey = CSDocModelKey_Name;
    sortAscending = YES;
-#if !defined(DEBUG)
+#if defined(DEBUG)
+   [ NSData setCompressLogging:YES ];
+   [ NSData setCryptoLogging:YES ];
+#else
    [ NSData setCompressLogging:NO ];
    [ NSData setCryptoLogging:NO ];
 #endif
