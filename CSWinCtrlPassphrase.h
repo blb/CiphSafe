@@ -59,13 +59,13 @@ extern NSString * const CSPassphraseNote_Change;
 
 // Request a passphrase, app-modal
 - (NSMutableData *) getEncryptionKeyWithNote:(NSString *)noteType
-                    forDocumentNamed:(NSString *)docName;
+                            forDocumentNamed:(NSString *)docName;
 
 // Request a passphrase, doc-modal
 - (void) getEncryptionKeyWithNote:(NSString *)noteType
-         inWindow:(NSWindow *)window
-         modalDelegate:(id)delegate
-         sendToSelector:(SEL)selector;
+                         inWindow:(NSWindow *)window
+                    modalDelegate:(id)delegate
+                   sendToSelector:(SEL)selector;
 
 // Actions for the passphrase window
 - (IBAction) passphraseAccept:(id)sender;
