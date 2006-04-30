@@ -42,16 +42,6 @@
 #import "NSData_crypto.h"
 #import "NSData_clear.h"
 
-// Defines for localized strings
-#define CSWINCTRLENTRY_LOC_INVALIDURL NSLocalizedString( @"Invalid URL", @"" )
-#define CSWINCTRLENTRY_LOC_URLNOTVALID \
-        NSLocalizedString( @"The URL entered is not a valid URL", @"" )
-#define CSWINCTRLENTRY_LOC_NOTSAVED NSLocalizedString( @"Entry Not Saved", @"" )
-#define CSWINCTRLENTRY_LOC_NOTSAVEDCLOSE \
-        NSLocalizedString( @"The entry has not been saved, close anyway?", @"" )
-#define CSWINCTRLENTRY_LOC_CLOSEANYWAY NSLocalizedString( @"Close Anyway", @"" )
-#define CSWINCTRLENTRY_LOC_DONTCLOSE NSLocalizedString( @"Don't Close", @"" )
-
 
 @implementation CSWinCtrlEntry
 
@@ -167,7 +157,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 {
    NSURL *theURL = [ NSURL URLWithString:[ urlText stringValue ] ];
    if( theURL == nil || ![ [ NSWorkspace sharedWorkspace ] openURL:theURL ] )
-      NSBeginInformationalAlertSheet( CSWINCTRLENTRY_LOC_INVALIDURL,
+      NSBeginInformationalAlertSheet( NSLocalizedString( @"Invalid URL", @"" ),
                                       nil,
                                       nil,
                                       nil,
@@ -176,7 +166,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
                                       nil,
                                       nil,
                                       nil,
-                                      CSWINCTRLENTRY_LOC_URLNOTVALID );
+                                      NSLocalizedString( @"The URL entered is not a valid URL", @"" ) );
 }
 
 
@@ -245,10 +235,12 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 {
    if( [ [ self window ] isDocumentEdited ] )
    {
-      id alertPanel = NSGetCriticalAlertPanel( CSWINCTRLENTRY_LOC_NOTSAVED,
-                                               CSWINCTRLENTRY_LOC_NOTSAVEDCLOSE,
-                                               CSWINCTRLENTRY_LOC_CLOSEANYWAY,
-                                               CSWINCTRLENTRY_LOC_DONTCLOSE,
+      id alertPanel = NSGetCriticalAlertPanel( NSLocalizedString( @"Entry Not Saved", @"" ),
+                                               NSLocalizedString(
+                                                  @"The entry has not been saved, close anyway?",
+                                                  @"" ),
+                                               NSLocalizedString( @"Close Anyway", @"" ),
+                                               NSLocalizedString( @"Don't Close", @"" ),
                                                nil );
       [ NSApp beginSheet:alertPanel
               modalForWindow:[ self window ]
