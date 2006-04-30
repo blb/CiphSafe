@@ -48,19 +48,9 @@ const int NSDataCompressionLevelLow = Z_BEST_SPEED;
 const int NSDataCompressionLevelMedium = 5;
 const int NSDataCompressionLevelHigh = Z_BEST_COMPRESSION;
 
+
 // Localized strings
-#define NSDATA_COMPRESS_LOC_COMPRESS2FAIL \
-        NSLocalizedString( @"call to compress2() failed: %d - %s", @"" )
 #define NSDATA_COMPRESS_LOC_MEMERR NSLocalizedString( @"memory error", @"" )
-#define NSDATA_COMPRESS_LOC_BADSIZE \
-        NSLocalizedString( @"bad size in data, is it really compressed? "\
-                           @"(reason is %@)", @"" )
-#define NSDATA_COMPRESS_LOC_UNCOMPRESSFAIL \
-        NSLocalizedString( @"call to uncompress() failed: %d - %s", @"" )
-#define NSDATA_COMPRESS_LOC_DATASIZEWARN \
-        NSLocalizedString( @"(warning) data size was %u, expected %u", @"" )
-#define NSDATA_COMPRESS_LOC_NOTZLIBFMT \
-        NSLocalizedString( @"data is not in zlib-compatible format", @"" )
 
 
 @implementation NSData (withay_compress)
@@ -128,7 +118,9 @@ static BOOL compressLoggingEnabled = YES;
       }
       else
       {
-         [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_COMPRESS2FAIL, zlibError, zError( zlibError ) ];
+         [ NSData logCompressMessage:NSLocalizedString( @"call to compress2() failed: %d - %s", @"" ),
+                                     zlibError,
+                                     zError( zlibError ) ];
          newData = nil;
       }
    }
@@ -163,7 +155,10 @@ static BOOL compressLoggingEnabled = YES;
       NS_HANDLER
          if( [ [ localException name ] isEqualToString:NSInvalidArgumentException ] )
          {
-            [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_BADSIZE, [ localException reason ] ];
+            [ NSData logCompressMessage:NSLocalizedString( @"bad size in data, is it really compressed? "
+                                                           @"(reason is %@)",
+                                                           @"" ),
+                                        [ localException reason ] ];
             NS_VALUERETURN( nil, NSMutableData * );
          }
          else
@@ -178,17 +173,21 @@ static BOOL compressLoggingEnabled = YES;
                                      [ self length ] - sizeof( unsigned ) );
          if( zlibError != Z_OK )
          {
-            [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_UNCOMPRESSFAIL, zlibError, zError( zlibError ) ];
+            [ NSData logCompressMessage:NSLocalizedString( @"call to uncompress() failed: %d - %s", @"" ),
+                                        zlibError,
+                                        zError( zlibError ) ];
             newData = nil;
          }
          else if( originalSize != outSize )
-            [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_DATASIZEWARN, outSize, originalSize ];
+            [ NSData logCompressMessage:NSLocalizedString( @"(warning) data size was %u, expected %u", @"" ),
+                                        outSize,
+                                        originalSize ];
       }
       else
          [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_MEMERR ];
    }
    else
-      [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_NOTZLIBFMT ];
+      [ NSData logCompressMessage:NSLocalizedString( @"data is not in zlib-compatible format", @"" ) ];
 
    return newData;
 }
