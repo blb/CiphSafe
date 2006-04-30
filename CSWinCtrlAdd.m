@@ -93,35 +93,38 @@
  */
 - (IBAction) add:(id)sender
 {
-   NSRange fullNotesRange;
-
-   fullNotesRange = NSMakeRange( 0, [ [ notes textStorage ] length ] );
+   NSRange fullNotesRange = NSMakeRange( 0, [ [ notes textStorage ] length ] );
    if( [ [ self document ] addEntryWithName:[ nameText stringValue ]
-                           account:[ accountText stringValue ]
-                           password:[ passwordText stringValue ]
-                           URL:[ urlText stringValue ]
-                           category:[ category stringValue ]
-                           notesRTFD:[ notes RTFDFromRange:fullNotesRange ] ] )
+                                    account:[ accountText stringValue ]
+                                   password:[ passwordText stringValue ]
+                                        URL:[ urlText stringValue ]
+                                   category:[ category stringValue ]
+                                  notesRTFD:[ notes RTFDFromRange:fullNotesRange ] ] )
    {
       [ self clear:self ];
-      if( ![ [ NSUserDefaults standardUserDefaults ] 
-             boolForKey:CSPrefDictKey_CloseAdd ] )
+      if( ![ [ NSUserDefaults standardUserDefaults ] boolForKey:CSPrefDictKey_CloseAdd ] )
       {
          // We queue it here as doing it immediately won't work
          [ [ NSRunLoop currentRunLoop ]
            performSelector:@selector( makeFirstResponder: )
-           target:[ self window ]
-           argument:nameText
-           order:9999
-           modes:[ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ] ];
+                    target:[ self window ]
+                  argument:nameText
+                     order:9999
+                     modes:[ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ] ];
       }
       else
          [ [ self window ] performClose:self ];
    }
    else
       NSBeginInformationalAlertSheet( CSWINCTRLENTRY_LOC_ENTRYEXISTS,
-                                      nil, nil, nil, [ self window ],
-                                      nil, nil, nil, NULL,
+                                      nil,
+                                      nil,
+                                      nil,
+                                      [ self window ],
+                                      nil,
+                                      nil,
+                                      nil,
+                                      NULL,
                                       CSWINCTRLENTRY_LOC_ENTRYEXISTSRENAME );
 }
 
