@@ -38,8 +38,6 @@
 #import "CSDocument.h"
 #import "CSAppController.h"
 
-// Defines for localized strings
-#define CSWINCTRLADD_LOC_ADDTO NSLocalizedString( @"Add to %@", @"" )
 
 @implementation CSWinCtrlAdd
 
@@ -65,7 +63,7 @@
  */
 - (void) synchronizeWindowTitleWithDocumentName
 {
-   [ [ self window ] setTitle:[ NSString stringWithFormat:CSWINCTRLADD_LOC_ADDTO,
+   [ [ self window ] setTitle:[ NSString stringWithFormat:NSLocalizedString( @"Add to %@", @"" ),
                                             [ [ self document ] displayName ] ] ];
 }
 
