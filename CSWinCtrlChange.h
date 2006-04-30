@@ -42,7 +42,7 @@
 
 // For finding an already-open controller
 + (CSWinCtrlChange *) controllerForEntryName:(NSString *)entryName
-                      inDocument:(NSDocument *)document;
+                                  inDocument:(NSDocument *)document;
 
 // Close all open controllers for a given document
 + (void) closeOpenControllersForDocument:(NSDocument *)document;
