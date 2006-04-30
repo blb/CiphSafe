@@ -35,6 +35,10 @@
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
+	<key>CFBundleHelpBookFolder</key>
+	<string>CiphSafe Help</string>
+	<key>CFBundleHelpBookName</key>
+	<string>CiphSafe Help</string>
 	<key>CFBundleIconFile</key>
 	<string>CiphSafe</string>
 	<key>CFBundleIdentifier</key>
@@ -47,12 +51,10 @@
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.3beta1</string>
 	<key>CFBundleVersion</key>
-	<string>1.3b1</string>
-   <key>CFBundleHelpBookFolder</key>
-   <string>CiphSafe Help</string>
-   <key>CFBundleHelpBookName</key>
-   <string>CiphSafe Help</string>
+	<string>@@SVN_REVISION@@</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
