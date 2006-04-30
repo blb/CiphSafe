@@ -59,11 +59,6 @@ NSString * const CSDocModelNotificationInfoKey_ChangedNameTo = @"CSDocModelNotif
 NSString * const CSDocModelNotificationInfoKey_DeletedNames = @"CSDocModelNotificationInfoKey_DeletedName";
 
 
-#define CSDOCMODEL_LOC_ADD NSLocalizedString( @"Add", @"" )
-#define CSDOCMODEL_LOC_CHANGE NSLocalizedString( @"Change", @"" )
-#define CSDOCMODEL_LOC_DELETE NSLocalizedString( @"Delete", @"" )
-
-
 // Used to sort the array
 int sortEntries( id dict1, id dict2, void *context );
 
@@ -444,7 +439,7 @@ static NSArray *keyArray;
    {
       [ undoManager registerUndoWithTarget:self selector:@selector( deleteEntryWithName: ) object:name ];
       if( ![ undoManager isUndoing ] && ![ undoManager isRedoing ] )
-         [ undoManager setActionName:CSDOCMODEL_LOC_ADD ];
+         [ undoManager setActionName:NSLocalizedString( @"Add", @"" ) ];
    }
 
    [ allEntries sortUsingFunction:sortEntries context:self ];
@@ -499,7 +494,7 @@ static NSArray *keyArray;
                    category:[ self stringFrom:theEntry forKey:CSDocModelKey_Category ]
                   notesRTFD:[ self dataFrom:theEntry forKey:CSDocModelKey_Notes ] ];
       if( ![ undoManager isUndoing ] && ![ undoManager isRedoing ] )
-         [ undoManager setActionName:CSDOCMODEL_LOC_CHANGE ];
+         [ undoManager setActionName:NSLocalizedString( @"Change", @"" ) ];
    }
 
    if( newName != nil )
@@ -558,7 +553,7 @@ static NSArray *keyArray;
                       category:[ theEntry objectForKey:CSDocModelKey_Category ]
                      notesRTFD:[ theEntry objectForKey:CSDocModelKey_Notes ] ];
             if( ![ undoManager isUndoing ] && ![ undoManager isRedoing ] )
-               [ undoManager setActionName:CSDOCMODEL_LOC_DELETE ];
+               [ undoManager setActionName:NSLocalizedString( @"Delete", @"" ) ];
          }
       }
    }
