@@ -73,13 +73,11 @@ static BOOL compressLoggingEnabled = YES;
  */
 + (void) logCompressMessage:(NSString *)format, ...
 {
-   va_list args;
-   
    if( compressLoggingEnabled )
    {
+      va_list args;
       va_start( args, format );
-      NSLogv( [ NSString stringWithFormat:@"NSData_compress: %@\n", format ],
-              args );
+      NSLogv( [ NSString stringWithFormat:@"NSData_compress: %@\n", format ], args );
       va_end( args );
    }
 }
@@ -109,31 +107,28 @@ static BOOL compressLoggingEnabled = YES;
  */
 - (NSMutableData *) compressedDataAtLevel:(int)level
 {
-   NSMutableData *newData;
-   unsigned long bufferLength;
-   int zlibError;
-
    /*
     * zlib says to make sure the destination has 0.1% more + 12 bytes; last
     * additional bytes to store the original size (needed for uncompress)
     */
-   bufferLength = ceil( (float) [ self length ] * 1.001 ) + 12 + sizeof( unsigned );
-   newData = [ NSMutableData dataWithLength:bufferLength ];
+   unsigned long bufferLength = ceil( (float) [ self length ] * 1.001 ) + 12 + sizeof( unsigned );
+   NSMutableData *newData = [ NSMutableData dataWithLength:bufferLength ];
    if( newData != nil )
    {
-      zlibError = compress2( [ newData mutableBytes ], &bufferLength,
-                             [ self bytes ], [ self length ], level );
+      int zlibError = compress2( [ newData mutableBytes ],
+                                 &bufferLength,
+                                 [ self bytes ],
+                                 [ self length ],
+                                 level );
       if( zlibError == Z_OK )
       {
          // Add original size to the end of the buffer, written big-endian
-         *( (unsigned *) ( [ newData mutableBytes ] + bufferLength ) ) =
-            NSSwapHostIntToBig( [ self length ] );
+         *( (unsigned *) ( [ newData mutableBytes ] + bufferLength ) ) = NSSwapHostIntToBig( [ self length ] );
          [ newData setLength:bufferLength + sizeof( unsigned ) ];
       }
       else
       {
-         [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_COMPRESS2FAIL,
-                                 zlibError, zError( zlibError ) ];
+         [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_COMPRESS2FAIL, zlibError, zError( zlibError ) ];
          newData = nil;
       }
    }
@@ -149,17 +144,11 @@ static BOOL compressLoggingEnabled = YES;
  */
 - (NSMutableData *) uncompressedData
 {
-   NSMutableData *newData;
-   unsigned originalSize;
-   unsigned long outSize;
-   int zlibError;
-
-   newData = nil;
+   NSMutableData *newData = nil;
    if( [ self isCompressedFormat ] )
    {
-      originalSize = NSSwapBigIntToHost( *( (unsigned *) ( [ self bytes ] +
-                                                           [ self length ] -
-                                                           sizeof( unsigned ) ) ) );
+      unsigned int originalSize = NSSwapBigIntToHost( *( (unsigned *) ( [ self bytes ] + [ self length ] -
+                                                                        sizeof( unsigned ) ) ) );
       /*
        * In the rare circumstance that data which is not compressed happens to
        * pass the checks above, we need to deal with the possibility that there
@@ -172,11 +161,9 @@ static BOOL compressLoggingEnabled = YES;
       NS_DURING
          newData = [ NSMutableData dataWithLength:originalSize ];
       NS_HANDLER
-         if( [ [ localException name ]
-               isEqualToString:NSInvalidArgumentException ] )
+         if( [ [ localException name ] isEqualToString:NSInvalidArgumentException ] )
          {
-            [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_BADSIZE,
-                                    [ localException reason ] ];
+            [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_BADSIZE, [ localException reason ] ];
             NS_VALUERETURN( nil, NSMutableData * );
          }
          else
@@ -184,19 +171,18 @@ static BOOL compressLoggingEnabled = YES;
       NS_ENDHANDLER
       if( newData != nil )
       {
-         outSize = originalSize;
-         zlibError = uncompress( [ newData mutableBytes ], &outSize,
-                                 [ self bytes ],
-                                 [ self length ] - sizeof( unsigned ) );
+         unsigned long outSize = originalSize;
+         int zlibError = uncompress( [ newData mutableBytes ],
+                                     &outSize,
+                                     [ self bytes ],
+                                     [ self length ] - sizeof( unsigned ) );
          if( zlibError != Z_OK )
          {
-            [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_UNCOMPRESSFAIL,
-                                    zlibError, zError( zlibError ) ];
+            [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_UNCOMPRESSFAIL, zlibError, zError( zlibError ) ];
             newData = nil;
          }
          else if( originalSize != outSize )
-            [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_DATASIZEWARN,
-                                    outSize, originalSize ];
+            [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_DATASIZEWARN, outSize, originalSize ];
       }
       else
          [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_MEMERR ];
@@ -214,11 +200,7 @@ static BOOL compressLoggingEnabled = YES;
  */
 - (BOOL) isCompressedFormat
 {
-   BOOL retval;
-   const unsigned char *bytes;
-
-   retval = NO;
-   bytes = [ self bytes ];
+   const unsigned char *bytes = [ self bytes ];
    /*
     * The checks are:
     *    ( *bytes & 0x0F ) == 8           : method is deflate (this is called CM,
@@ -232,11 +214,10 @@ static BOOL compressLoggingEnabled = YES;
     *                                       (this is discussed in the FCHECK in
     *                                       FLG, flags, section)
     */
-   if( ( *bytes & 0x0F ) == 8 && ( *bytes & 0x80 ) == 0 &&
-       NSSwapBigShortToHost( *( (short *) bytes ) ) % 31 == 0 )
-      retval = YES;
+   if( ( *bytes & 0x0F ) == 8 && ( *bytes & 0x80 ) == 0 && NSSwapBigShortToHost( *( (short *) bytes ) ) % 31 == 0 )
+      return YES;
 
-   return retval;
+   return NO;
 }
 
 @end
