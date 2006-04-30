@@ -38,13 +38,6 @@
 #import "CSDocModel.h"
 
 
-// Format strings for window and table view information saved in user defaults
-#define CSWINCTRLMAIN_PREF_WINDOW @"CSWinCtrlMain Window %@"
-#define CSWINCTRLMAIN_PREF_TABLE @"CSWinCtrlMain Table %@"
-// Dictionary keys in saved table view information
-#define CSWINCTRLMAIN_PREF_TABLE_NAME @"name"
-#define CSWINCTRLMAIN_PREF_TABLE_WIDTH @"width"
-
 // Localized strings
 #define CSWINCTRLMAIN_LOC_SUREDELROWS \
            NSLocalizedString( @"Are you sure you want to delete the selected " \
@@ -91,7 +84,6 @@ const int CSWinCtrlMainTag_Notes = 6;
 @implementation CSWinCtrlMain
 
 static NSArray *cmmCopyFields;
-static NSAttributedString *defaultSearchString;
 static NSArray *columnSelectionArray;
 static NSArray *searchWhatArray;
 
@@ -104,23 +96,15 @@ static NSArray *searchWhatArray;
                                                        CSDocModelKey_Name,
                                                        CSDocModelKey_Notes,
                                                        nil ];
-   defaultSearchString = [ [ NSAttributedString alloc ]
-                           initWithString:CSWINCTRLMAIN_LOC_SEARCH
-                           attributes:
-                              [ NSDictionary dictionaryWithObjectsAndKeys:
-                                                [ NSColor grayColor ],
-                                                   NSForegroundColorAttributeName,
-                                                nil ] ];
    // Mapping from corner menu tags to field names
-   columnSelectionArray = [ [ NSArray alloc ] initWithObjects:
-                                                 @"allColumns",
-                                                 CSDocModelKey_Name,
-                                                 CSDocModelKey_Acct,
-                                                 CSDocModelKey_Passwd,
-                                                 CSDocModelKey_URL,
-                                                 CSDocModelKey_Category,
-                                                 CSDocModelKey_Notes,
-                                                 nil ];
+   columnSelectionArray = [ [ NSArray alloc ] initWithObjects:@"allColumns",
+                                                              CSDocModelKey_Name,
+                                                              CSDocModelKey_Acct,
+                                                              CSDocModelKey_Passwd,
+                                                              CSDocModelKey_URL,
+                                                              CSDocModelKey_Category,
+                                                              CSDocModelKey_Notes,
+                                                              nil ];
    searchWhatArray = [ [ NSArray alloc ] initWithObjects:@"all",
                                                          CSDocModelKey_Name,
                                                          CSDocModelKey_Acct,
@@ -157,8 +141,7 @@ static NSArray *searchWhatArray;
 {
    NSSize newSpacing = NSMakeSize( 3.0, 2.0 );
    
-   switch( [ [ NSUserDefaults standardUserDefaults ]
-             integerForKey:CSPrefDictKey_CellSpacing ] )
+   switch( [ [ NSUserDefaults standardUserDefaults ] integerForKey:CSPrefDictKey_CellSpacing ] )
    {
       case 0:   // Small
          newSpacing = NSMakeSize( 3.0, 2.0 );
@@ -177,16 +160,21 @@ static NSArray *searchWhatArray;
 
 
 /*
+ * Method to return a good, hopefully-unique string to use as a key into the prefs for saving a window
+ */
+- (NSString *) windowPrefKey
+{
+   return [ NSString stringWithFormat:@"CSWinCtrlMain Window %@", [ [ self document ] displayName ] ];
+}
+
+
+/*
  * Load previously-saved window layout information, if any
  */
 - (void) loadSavedWindowState
 {
-   NSString *windowFrameString;
-   
-   windowFrameString = [ [ NSUserDefaults standardUserDefaults ]
-                         stringForKey:[ NSString stringWithFormat:
-                            CSWINCTRLMAIN_PREF_WINDOW,
-                            [ [ self document ] displayName ] ] ];
+   NSString *windowFrameString = [ [ NSUserDefaults standardUserDefaults ]
+                                   stringForKey:[ self windowPrefKey ] ];
    if( windowFrameString != nil )
       [ [ self window ] setFrameFromString:windowFrameString ];
 }
@@ -197,10 +185,8 @@ static NSArray *searchWhatArray;
  */
 - (void) saveWindowState
 {
-   [ [ NSUserDefaults standardUserDefaults ]
-     setObject:[ [ self window ] stringWithSavedFrame ]
-        forKey:[ NSString stringWithFormat:CSWINCTRLMAIN_PREF_WINDOW,
-           [ [ self document ] displayName ] ] ];
+   [ [ NSUserDefaults standardUserDefaults ] setObject:[ [ self window ] stringWithSavedFrame ]
+                                                forKey:[ self windowPrefKey ] ];
 }
 
 
@@ -209,11 +195,9 @@ static NSArray *searchWhatArray;
  */
 - (void) addTableColumnWithID:(NSString *)colID
 {
-   NSTableColumn *newColumn;
-   
    if( [ documentView columnWithIdentifier:colID ] == -1 )
    {
-      newColumn = [ [ NSTableColumn alloc ] initWithIdentifier:colID ];
+      NSTableColumn *newColumn = [ [ NSTableColumn alloc ] initWithIdentifier:colID ];
       [ newColumn setEditable:NO ];
       [ newColumn setResizingMask:( NSTableColumnAutoresizingMask | NSTableColumnUserResizingMask ) ];
       [ [ newColumn headerCell ] setStringValue:NSLocalizedString( colID, @"" ) ];
@@ -223,40 +207,39 @@ static NSArray *searchWhatArray;
 
 
 /*
+ * Method to return a good, hopefully-unique string to use as a key into the prefs for saving a table view
+ */
+- (NSString *) tableViewPrefKey
+{
+   return [ NSString stringWithFormat:@"CSWinCtrlMain Table %@", [ [ self document ] displayName ] ];
+}
+
+
+/*
  * Load previously-saved table layout information, if any
  */
 - (BOOL) loadSavedTableState
 {
-   BOOL retval;
-   NSString *tableInfoString, *colName;
-   NSArray *partsArray;
-   unsigned index;
-   int currentColIndex;
-   NSTableColumn *tableColumn;
-   
-   retval = NO;
-   tableInfoString = [ [ NSUserDefaults standardUserDefaults ]
-                      stringForKey:[ NSString stringWithFormat:
-                         CSWINCTRLMAIN_PREF_TABLE,
-                         [ [ self document ] displayName ] ] ];
+   NSString *tableInfoString = [ [ NSUserDefaults standardUserDefaults ]
+                                 stringForKey:[ self tableViewPrefKey ] ];
    // Loop through rearranging columns and setting each column's size
    if( tableInfoString != nil && [ tableInfoString length ] > 0 )
    {
-      partsArray = [ tableInfoString componentsSeparatedByString:@" " ];
+      NSArray *partsArray = [ tableInfoString componentsSeparatedByString:@" " ];
+      unsigned int index;
       for( index = 0; index < [ partsArray count ]; index += 2 )
       {
-         colName = [ partsArray objectAtIndex:index ];
+         NSString *colName = [ partsArray objectAtIndex:index ];
          [ self addTableColumnWithID:colName ];
-         currentColIndex = [ documentView columnWithIdentifier:colName ];
+         int currentColIndex = [ documentView columnWithIdentifier:colName ];
          [ documentView moveColumn:currentColIndex toColumn:( index / 2 ) ];
-         tableColumn = [ documentView tableColumnWithIdentifier:colName ];
-         [ tableColumn setWidth:[ [ partsArray objectAtIndex:( index + 1 ) ]
-            floatValue ] ];
+         NSTableColumn *tableColumn = [ documentView tableColumnWithIdentifier:colName ];
+         [ tableColumn setWidth:[ [ partsArray objectAtIndex:( index + 1 ) ] floatValue ] ];
       }
-      retval = YES;
+      return YES;
    }
    
-   return retval;
+   return NO;
 }
 
 
@@ -265,27 +248,19 @@ static NSArray *searchWhatArray;
  */
 - (void) saveTableState
 {
-   NSArray *tableColumns;
-   NSMutableString *infoString;
-   unsigned index;
-   NSTableColumn *tableColumn;
-   
-   tableColumns = [ documentView tableColumns ];
-   infoString = [ NSMutableString stringWithCapacity:70 ];
+   NSArray *tableColumns = [ documentView tableColumns ];
+   NSMutableString *infoString = [ NSMutableString stringWithCapacity:70 ];
+   unsigned int index;
    for( index = 0; index < [ tableColumns count ]; index++ )
    {
-      tableColumn = [ tableColumns objectAtIndex:index ];
+      NSTableColumn *tableColumn = [ tableColumns objectAtIndex:index ];
       if( index == 0 )
-         [ infoString appendFormat:@"%@ %f", [ tableColumn identifier ],
-            [ tableColumn width ] ];
+         [ infoString appendFormat:@"%@ %f", [ tableColumn identifier ], [ tableColumn width ] ];
       else
-         [ infoString appendFormat:@" %@ %f", [ tableColumn identifier ],
-            [ tableColumn width ] ];
+         [ infoString appendFormat:@" %@ %f", [ tableColumn identifier ], [ tableColumn width ] ];
    }
-   [ [ NSUserDefaults standardUserDefaults ]
-     setObject:infoString
-        forKey:[ NSString stringWithFormat:CSWINCTRLMAIN_PREF_TABLE,
-           [ [ self document ] displayName ] ] ];
+   [ [ NSUserDefaults standardUserDefaults ] setObject:infoString
+                                                forKey:[ self tableViewPrefKey ] ];
 }
 
 
@@ -294,18 +269,14 @@ static NSArray *searchWhatArray;
  */
 - (void) setDisplayOfColumnID:(NSString *)colID enabled:(BOOL)enabled
 {
-   NSTableColumn *colToRemove;
-   
    if( enabled )
       [ self addTableColumnWithID:colID ];
    else
    {
-      colToRemove = [ [ documentView tableColumnWithIdentifier:colID ] retain ];
+      NSTableColumn *colToRemove = [ [ documentView tableColumnWithIdentifier:colID ] retain ];
       [ documentView removeTableColumn:colToRemove ];
       if( [ previouslySelectedColumn isEqual:colToRemove ] )
-         [ self tableView:documentView
-      didClickTableColumn:[ [ documentView tableColumns ]
-                                      objectAtIndex:0 ] ];
+         [ self tableView:documentView didClickTableColumn:[ [ documentView tableColumns ] objectAtIndex:0 ] ];
       [ colToRemove release ];
    }
    [ documentView sizeToFit ];
@@ -336,13 +307,10 @@ static NSArray *searchWhatArray;
  */
 - (void) updateCornerMenu
 {
-   unsigned index;
-   
+   unsigned int index;
    for( index = 1; index < [ columnSelectionArray count ]; index++ )
    {
-      if( [ documentView columnWithIdentifier:
-         [ columnSelectionArray objectAtIndex:index ] ]
-          >= 0 )
+      if( [ documentView columnWithIdentifier:[ columnSelectionArray objectAtIndex:index ] ] >= 0 )
          [ [ cmmTableHeader itemWithTag:index ] setState:NSOnState ];
       else
          [ [ cmmTableHeader itemWithTag:index ] setState:NSOffState ];
@@ -355,20 +323,15 @@ static NSArray *searchWhatArray;
  */
 - (void) updateSetCategoryMenu
 {
-   NSMenu *categoriesMenu;
-   NSEnumerator *oldItemsEnum, *currentCategoriesEnum;
-   id oldItem;
-   NSString *newItem;
-   
    if( [ [ self window ] isKeyWindow ] )
    {
-      categoriesMenu = [ [ [ NSApp delegate ] editMenuSetCategoryMenuItem ]
-         submenu ];
-      oldItemsEnum = [ [ categoriesMenu itemArray ] objectEnumerator ];
+      NSMenu *categoriesMenu = [ [ [ NSApp delegate ] editMenuSetCategoryMenuItem ] submenu ];
+      NSEnumerator *oldItemsEnum = [ [ categoriesMenu itemArray ] objectEnumerator ];
+      id oldItem;
       while( ( oldItem = [ oldItemsEnum nextObject ] ) != nil )
          [ categoriesMenu removeItem:oldItem ];
-      currentCategoriesEnum = [ [ [ self document ] categories ]
-         objectEnumerator ];
+      NSEnumerator *currentCategoriesEnum = [ [ [ self document ] categories ] objectEnumerator ];
+      NSString *newItem;
       while( ( newItem = [ currentCategoriesEnum nextObject ] ) != nil )
          [ categoriesMenu addItemWithTitle:newItem
                                     action:@selector( setCategory: )
@@ -420,20 +383,15 @@ static NSArray *searchWhatArray;
  */
 - (void) updateStatusField
 {
-   int entryCount, selectedCount;
+   int entryCount = [ self numberOfRowsInTableView:documentView ];
+   int selectedCount = [ documentView numberOfSelectedRows ];
    NSString *statusString;
-   
-   entryCount = [ self numberOfRowsInTableView:documentView ];
-   selectedCount = [ documentView numberOfSelectedRows ];
    if( entryCount == 1 )
-      statusString = [ NSString stringWithFormat:CSWINCTRLMAIN_LOC_ONEENTRY,
-         selectedCount ];
+      statusString = [ NSString stringWithFormat:CSWINCTRLMAIN_LOC_ONEENTRY, selectedCount ];
    else
-      statusString = [ NSString stringWithFormat:CSWINCTRLMAIN_LOC_NUMENTRIES,
-         entryCount, selectedCount ];
+      statusString = [ NSString stringWithFormat:CSWINCTRLMAIN_LOC_NUMENTRIES, entryCount, selectedCount ];
    if( searchResultList != nil )
-      statusString = [ NSString stringWithFormat:@"%@ (%@)",
-         statusString, CSWINCTRLMAIN_LOC_FILTERED ];
+      statusString = [ NSString stringWithFormat:@"%@ (%@)", statusString, CSWINCTRLMAIN_LOC_FILTERED ];
    [ documentStatus setStringValue:statusString ];
 }
 
@@ -496,8 +454,7 @@ static NSArray *searchWhatArray;
                contextInfo:(void *)contextInfo
 {
    if( returnCode == NSAlertDefaultReturn )   // They said delete...
-      [ [ self document ]
-        deleteEntriesWithNamesInArray:[ self getSelectedNames ] ];
+      [ [ self document ] deleteEntriesWithNamesInArray:[ self getSelectedNames ] ];
 }
 
 
@@ -508,14 +465,13 @@ static NSArray *searchWhatArray;
 - (void) setSortingImageForColumn:(NSTableColumn *)tableColumn
 {
    if( [ [ self document ] isSortAscending ] )
-      [ documentView setIndicatorImage:[ NSImage imageNamed:@"sortArrowUp" ]
+      [ documentView setIndicatorImage:[ NSImage imageNamed:@"NSAscendingSortIndicator" ]
                          inTableColumn:tableColumn ];
    else
-      [ documentView setIndicatorImage:[ NSImage imageNamed:@"sortArrowDown" ]
+      [ documentView setIndicatorImage:[ NSImage imageNamed:@"NSDescendingSortIndicator" ]
                          inTableColumn:tableColumn ];
    if( ![ previouslySelectedColumn isEqual:tableColumn ] )
-      [ documentView setIndicatorImage:nil
-                         inTableColumn:previouslySelectedColumn ];
+      [ documentView setIndicatorImage:nil inTableColumn:previouslySelectedColumn ];
    previouslySelectedColumn = tableColumn;
 }
 
@@ -527,7 +483,7 @@ static NSArray *searchWhatArray;
 {
    if( searchResultList != nil )
    {
-      unsigned index;
+      unsigned int index;
       for( index = 0; index < [ searchResultList count ]; index++ )
       {
          if( [ [ searchResultList objectAtIndex:index ] intValue ] == row )
@@ -557,8 +513,7 @@ static NSArray *searchWhatArray;
 
    [ self updateCornerMenu ];
    [ documentView setDoubleAction:@selector( viewEntry: ) ];
-   previouslySelectedColumn = [ documentView tableColumnWithIdentifier:
-                                                  [ [ self document ] sortKey ] ];
+   previouslySelectedColumn = [ documentView tableColumnWithIdentifier:[ [ self document ] sortKey ] ];
    [ documentView setHighlightedTableColumn:previouslySelectedColumn ];
    [ self setSortingImageForColumn:previouslySelectedColumn ];
    /*
@@ -566,14 +521,12 @@ static NSArray *searchWhatArray;
     * this as well
     */
    [ [ self window ] makeFirstResponder:documentView ];
-   [ documentView registerForDraggedTypes:
-                      [ NSArray arrayWithObject:CSDocumentPboardType ] ];
+   [ documentView registerForDraggedTypes:[ NSArray arrayWithObject:CSDocumentPboardType ] ];
    [ [ documentView cornerView ] setMenu:cmmTableHeader ];
    [ [ documentView headerView ] setMenu:cmmTableHeader ];
    [ self setTableViewSpacing ];
    [ self refreshWindow ];
-   [ [ searchField cell ]
-     setPlaceholderString:NSLocalizedString( [ searchWhatArray objectAtIndex:CSWinCtrlMainTag_Name ], nil ) ];
+   [ [ searchField cell ] setPlaceholderString:NSLocalizedString( CSDocModelKey_Name, nil ) ];
    NSUserDefaults *stdDefaults = [ NSUserDefaults standardUserDefaults ];
    NSColor *stripeColor = [ NSUnarchiver unarchiveObjectWithData:
                                             [ stdDefaults objectForKey:CSPrefDictKey_TableAltBackground ] ];
@@ -635,25 +588,26 @@ static NSArray *searchWhatArray;
  */
 - (IBAction) delete:(id)sender
 {
-   NSString *sheetQuestion;
-   SEL delSelector;
-
-   if( [ [ NSUserDefaults standardUserDefaults ]
-         boolForKey:CSPrefDictKey_ConfirmDelete ] )
+   if( [ [ NSUserDefaults standardUserDefaults ] boolForKey:CSPrefDictKey_ConfirmDelete ] )
    {
+      NSString *sheetQuestion;
       if( [ documentView numberOfSelectedRows ] > 1 )
          sheetQuestion = CSWINCTRLMAIN_LOC_SUREDELROWS;
       else
          sheetQuestion = CSWINCTRLMAIN_LOC_SUREDELONEROW;
-      delSelector = @selector( deleteSheetDidEnd:returnCode:contextInfo: );
-      NSBeginCriticalAlertSheet( CSWINCTRLMAIN_LOC_SURE, CSWINCTRLMAIN_LOC_DELETE,
-                                 CSWINCTRLMAIN_LOC_CANCEL, nil,
-                                 [ self window ], self, delSelector, nil,
-                                 NULL, sheetQuestion );
+      NSBeginCriticalAlertSheet( CSWINCTRLMAIN_LOC_SURE,
+                                 CSWINCTRLMAIN_LOC_DELETE,
+                                 CSWINCTRLMAIN_LOC_CANCEL,
+                                 nil,
+                                 [ self window ],
+                                 self,
+                                 @selector( deleteSheetDidEnd:returnCode:contextInfo: ),
+                                 nil,
+                                 NULL,
+                                 sheetQuestion );
    }
    else
-      [ [ self document ]
-        deleteEntriesWithNamesInArray:[ self getSelectedNames ] ];
+      [ [ self document ] deleteEntriesWithNamesInArray:[ self getSelectedNames ] ];
 }
 
 
@@ -706,9 +660,7 @@ static NSArray *searchWhatArray;
  */
 - (IBAction) cut:(id)sender
 {
-   [ [ self document ]
-     copyNames:[ self getSelectedNames ]
-     toPasteboard:[ NSPasteboard generalPasteboard ] ];
+   [ [ self document ] copyNames:[ self getSelectedNames ] toPasteboard:[ NSPasteboard generalPasteboard ] ];
    [ [ self document ] deleteEntriesWithNamesInArray:[ self getSelectedNames ] ];
    [ [ [ self document ] undoManager ] setActionName:CSWINCTRLMAIN_LOC_CUT ];
    [ [ NSApp delegate ] notePBChangeCount ];
@@ -720,9 +672,7 @@ static NSArray *searchWhatArray;
  */
 - (IBAction) copy:(id)sender
 {
-   [ [ self document ]
-     copyNames:[ self getSelectedNames ]
-     toPasteboard:[ NSPasteboard generalPasteboard ] ];
+   [ [ self document ] copyNames:[ self getSelectedNames ]toPasteboard:[ NSPasteboard generalPasteboard ] ];
    [ [ NSApp delegate ] notePBChangeCount ];
 }
 
@@ -732,9 +682,8 @@ static NSArray *searchWhatArray;
  */
 - (IBAction) paste:(id)sender
 {
-   [ [ self document ] retrieveEntriesFromPasteboard:
-                          [ NSPasteboard generalPasteboard ]
-                       undoName:CSWINCTRLMAIN_LOC_PASTE ];
+   [ [ self document ] retrieveEntriesFromPasteboard:[ NSPasteboard generalPasteboard ]
+                                            undoName:CSWINCTRLMAIN_LOC_PASTE ];
 }
 
 
@@ -743,22 +692,15 @@ static NSArray *searchWhatArray;
  */
 - (BOOL) validateMenuItem:(NSMenuItem *)menuItem
 {
-   SEL menuItemAction;
-   BOOL retval;
-
-   menuItemAction = [ menuItem action ];
-   if( menuItemAction == @selector( copy: ) ||
-       menuItemAction == @selector( cut: ) ||
+   SEL menuItemAction = [ menuItem action ];
+   if( menuItemAction == @selector( copy: ) || menuItemAction == @selector( cut: ) ||
        menuItemAction == @selector( setCategory: ) )
-      retval = ( [ documentView numberOfSelectedRows ] > 0 );
+      return ( [ documentView numberOfSelectedRows ] > 0 );
    else if( menuItemAction == @selector( paste: ) )
-      retval = ( [ [ NSPasteboard generalPasteboard ]
-                   availableTypeFromArray:
-                      [ NSArray arrayWithObject:CSDocumentPboardType ] ] != nil );
-   else
-      retval = YES;
+      return ( [ [ NSPasteboard generalPasteboard ] 
+                 availableTypeFromArray:[ NSArray arrayWithObject:CSDocumentPboardType ] ] != nil );
 
-   return retval;
+   return YES;
 }
 
 
@@ -785,15 +727,11 @@ static NSArray *searchWhatArray;
        objectValueForTableColumn:(NSTableColumn *)aTableColumn
        row:(int)rowIndex
 {
-   NSString *colID;
-
-   colID = [ aTableColumn identifier ];
+   NSString *colID = [ aTableColumn identifier ];
    if( [ colID isEqualToString:CSDocModelKey_Notes ] )
-      return [ [ self document ]
-               RTFDStringNotesAtRow:[ self rowForFilteredRow:rowIndex ] ];
+      return [ [ self document ] RTFDStringNotesAtRow:[ self rowForFilteredRow:rowIndex ] ];
    else
-      return [ [ self document ]
-               stringForKey:colID atRow:[ self rowForFilteredRow:rowIndex ] ];
+      return [ [ self document ] stringForKey:colID atRow:[ self rowForFilteredRow:rowIndex ] ];
 }
 
 
@@ -803,13 +741,10 @@ static NSArray *searchWhatArray;
 - (void) tableView:(NSTableView*)tableView
          didClickTableColumn:(NSTableColumn *)tableColumn;
 {
-   NSString *colID;
-
-   colID = [ tableColumn identifier ];
+   NSString *colID = [ tableColumn identifier ];
    // If the current sorting column is clicked, we reverse the order
    if( [ [ [ self document ] sortKey ] isEqualToString:colID ] )
-      [ [ self document ] setSortAscending:![ [ self document ]
-                                              isSortAscending ] ];
+      [ [ self document ] setSortAscending:![ [ self document ] isSortAscending ] ];
    else   // Otherwise, set new sort key
       [ [ self document ] setSortKey:colID ascending:YES ];
 
@@ -824,13 +759,7 @@ static NSArray *searchWhatArray;
  */
 - (void) tableViewSelectionDidChange:(NSNotification *)aNotification
 {
-   BOOL enableState;
-
-   if( [ documentView numberOfSelectedRows ] == 0 )
-      enableState = NO;
-   else
-      enableState = YES;
-
+   BOOL enableState = ( [ documentView numberOfSelectedRows ] != 0 );
    [ documentDeleteButton setEnabled:enableState ];
    [ documentViewButton setEnabled:enableState ];
    [ self updateStatusField ];
@@ -840,9 +769,9 @@ static NSArray *searchWhatArray;
 /*
  * Support dragging of tableview rows
  */
-- (BOOL)      tableView:(NSTableView *)aTableView
-   writeRowsWithIndexes:(NSIndexSet *)rowIndexes
-           toPasteboard:(NSPasteboard*)pboard
+- (BOOL) tableView:(NSTableView *)aTableView
+         writeRowsWithIndexes:(NSIndexSet *)rowIndexes
+         toPasteboard:(NSPasteboard*)pboard
 {
    return [ [ self document ] copyNames:[ self namesFromIndexes:rowIndexes ] toPasteboard:pboard ];
 }
@@ -869,9 +798,8 @@ static NSArray *searchWhatArray;
          row:(int)row
          dropOperation:(NSTableViewDropOperation)op
 {
-   return [ [ self document ] retrieveEntriesFromPasteboard:
-                                 [ info draggingPasteboard ]
-                              undoName:CSWINCTRLMAIN_LOC_DROP ];
+   return [ [ self document ] retrieveEntriesFromPasteboard:[ info draggingPasteboard ]
+                                                   undoName:CSWINCTRLMAIN_LOC_DROP ];
 }
 
 
@@ -917,17 +845,10 @@ static NSArray *searchWhatArray;
  */
 - (IBAction) setCategory:(id)sender
 {
-   NSMenu *categoriesMenu;
-   NSString *category;
-   NSArray *selectedNamesArray;
-   CSDocument *document;
-   unsigned index;
-
-   categoriesMenu = [ [ [ NSApp delegate ] editMenuSetCategoryMenuItem ]
-                      submenu ];
+   NSMenu *categoriesMenu = [ [ [ NSApp delegate ] editMenuSetCategoryMenuItem ] submenu ];
    // Last item is new category
-   if( [ categoriesMenu indexOfItem:sender ] ==
-       ( [ categoriesMenu numberOfItems ] - 1 ) )
+   NSString *category;
+   if( [ categoriesMenu indexOfItem:sender ] == ( [ categoriesMenu numberOfItems ] - 1 ) )
    {
       if( [ NSApp runModalForWindow:newCategoryWindow ] == NSRunStoppedResponse )
          category = [ newCategory stringValue ];
@@ -936,19 +857,19 @@ static NSArray *searchWhatArray;
    }
    else
       category = [ sender title ];
-   selectedNamesArray = [ self getSelectedNames ];
-   document = [ self document ];
+   NSArray *selectedNamesArray = [ self getSelectedNames ];
    if( category != nil )
    {
+      unsigned int index;
       for( index = 0; index < [ selectedNamesArray count ]; index++ )
       {
-         [ document changeEntryWithName:[ selectedNamesArray objectAtIndex:index ]
-                    newName:nil
-                    account:nil
-                    password:nil
-                    URL:nil
-                    category:category
-                    notesRTFD:nil ];
+         [ [ self document ] changeEntryWithName:[ selectedNamesArray objectAtIndex:index ]
+                                         newName:nil
+                                         account:nil
+                                        password:nil
+                                             URL:nil
+                                        category:category
+                                       notesRTFD:nil ];
       }
    }
 }
@@ -977,32 +898,21 @@ static NSArray *searchWhatArray;
  */
 - (IBAction) cmmCopyField:(id)sender
 {
-   NSString *fieldName;
-   NSPasteboard *generalPB;
-   int selectedRow;
-
-   fieldName = [ cmmCopyFields objectAtIndex:[ sender tag ] ];
-   generalPB = [ NSPasteboard generalPasteboard ];
-   selectedRow = [ self rowForFilteredRow:[ documentView selectedRow ] ];
+   NSString *fieldName = [ cmmCopyFields objectAtIndex:[ sender tag ] ];
+   NSPasteboard *generalPB = [ NSPasteboard generalPasteboard ];
+   int selectedRow = [ self rowForFilteredRow:[ documentView selectedRow ] ];
    if( [ fieldName isEqual:CSDocModelKey_Notes ] )
    {
-      [ generalPB declareTypes:[ NSArray arrayWithObjects:NSRTFDPboardType,
-                                                          NSRTFPboardType,
-                                                          nil ]
-                  owner:nil ];
-
-      [ generalPB setData:[ [ self document ] RTFDNotesAtRow:selectedRow ]
-                          forType:NSRTFDPboardType ];
-      [ generalPB setData:[ [ self document ] RTFNotesAtRow:selectedRow ]
-                          forType:NSRTFPboardType ];
+      [ generalPB declareTypes:[ NSArray arrayWithObjects:NSRTFDPboardType, NSRTFPboardType, nil ]
+                         owner:nil ];
+      [ generalPB setData:[ [ self document ] RTFDNotesAtRow:selectedRow ] forType:NSRTFDPboardType ];
+      [ generalPB setData:[ [ self document ] RTFNotesAtRow:selectedRow ] forType:NSRTFPboardType ];
    }
    else
    {
-      [ generalPB declareTypes:[ NSArray arrayWithObject:NSStringPboardType ]
-                  owner:nil ];
-      [ generalPB setString:[ [ self document ] stringForKey:fieldName
-                                                atRow:selectedRow ]
-                  forType:NSStringPboardType ];
+      [ generalPB declareTypes:[ NSArray arrayWithObject:NSStringPboardType ] owner:nil ];
+      [ generalPB setString:[ [ self document ] stringForKey:fieldName atRow:selectedRow ]
+                    forType:NSStringPboardType ];
    }
    [ [ NSApp delegate ] notePBChangeCount ];
 }
@@ -1013,22 +923,20 @@ static NSArray *searchWhatArray;
  */
 - (IBAction) cmmOpenURL:(id)sender
 {
-   BOOL urlIsInvalid;
-   int selectedRow;
-   NSURL *theURL;
-
-   urlIsInvalid = YES;
-   selectedRow = [ self rowForFilteredRow:[ documentView selectedRow ] ];
-   theURL = [ NSURL URLWithString:[ [ self document ]
-                                    stringForKey:CSDocModelKey_URL
-                                    atRow:selectedRow ] ];
-   if( theURL != nil && [ [ NSWorkspace sharedWorkspace ] openURL:theURL ] )
-      urlIsInvalid = NO;
-
-   if( urlIsInvalid )
+   int selectedRow = [ self rowForFilteredRow:[ documentView selectedRow ] ];
+   NSURL *theURL = [ NSURL URLWithString:[ [ self document ] stringForKey:CSDocModelKey_URL
+                                                                    atRow:selectedRow ] ];
+   if( theURL == nil || ![ [ NSWorkspace sharedWorkspace ] openURL:theURL ] )
       NSBeginInformationalAlertSheet( CSWINCTRLMAIN_LOC_INVALIDURL,
-                                      nil, nil, nil, [ self window ], nil, nil,
-                                      nil, nil, CSWINCTRLMAIN_LOC_URLNOTVALID );
+                                      nil,
+                                      nil,
+                                      nil,
+                                      [ self window ],
+                                      nil,
+                                      nil,
+                                      nil,
+                                      nil,
+                                      CSWINCTRLMAIN_LOC_URLNOTVALID );
 }
 
 
@@ -1037,25 +945,27 @@ static NSArray *searchWhatArray;
  */
 - (IBAction) cornerSelectField:(id)sender
 {
-   unsigned index;
-   BOOL enabled;
-
    if( [ sender tag ] == 0 )   // Show all columns
    {
+      unsigned int index;
       for( index = 1; index < [ columnSelectionArray count ]; index++ )
-         [ self setDisplayOfColumnID:[ columnSelectionArray objectAtIndex:index ]
-                enabled:YES ];
+         [ self setDisplayOfColumnID:[ columnSelectionArray objectAtIndex:index ] enabled:YES ];
    }
    else
    {
-      enabled = !( [ sender state ] == NSOnState );
+      BOOL enabled = ( [ sender state ] != NSOnState );
       if( [ [ documentView tableColumns ] count ] > 1 || enabled )
-         [ self setDisplayOfColumnID:
-                   [ columnSelectionArray objectAtIndex:[ sender tag ] ]
-                enabled:enabled ];
+         [ self setDisplayOfColumnID:[ columnSelectionArray objectAtIndex:[ sender tag ] ] enabled:enabled ];
       else
-         NSBeginCriticalAlertSheet( CSWINCTRLMAIN_LOC_NEEDCOL, nil, nil, nil,
-                                    [ self window ], nil, nil, nil, NULL,
+         NSBeginCriticalAlertSheet( CSWINCTRLMAIN_LOC_NEEDCOL,
+                                    nil,
+                                    nil,
+                                    nil,
+                                    [ self window ],
+                                    nil,
+                                    nil,
+                                    nil,
+                                    NULL,
                                     CSWINCTRLMAIN_LOC_NEEDCOLTEXT );
    }
    [ self updateCornerMenu ];
@@ -1108,8 +1018,7 @@ static NSArray *searchWhatArray;
  */
 - (void) setDocument:(NSDocument *)document
 {
-   if( [ self document ] != nil && document == nil &&
-       [ [ self document ] fileName ] != nil )
+   if( [ self document ] != nil && document == nil && [ [ self document ] fileName ] != nil )
    {
       [ self saveWindowState ];
       [ self saveTableState ];
@@ -1136,6 +1045,7 @@ static NSArray *searchWhatArray;
    [ self setSearchResultList:nil ];
    NSUserDefaults *stdDefaults = [ NSUserDefaults standardUserDefaults ];
    [ stdDefaults removeObserver:self forKeyPath:CSPrefDictKey_CellSpacing ];
+   [ stdDefaults removeObserver:self forKeyPath:CSPrefDictKey_TableAltBackground ];
    [ stdDefaults removeObserver:self forKeyPath:CSPrefDictKey_IncludeDefaultCategories ];
 }
 
