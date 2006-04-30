@@ -45,26 +45,8 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
 // What's considered short
 #define CSWINCTRLPASSPHRASE_SHORT_PASSPHRASE 8
 
-#define CSWINCTRLPASSPHRASE_TABVIEW_NOCONFIRM @"noconfirm"
-#define CSWINCTRLPASSPHRASE_TABVIEW_CONFIRM @"confirm"
-
 // Defines for localized strings
-#define CSWINCTRLPASSPHRASE_LOC_SHORTPHRASE \
-           NSLocalizedString( @"Short Passphrase", "short passphrase" )
-#define CSWINCTRLPASSPHRASE_LOC_PHRASEISSHORT \
-           NSLocalizedString( @"The entered passphrase is somewhat short, do " \
-                              @"you wish to use it anyway?", @"" )
-#define CSWINCTRLPASSPHRASE_LOC_USEIT NSLocalizedString( @"Use It", @"" )
-#define CSWINCTRLPASSPHRASE_LOC_ENTERAGAIN \
-           NSLocalizedString( @"Enter Again", @"" )
-#define CSWINCTRLPASSPHRASE_LOC_WINTITLE \
-           NSLocalizedString( @"Enter passphrase for %@", @"" )
-#define CSWINCTRLPASSPHRASE_LOC_DONTMATCH \
-           NSLocalizedString( @"Passphrases Don't Match", @"" )
-#define CSWINCTRLPASSPHRASE_LOC_NOMATCH \
-           NSLocalizedString( @"The passphrases do not match; do you wish to " \
-                              @"enter again or cancel?", @"" )
-#define CSWINCTRLPASSPHRASE_LOC_CANCEL NSLocalizedString( @"Cancel", @"" )
+#define CSWINCTRLPASSPHRASE_LOC_ENTERAGAIN NSLocalizedString( @"Enter Again", @"" )
 
 
 @implementation CSWinCtrlPassphrase
@@ -155,7 +137,8 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
 - (NSMutableData *) getEncryptionKeyWithNote:(NSString *)noteType
                             forDocumentNamed:(NSString *)docName
 {
-   [ [ self window ] setTitle:[ NSString stringWithFormat:CSWINCTRLPASSPHRASE_LOC_WINTITLE, docName ] ];
+   [ [ self window ] setTitle:[ NSString stringWithFormat:NSLocalizedString( @"Enter passphrase for %@", @"" ),
+                                                          docName ] ];
    [ passphraseNote1 setStringValue:NSLocalizedString( noteType, nil ) ];
    [ self setAndSizeWindowForView:nonConfirmView ];
    [ [ NSRunLoop currentRunLoop ]
@@ -222,22 +205,23 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
       if( ![ self doPassphrasesMatch ] )
       {
          // Ask for direction if the passphrases don't match
-         NSBeginAlertSheet( CSWINCTRLPASSPHRASE_LOC_DONTMATCH,
+         NSBeginAlertSheet( NSLocalizedString( @"Passphrases Don't Match", @"" ),
                             CSWINCTRLPASSPHRASE_LOC_ENTERAGAIN,
-                            CSWINCTRLPASSPHRASE_LOC_CANCEL,
+                            NSLocalizedString( @"Cancel", @"" ),
                             nil,
                             parentWindow,
                             self,
                             nil,
                             @selector( noMatchSheetDidDismiss:returnCode:contextInfo: ),
                             NULL,
-                            CSWINCTRLPASSPHRASE_LOC_NOMATCH );
+                            NSLocalizedString( @"The passphrases do not match; do you wish to enter again "
+                                               @"or cancel?", @"" ) );
       }
       else if( ( [ [ passphrasePhrase2 stringValue ] length ] < CSWINCTRLPASSPHRASE_SHORT_PASSPHRASE ) )
       {
          // Warn if it is short and the user pref is enabled
-         NSBeginAlertSheet( CSWINCTRLPASSPHRASE_LOC_SHORTPHRASE,
-                            CSWINCTRLPASSPHRASE_LOC_USEIT,
+         NSBeginAlertSheet( NSLocalizedString( @"Short Passphrase", @"" ),
+                            NSLocalizedString( @"Use It", @"" ),
                             CSWINCTRLPASSPHRASE_LOC_ENTERAGAIN,
                             nil,
                             parentWindow,
@@ -245,7 +229,8 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
                             nil,
                             @selector( shortPPSheetDidDismiss:returnCode:contextInfo: ),
                             NULL,
-                            CSWINCTRLPASSPHRASE_LOC_PHRASEISSHORT );
+                            NSLocalizedString( @"The entered passphrase is somewhat short, do you wish to " 
+                                               @"use it anyway?", @"" ) );
       }
       else   // All is well, send the key
          [ modalDelegate performSelector:sheetEndSelector withObject:[ self genKeyForConfirm:YES ] ];
