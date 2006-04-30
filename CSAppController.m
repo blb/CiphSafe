@@ -62,13 +62,12 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 @implementation CSAppController
 
 static NSString *MENUSPACE = @"   ";
+/*
 static CFAllocatorRef ciphSafeCFAllocator;
 static CFAllocatorRef originalCFAllocator;
 
 
-/*
- * These are the custom CoreFoundation allocator functions
- */
+// These are the custom CoreFoundation allocator functions
 void *ciphSafeCFReallocate( void *ptr, CFIndex newsize, CFOptionFlags hint, void *info )
 {
 //   return realloc( ptr, newsize );
@@ -82,7 +81,7 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
 //   return;
    CFAllocatorDeallocate( originalCFAllocator, ptr );
 }
-
+*/
 
 /*
  * Setup up default defaults
