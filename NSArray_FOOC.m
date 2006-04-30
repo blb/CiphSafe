@@ -41,12 +41,9 @@
  */
 - (id) firstObjectOfClass:(Class)classToFind
 {
-   NSEnumerator *objectEnumerator;
+   NSEnumerator *objectEnumerator = [ self objectEnumerator ];
    id someObject;
-
-   objectEnumerator = [ self objectEnumerator ];
-   while( ( someObject = [ objectEnumerator nextObject ] ) != nil &&
-          ![ someObject isKindOfClass:classToFind ] )
+   while( ( ( someObject = [ objectEnumerator nextObject ] ) != nil ) && ![ someObject isKindOfClass:classToFind ] )
       ;   // Simply iterate
 
    return someObject;
