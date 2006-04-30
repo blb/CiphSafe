@@ -80,10 +80,9 @@ static BOOL cryptoLoggingEnabled = YES;
  */
 + (void) logCryptoMessage:(NSString *)format, ...
 {
-   va_list args;
-   
    if( cryptoLoggingEnabled )
    {
+      va_list args;
       va_start( args, format );
       NSLogv( [ NSString stringWithFormat:@"NSData_crypto: %@\n", format ], args );
       va_end( args );
@@ -106,13 +105,9 @@ static BOOL cryptoLoggingEnabled = YES;
  */
 + (NSMutableData *) randomDataOfLength:(int)len
 {
-   NSMutableData *randomData;
-   ssize_t amtRead, oneRead;
-   NSFileHandle *devRandom;
-
-   randomData = nil;
-   amtRead = 0;
-   devRandom = [ NSFileHandle fileHandleForReadingAtPath:@"/dev/random" ];
+   NSMutableData *randomData = nil;
+   ssize_t amtRead = 0;
+   NSFileHandle *devRandom = [ NSFileHandle fileHandleForReadingAtPath:@"/dev/random" ];
    if( devRandom != nil )
    {
       randomData = [ NSMutableData dataWithLength:len ];
@@ -122,12 +117,12 @@ static BOOL cryptoLoggingEnabled = YES;
           * Here, we use read() instead of NSFileHandle's readDataOfLength:
           * because readDataOfLength: returns an NSData *, not NSMutableData *.
           */
-         oneRead = read( [ devRandom fileDescriptor ], [ randomData mutableBytes ],
-                         len - amtRead );
+         ssize_t oneRead = read( [ devRandom fileDescriptor ],
+                                 [ randomData mutableBytes ],
+                                 len - amtRead );
          if( oneRead <= 0 && ( errno != EINTR && errno != EAGAIN ) )
          {
-            [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_READERR, strerror( errno ),
-                                  errno ];
+            [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_READERR, strerror( errno ), errno ];
             randomData = nil;
             break;
          }
@@ -148,31 +143,30 @@ static BOOL cryptoLoggingEnabled = YES;
  */
 - (NSMutableData *) blowfishEncryptedDataWithKey:(NSData *)key iv:(NSData *)iv
 {
-   EVP_CIPHER_CTX cipherContext;
-   NSMutableData *encryptedData;
-   unsigned encLen, finalLen;
-
-   encryptedData = nil;
-   finalLen = 0;
+   NSMutableData *encryptedData = nil;
+   unsigned int finalLen = 0;
    if( [ iv length ] == 8 )
    {
+      EVP_CIPHER_CTX cipherContext;
       if( EVP_EncryptInit( &cipherContext, EVP_bf_cbc(), NULL, [ iv bytes ] ) )
       {
          if( EVP_CIPHER_CTX_set_key_length( &cipherContext, [ key length ] ) )
          {
             if( EVP_EncryptInit( &cipherContext, NULL, [ key bytes ], NULL ) )
             {
-               encLen = [ self length ] + 8;   // Make sure we have enough space
+               unsigned int encLen = [ self length ] + 8;   // Make sure we have enough space
                encryptedData = [ NSMutableData dataWithLength:encLen ];
                if( EVP_EncryptUpdate( &cipherContext,
-                                      [ encryptedData mutableBytes ], (int *) &encLen,
-                                      [ self bytes ], [ self length ] ) )
+                                      [ encryptedData mutableBytes ],
+                                      (int *) &encLen,
+                                      [ self bytes ],
+                                      [ self length ] ) )
                {
                   finalLen = encLen;
                   encLen = [ encryptedData length ] - finalLen;
                   if( EVP_EncryptFinal( &cipherContext,
-                                       [ encryptedData mutableBytes ] + finalLen,
-                                       (int *) &encLen ) )
+                                        [ encryptedData mutableBytes ] + finalLen,
+                                        (int *) &encLen ) )
                   {
                      finalLen += encLen;
                      [ encryptedData setLength:finalLen ];
@@ -209,24 +203,24 @@ static BOOL cryptoLoggingEnabled = YES;
  */
 - (NSMutableData *) blowfishDecryptedDataWithKey:(NSData *)key iv:(NSData *)iv
 {
-   EVP_CIPHER_CTX cipherContext;
-   NSMutableData *plainData;
-   unsigned decLen, finalLen;
-
-   plainData = nil;
-   finalLen = 0;
+   NSMutableData *plainData = nil;
+   unsigned int finalLen = 0;
    if( [ iv length ] == 8 )
    {
+      EVP_CIPHER_CTX cipherContext;
       if( EVP_DecryptInit( &cipherContext, EVP_bf_cbc(), NULL, [ iv bytes ] ) )
       {
          if( EVP_CIPHER_CTX_set_key_length( &cipherContext, [ key length ] ) )
          {
             if( EVP_DecryptInit( &cipherContext, NULL, [ key bytes ], NULL ) )
             {
-               decLen = [ self length ] + 8;   // Make sure there's enough room
+               unsigned int decLen = [ self length ] + 8;   // Make sure there's enough room
                plainData = [ NSMutableData dataWithLength:decLen ];
-               if( EVP_DecryptUpdate( &cipherContext, [ plainData mutableBytes ],
-                                      (int *) &decLen, [ self bytes ], [ self length ] ) )
+               if( EVP_DecryptUpdate( &cipherContext,
+                                      [ plainData mutableBytes ],
+                                      (int *) &decLen,
+                                      [ self bytes ],
+                                      [ self length ] ) )
                {
                   finalLen = decLen;
                   decLen = [ plainData length ] - finalLen;
@@ -269,18 +263,15 @@ static BOOL cryptoLoggingEnabled = YES;
 - (NSMutableData *) SHA1Hash
 {
    EVP_MD_CTX digestContext;
-   NSMutableData *hashValue;
-   unsigned int hashLen, writtenLen;
-
    EVP_DigestInit( &digestContext, EVP_sha1() );
-   hashLen = EVP_MD_CTX_size( &digestContext );
-   hashValue = [ NSMutableData dataWithLength:hashLen ];
+   unsigned int hashLen = EVP_MD_CTX_size( &digestContext );
+   NSMutableData *hashValue = [ NSMutableData dataWithLength:hashLen ];
    EVP_DigestUpdate( &digestContext, [ self bytes ], [ self length ] );
+   unsigned int writtenLen;
    EVP_DigestFinal( &digestContext, [ hashValue mutableBytes ], &writtenLen );
    if( writtenLen != hashLen )
    {
-      [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_DIGESTFINALFAIL, writtenLen,
-                            hashLen ];
+      [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_DIGESTFINALFAIL, writtenLen, hashLen ];
       hashValue = nil;
    }
 
