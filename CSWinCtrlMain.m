@@ -38,35 +38,6 @@
 #import "CSDocModel.h"
 
 
-// Localized strings
-#define CSWINCTRLMAIN_LOC_SUREDELROWS \
-           NSLocalizedString( @"Are you sure you want to delete the selected " \
-                              @"rows?", @"" )
-#define CSWINCTRLMAIN_LOC_SUREDELONEROW \
-           NSLocalizedString( @"Are you sure you want to delete the selected " \
-                              @"row?", @"" )
-#define CSWINCTRLMAIN_LOC_SURE NSLocalizedString( @"Are You Sure?", @"" )
-#define CSWINCTRLMAIN_LOC_DELETE NSLocalizedString( @"Delete", @"" )
-#define CSWINCTRLMAIN_LOC_CANCEL NSLocalizedString( @"Cancel", @"" )
-#define CSWINCTRLMAIN_LOC_DROP NSLocalizedString( @"Drop", @"" )
-#define CSWINCTRLMAIN_LOC_PASTE NSLocalizedString( @"Paste", @"" )
-#define CSWINCTRLMAIN_LOC_CUT NSLocalizedString( @"Cut", @"" )
-#define CSWINCTRLMAIN_LOC_ONEENTRY \
-           NSLocalizedString( @"1 entry, %d selected", @"" )
-#define CSWINCTRLMAIN_LOC_NUMENTRIES \
-           NSLocalizedString( @"%d entries, %d selected", @"" )
-#define CSWINCTRLMAIN_LOC_INVALIDURL NSLocalizedString( @"Invalid URL", @"" )
-#define CSWINCTRLMAIN_LOC_URLNOTVALID \
-           NSLocalizedString( @"The URL entered is not a valid URL", @"" )
-#define CSWINCTRLMAIN_LOC_SEARCH NSLocalizedString( @"search", @"" )
-#define CSWINCTRLMAIN_LOC_FILTERED NSLocalizedString( @"filtered", @"" )
-#define CSWINCTRLMAIN_LOC_NEEDCOL \
-           NSLocalizedString( @"Need at least one column", @"" )
-#define CSWINCTRLMAIN_LOC_NEEDCOLTEXT \
-           NSLocalizedString( @"At least one column is needed in order to " \
-           @"be useful", @"" )
-#define CSWINCTRLMAIN_LOC_NEWCATEGORY NSLocalizedString( @"New Category", @"" )
-
 // Accessory view export type tags
 const int CSWinCtrlMainExportType_CSV = 0;
 const int CSWinCtrlMainExportType_XML = 1;
@@ -337,7 +308,7 @@ static NSArray *searchWhatArray;
                                     action:@selector( setCategory: )
                              keyEquivalent:@"" ];
       [ categoriesMenu addItem:[ NSMenuItem separatorItem ] ];
-      [ categoriesMenu addItemWithTitle:CSWINCTRLMAIN_LOC_NEWCATEGORY
+      [ categoriesMenu addItemWithTitle:NSLocalizedString( @"New Category", @"" )
                                  action:@selector( setCategory: )
                           keyEquivalent:@"" ];
    }
@@ -387,11 +358,16 @@ static NSArray *searchWhatArray;
    int selectedCount = [ documentView numberOfSelectedRows ];
    NSString *statusString;
    if( entryCount == 1 )
-      statusString = [ NSString stringWithFormat:CSWINCTRLMAIN_LOC_ONEENTRY, selectedCount ];
+      statusString = [ NSString stringWithFormat:NSLocalizedString( @"1 entry, %d selected", @"" ),
+                                                 selectedCount ];
    else
-      statusString = [ NSString stringWithFormat:CSWINCTRLMAIN_LOC_NUMENTRIES, entryCount, selectedCount ];
+      statusString = [ NSString stringWithFormat:NSLocalizedString( @"%d entries, %d selected", @"" ),
+                                                 entryCount,
+                                                 selectedCount ];
    if( searchResultList != nil )
-      statusString = [ NSString stringWithFormat:@"%@ (%@)", statusString, CSWINCTRLMAIN_LOC_FILTERED ];
+      statusString = [ NSString stringWithFormat:@"%@ (%@)",
+                                                 statusString,
+                                                 NSLocalizedString( @"filtered", @"" ) ];
    [ documentStatus setStringValue:statusString ];
 }
 
@@ -592,12 +568,12 @@ static NSArray *searchWhatArray;
    {
       NSString *sheetQuestion;
       if( [ documentView numberOfSelectedRows ] > 1 )
-         sheetQuestion = CSWINCTRLMAIN_LOC_SUREDELROWS;
+         sheetQuestion = NSLocalizedString( @"Are you sure you want to delete the selected rows?", @"" );
       else
-         sheetQuestion = CSWINCTRLMAIN_LOC_SUREDELONEROW;
-      NSBeginCriticalAlertSheet( CSWINCTRLMAIN_LOC_SURE,
-                                 CSWINCTRLMAIN_LOC_DELETE,
-                                 CSWINCTRLMAIN_LOC_CANCEL,
+         sheetQuestion = NSLocalizedString( @"Are you sure you want to delete the selected row?", @"" );
+      NSBeginCriticalAlertSheet( NSLocalizedString( @"Are You Sure?", @"" ),
+                                 NSLocalizedString( @"Delete", @"" ),
+                                 NSLocalizedString( @"Cancel", @"" ),
                                  nil,
                                  [ self window ],
                                  self,
@@ -662,7 +638,7 @@ static NSArray *searchWhatArray;
 {
    [ [ self document ] copyNames:[ self getSelectedNames ] toPasteboard:[ NSPasteboard generalPasteboard ] ];
    [ [ self document ] deleteEntriesWithNamesInArray:[ self getSelectedNames ] ];
-   [ [ [ self document ] undoManager ] setActionName:CSWINCTRLMAIN_LOC_CUT ];
+   [ [ [ self document ] undoManager ] setActionName:NSLocalizedString( @"Cut", @"" ) ];
    [ [ NSApp delegate ] notePBChangeCount ];
 }
 
@@ -683,7 +659,7 @@ static NSArray *searchWhatArray;
 - (IBAction) paste:(id)sender
 {
    [ [ self document ] retrieveEntriesFromPasteboard:[ NSPasteboard generalPasteboard ]
-                                            undoName:CSWINCTRLMAIN_LOC_PASTE ];
+                                            undoName:NSLocalizedString( @"Paste", @"" ) ];
 }
 
 
@@ -799,7 +775,7 @@ static NSArray *searchWhatArray;
          dropOperation:(NSTableViewDropOperation)op
 {
    return [ [ self document ] retrieveEntriesFromPasteboard:[ info draggingPasteboard ]
-                                                   undoName:CSWINCTRLMAIN_LOC_DROP ];
+                                                   undoName:NSLocalizedString( @"Drop", @"" ) ];
 }
 
 
@@ -927,7 +903,7 @@ static NSArray *searchWhatArray;
    NSURL *theURL = [ NSURL URLWithString:[ [ self document ] stringForKey:CSDocModelKey_URL
                                                                     atRow:selectedRow ] ];
    if( theURL == nil || ![ [ NSWorkspace sharedWorkspace ] openURL:theURL ] )
-      NSBeginInformationalAlertSheet( CSWINCTRLMAIN_LOC_INVALIDURL,
+      NSBeginInformationalAlertSheet( NSLocalizedString( @"Invalid URL", @"" ),
                                       nil,
                                       nil,
                                       nil,
@@ -936,7 +912,7 @@ static NSArray *searchWhatArray;
                                       nil,
                                       nil,
                                       nil,
-                                      CSWINCTRLMAIN_LOC_URLNOTVALID );
+                                      NSLocalizedString( @"The URL entered is not a valid URL", @"" ) );
 }
 
 
@@ -957,7 +933,7 @@ static NSArray *searchWhatArray;
       if( [ [ documentView tableColumns ] count ] > 1 || enabled )
          [ self setDisplayOfColumnID:[ columnSelectionArray objectAtIndex:[ sender tag ] ] enabled:enabled ];
       else
-         NSBeginCriticalAlertSheet( CSWINCTRLMAIN_LOC_NEEDCOL,
+         NSBeginCriticalAlertSheet( NSLocalizedString( @"Need at least one column", @"" ),
                                     nil,
                                     nil,
                                     nil,
@@ -966,7 +942,8 @@ static NSArray *searchWhatArray;
                                     nil,
                                     nil,
                                     NULL,
-                                    CSWINCTRLMAIN_LOC_NEEDCOLTEXT );
+                                    NSLocalizedString( @"At least one column is needed in order to be useful",
+                                                       @"" ) );
    }
    [ self updateCornerMenu ];
 }
