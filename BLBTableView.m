@@ -43,7 +43,7 @@
 - (void) awakeFromNib
 {
    NSArray *tableColumns = [ self tableColumns ];
-   unsigned index;
+   unsigned int index;
    for( index = 0; index < [ tableColumns count ]; index++ )
       [ [ [ tableColumns objectAtIndex:index ] dataCell ] setDrawsBackground:NO ];
 }
@@ -63,11 +63,10 @@
       firstStripe++;   // We're only interested in drawing the stripes
    
    // Set up first rect
-   NSRect stripeRect;
-   stripeRect.origin.x = clipRect.origin.x;
-   stripeRect.origin.y = firstStripe * fullRowHeight;
-   stripeRect.size.width = clipRect.size.width;
-   stripeRect.size.height = fullRowHeight;
+   NSRect stripeRect = NSMakeRect( clipRect.origin.x,
+                                   firstStripe * fullRowHeight,
+                                   clipRect.size.width,
+                                   fullRowHeight );
    
    // Set the color
    [ stripeColor set ];
@@ -96,11 +95,10 @@
  */
 - (BOOL) validateMenuItem:(NSMenuItem *)menuItem
 {
-   BOOL retval = YES;
    if( [ menuItem action ] == @selector( deselectAll: ) )
-      retval = ( [ self numberOfSelectedRows ] > 0 );
+      return ( [ self numberOfSelectedRows ] > 0 );
 
-   return retval;
+   return YES;
 }
 
 

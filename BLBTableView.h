@@ -52,9 +52,8 @@
  * implement tableView:didReceiveKeyDownEvent: to handle key presses in the table
  */
 @interface NSObject (BLBTableViewDelegate)
-- (NSMenu *) contextualMenuForTableView:(BLBTableView *)tableView
-             row:(int)row
-             column:(int)column;
-- (BOOL) tableView:(BLBTableView *)tableView
-         didReceiveKeyDownEvent:(NSEvent *)theEvent;
+
+- (NSMenu *) contextualMenuForTableView:(BLBTableView *)tableView row:(int)row column:(int)column;
+- (BOOL) tableView:(BLBTableView *)tableView didReceiveKeyDownEvent:(NSEvent *)theEvent;
+
 @end
