@@ -44,13 +44,8 @@
 #import "NSAttributedString_RWDA.h"
 #import "NSData_clear.h"
 
-// Defines for localized strings
-#define CSDOCUMENT_LOC_NAMECOPYN NSLocalizedString( @"%@ copy %d", @"" )
-#define CSDOCUMENT_LOC_NAMECOPY NSLocalizedString( @"%@ copy", @"" )
 
-#define CSDOCUMENT_NAME @"CiphSafe Document"
-
-
+NSString * const CSDocument_Name = @"CiphSafe Document";
 NSString * const CSDocumentXML_RootNode = @"document";
 NSString * const CSDocumentXML_EntryNode = @"entry";
 
@@ -73,9 +68,9 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
    for( index = 0; [ self rowForName:uniqueName ] != -1; index++ )
    {
       if( index )
-         uniqueName = [ NSString stringWithFormat:CSDOCUMENT_LOC_NAMECOPYN, name, index ];
+         uniqueName = [ NSString stringWithFormat:NSLocalizedString( @"%@ copy %d", @"" ), name, index ];
       else
-         uniqueName = [ NSString stringWithFormat:CSDOCUMENT_LOC_NAMECOPY, name ];
+         uniqueName = [ NSString stringWithFormat:NSLocalizedString( @"%@ copy", @"" ), name ];
    }
    
    return uniqueName;
@@ -289,7 +284,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (NSData *) dataRepresentationOfType:(NSString *)aType
 {
-   NSAssert( [ aType isEqualToString:CSDOCUMENT_NAME ], @"Unknown file type" );
+   NSAssert( [ aType isEqualToString:CSDocument_Name ], @"Unknown file type" );
    NSAssert( bfKey != nil, @"key is nil" );
 
    return [ [ self model ] encryptedDataWithKey:bfKey ];
@@ -301,7 +296,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (BOOL) loadDataRepresentation:(NSData *)data ofType:(NSString *)aType
 {
-   NSAssert( [ aType isEqualToString:CSDOCUMENT_NAME ], @"Unknown file type" );
+   NSAssert( [ aType isEqualToString:CSDocument_Name ], @"Unknown file type" );
 
    if( docModel != nil )   // This'll happen on revert
    {
