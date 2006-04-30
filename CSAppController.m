@@ -129,9 +129,7 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
    if( [ userDefaults boolForKey:CSPrefDictKey_CloseAfterTimeout ] )
       [ self performSelector:@selector( closeAll: )
                   withObject:self
-                  afterDelay:( [ userDefaults integerForKey:
-                     CSPrefDictKey_CloseTimeout ]
-                               * 60 ) ];
+                  afterDelay:( [ userDefaults integerForKey:CSPrefDictKey_CloseTimeout ] * 60 ) ];
 }
 
 
@@ -171,14 +169,11 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (BOOL) isMenuItem:(id)menuItem forWindowControllerClass:(Class)theClass
 {
-   id target;
-   NSWindowController *winController;
-   
-   target = [ menuItem target ];
+   id target = [ menuItem target ];
    // Only windows may have window controllers
    if( [ target isKindOfClass:[ NSWindow class ] ] )
    {
-      winController = [ target windowController ];
+      NSWindowController *winController = [ target windowController ];
       if( [ winController isKindOfClass:[ theClass class ] ] )
          return YES;
    }
@@ -193,16 +188,11 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (void) rearrangeWindowMenu:(id)unused
 {
-   NSMenu *windowMenu;
-   NSMutableArray *windowMenuSecondaryItems;
-   NSEnumerator *itemEnumerator;
-   id menuItem;
-   int parentItemIndex;
-   
-   windowMenu = [ NSApp windowsMenu ];
-   windowMenuSecondaryItems = [ NSMutableArray arrayWithCapacity:25 ];
-   itemEnumerator = [ [ windowMenu itemArray ] objectEnumerator ];
+   NSMenu *windowMenu = [ NSApp windowsMenu ];
+   NSMutableArray *windowMenuSecondaryItems = [ NSMutableArray arrayWithCapacity:25 ];
+   NSEnumerator *itemEnumerator = [ [ windowMenu itemArray ] objectEnumerator ];
    // First, remove all secondary items which we want to rearrange
+   id menuItem;
    while( ( menuItem = [ itemEnumerator nextObject ] ) != nil )
    {
       // We only rearrange windows owned by CSWinCtrlEntry subclasses
@@ -211,8 +201,7 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
          // If it is already prefixed by spaces, we've already handled it
          if( [ [ menuItem title ] characterAtIndex:0 ] != ' ' )
          {
-            [ menuItem setTitle:[ MENUSPACE stringByAppendingString:
-               [ menuItem title ] ] ];
+            [ menuItem setTitle:[ MENUSPACE stringByAppendingString:[ menuItem title ] ] ];
             [ windowMenuSecondaryItems addObject:menuItem ];
             [ windowMenu removeItem:menuItem ];
          }
@@ -233,14 +222,12 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
           * from that, we can get the parent window.  The newly-added menu item
           * goes after that window's menu item.
           */
-         parentItemIndex = [ windowMenu indexOfItemWithTarget:
-            [ [ [ [ [ menuItem target ]
-               windowController ]
-               document ]
-               mainWindowController ]
-               window ]
-                                                    andAction:
-            @selector( makeKeyAndOrderFront: ) ];
+         int parentItemIndex = [ windowMenu indexOfItemWithTarget:[ [ [ [ [ menuItem target ]
+                                                                          windowController ]
+                                                                        document ]
+                                                                      mainWindowController ]
+                                                                    window ]
+                                                        andAction:@selector( makeKeyAndOrderFront: ) ];
          NSAssert( parentItemIndex >= 0, @"No parent window menu item" );
          if( parentItemIndex == [ windowMenu numberOfItems ] - 1 )
             [ windowMenu addItem:menuItem ];
@@ -258,19 +245,16 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (void) applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-   NSUserDefaults *userDefaults;
-
    [ [ NSNotificationCenter defaultCenter ]
      addObserver:self
-     selector:@selector( windowsMenuDidUpdate: )
-     name:NSMenuDidAddItemNotification
-     object:[ NSApp windowsMenu ] ];
-   userDefaults = [ NSUserDefaults standardUserDefaults ];
+        selector:@selector( windowsMenuDidUpdate: )
+            name:NSMenuDidAddItemNotification
+          object:[ NSApp windowsMenu ] ];
+   NSUserDefaults *userDefaults = [ NSUserDefaults standardUserDefaults ];
    if( [ userDefaults boolForKey:CSPrefDictKey_AutoOpen ] )
       [ [ NSDocumentController sharedDocumentController ]
-        openDocumentWithContentsOfFile:
-           [ userDefaults objectForKey:CSPrefDictKey_AutoOpenPath ]
-        display:YES ];
+        openDocumentWithContentsOfFile:[ userDefaults objectForKey:CSPrefDictKey_AutoOpenPath ]
+                               display:YES ];
    lastPBChangeCount = [ [ NSPasteboard generalPasteboard ] changeCount ] - 1;
 }
 
@@ -282,9 +266,7 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
 - (BOOL) applicationShouldOpenUntitledFile:(NSApplication *)sender
 {
    static BOOL initialShouldOpen = YES;
-   NSUserDefaults *userDefaults;
-
-   userDefaults = [ NSUserDefaults standardUserDefaults ];
+   NSUserDefaults *userDefaults = [ NSUserDefaults standardUserDefaults ];
    if( initialShouldOpen )
    {
       initialShouldOpen = NO;
@@ -320,13 +302,10 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (void) applicationWillTerminate:(NSNotification *)aNotification
 {
-   NSPasteboard *generalPB;
-   
    [ [ NSUserDefaults standardUserDefaults ] synchronize ];
-   generalPB = [ NSPasteboard generalPasteboard ];
-   if( [ [ NSUserDefaults standardUserDefaults ]
-         boolForKey:CSPrefDictKey_ClearClipboard ] &&
-       [ generalPB changeCount ] == lastPBChangeCount )
+   NSPasteboard *generalPB = [ NSPasteboard generalPasteboard ];
+   if( [ [ NSUserDefaults standardUserDefaults ] boolForKey:CSPrefDictKey_ClearClipboard ] &&
+       ( [ generalPB changeCount ] == lastPBChangeCount ) )
    {
       [ generalPB declareTypes:[ NSArray arrayWithObject:@"" ] owner:nil ];
       [ generalPB setString:@"" forType:@"" ];
@@ -392,17 +371,11 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (BOOL) validateMenuItem:(id <NSMenuItem>)menuItem
 {
-   SEL menuItemAction;
-   BOOL retval;
-
-   menuItemAction = [ menuItem action ];
-
-   retval = YES;
+   SEL menuItemAction = [ menuItem action ];
    if( menuItemAction == @selector( closeAll: ) )
-      retval = ( [ [ [ NSDocumentController sharedDocumentController ]
-                   documents ] count ] > 0 );
+      return ( [ [ [ NSDocumentController sharedDocumentController ] documents ] count ] > 0 );
 
-   return retval;
+   return YES;
 }
 
 
