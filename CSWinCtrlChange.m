@@ -38,10 +38,6 @@
 #import "CSDocModel.h"
 #import "CSAppController.h"
 
-// Defines for localized strings
-#define CSWINCTRLCHANGE_LOC_VIEW \
-           NSLocalizedString( @"View/Change %@ in %@", @"" )
-
 
 @implementation CSWinCtrlChange
 
@@ -230,7 +226,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 - (void) synchronizeWindowTitleWithDocumentName
 {
-   [ [ self window ] setTitle:[ NSString stringWithFormat:CSWINCTRLCHANGE_LOC_VIEW,
+   [ [ self window ] setTitle:[ NSString stringWithFormat:NSLocalizedString( @"View/Change %@ in %@", @"" ),
                                                           myEntryName,
                                                           [ [ self document ] displayName ] ] ];
 }
