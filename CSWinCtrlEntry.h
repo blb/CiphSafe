@@ -35,11 +35,9 @@
 #import <Cocoa/Cocoa.h>
 
 // Defines for localized strings
-#define CSWINCTRLENTRY_LOC_ENTRYEXISTS \
-        NSLocalizedString( @"Entry Already Exists", @"" )
-#define CSWINCTRLENTRY_LOC_ENTRYEXISTSRENAME \
-        NSLocalizedString( @"An entry with that name already exists, enter " \
-                           @"another name", @"" )
+#define CSWINCTRLENTRY_LOC_ENTRYEXISTS NSLocalizedString( @"Entry Already Exists", @"" )
+#define CSWINCTRLENTRY_LOC_ENTRYEXISTSRENAME NSLocalizedString( @"An entry with that name already " \
+                                                                @"exists, enter another name", @"" )
 
 @interface CSWinCtrlEntry : NSWindowController
 {
