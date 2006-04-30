@@ -145,8 +145,7 @@
  */
 - (NSMenu *) menuForEvent:(NSEvent *)theEvent
 {
-   SEL contextMenuSel = @selector( contextualMenuForTableView:row:column: );
-   if( [ [ self delegate ] respondsToSelector:contextMenuSel ] )
+   if( [ [ self delegate ] respondsToSelector:@selector( contextualMenuForTableView:row:column: ) ] )
    {
       NSPoint clickPoint = [ self convertPoint:[ theEvent locationInWindow ] fromView:nil ];
       int clickColumn = [ self columnAtPoint:clickPoint ];
