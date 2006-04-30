@@ -42,14 +42,12 @@
 
 - (NSData *) RTFWithDocumentAttributes:(NSDictionary *)dict
 {
-   return [ self RTFFromRange:NSMakeRange( 0, [ self length ] )
-                 documentAttributes:dict ];
+   return [ self RTFFromRange:NSMakeRange( 0, [ self length ] ) documentAttributes:dict ];
 }
 
 - (NSData *) RTFDWithDocumentAttributes:(NSDictionary *)dict
 {
-   return [ self RTFDFromRange:NSMakeRange( 0, [ self length ] )
-                 documentAttributes:dict ];
+   return [ self RTFDFromRange:NSMakeRange( 0, [ self length ] ) documentAttributes:dict ];
 }
 
 @end
