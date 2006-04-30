@@ -80,14 +80,14 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
       notesUM = [ [ NSUndoManager alloc ] init ];
       [ [ NSNotificationCenter defaultCenter ]
         addObserver:self
-        selector:@selector( undoManagerDidChange: )
-        name:NSUndoManagerDidUndoChangeNotification
-        object:notesUM ];
+           selector:@selector( undoManagerDidChange: )
+               name:NSUndoManagerDidUndoChangeNotification
+             object:notesUM ];
       [ [ NSNotificationCenter defaultCenter ]
         addObserver:self
-        selector:@selector( undoManagerDidChange: )
-        name:NSUndoManagerDidRedoChangeNotification
-        object:notesUM ];
+           selector:@selector( undoManagerDidChange: )
+               name:NSUndoManagerDidRedoChangeNotification
+             object:notesUM ];
       // Undo manager for everything else in the window
       otherUM = [ [ NSUndoManager alloc ] init ];
    }
@@ -136,36 +136,25 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 - (IBAction) generate:(id)sender
 {
    const char *genString;
-   int genStringLength;
-   int genSize;
-   NSMutableString *randomString;
-   NSMutableData *randomData;
-   unsigned char *randomBytes;
-   int index;
-
-   if( [ [ NSUserDefaults standardUserDefaults ]
-         boolForKey:CSPrefDictKey_AlphanumOnly ] )
+   if( [ [ NSUserDefaults standardUserDefaults ] boolForKey:CSPrefDictKey_AlphanumOnly ] )
       genString = genAlphanum;
    else
       genString = genAll;
-   genStringLength = strlen( genString );
-
-   genSize = [ [ NSUserDefaults standardUserDefaults ]
-               integerForKey:CSPrefDictKey_GenSize ];
-   randomString = [ NSMutableString stringWithCapacity:genSize ];
-   randomData = [ NSData randomDataOfLength:genSize ];
-   randomBytes = [ randomData mutableBytes ];
+   int genStringLength = strlen( genString );
+   int genSize = [ [ NSUserDefaults standardUserDefaults ] integerForKey:CSPrefDictKey_GenSize ];
+   NSMutableString *randomString = [ NSMutableString stringWithCapacity:genSize ];
+   NSMutableData *randomData = [ NSData randomDataOfLength:genSize ];
+   unsigned char *randomBytes = [ randomData mutableBytes ];
+   int index;
    for( index = 0; index < genSize; index++ )
-      [ randomString appendFormat:@"%c",
-                        genString[ randomBytes[ index ] % genStringLength ] ];
+      [ randomString appendFormat:@"%c", genString[ randomBytes[ index ] % genStringLength ] ];
    [ passwordText setStringValue:randomString ];
    [ randomData clearOutData ];
    /*
     * XXX deleteCharactersInRange: probably just changes its length; strings are
     * a pain in the ass in Cocoa from a security point of view
     */
-   [ randomString deleteCharactersInRange:
-                     NSMakeRange( 0, [ randomString length ] ) ];
+   [ randomString deleteCharactersInRange:NSMakeRange( 0, [ randomString length ] ) ];
 
    [ [ self window ] setDocumentEdited:YES ];
 }
@@ -176,18 +165,18 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
  */
 - (IBAction) openURL:(id)sender
 {
-   BOOL urlIsInvalid;
-   NSURL *theURL;
-
-   urlIsInvalid = YES;
-   theURL = [ NSURL URLWithString:[ urlText stringValue ] ];
-   if( theURL != nil && [ [ NSWorkspace sharedWorkspace ] openURL:theURL ] )
-      urlIsInvalid = NO;
-
-   if( urlIsInvalid )
+   NSURL *theURL = [ NSURL URLWithString:[ urlText stringValue ] ];
+   if( theURL == nil || ![ [ NSWorkspace sharedWorkspace ] openURL:theURL ] )
       NSBeginInformationalAlertSheet( CSWINCTRLENTRY_LOC_INVALIDURL,
-                                      nil, nil, nil, [ self window ], nil, nil,
-                                      nil, nil, CSWINCTRLENTRY_LOC_URLNOTVALID );
+                                      nil,
+                                      nil,
+                                      nil,
+                                      [ self window ],
+                                      nil,
+                                      nil,
+                                      nil,
+                                      nil,
+                                      CSWINCTRLENTRY_LOC_URLNOTVALID );
 }
 
 
@@ -219,12 +208,10 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
  */
 - (void) controlTextDidChange:(NSNotification *)aNotification
 {
-   NSString *nameTextString;
-
    [ self updateDocumentEditedStatus ];
    if( [ [ aNotification object ] isEqual:nameText ] )
    {
-      nameTextString = [ nameText stringValue ];
+      NSString *nameTextString = [ nameText stringValue ];
       if( nameTextString == nil || [ nameTextString length ] == 0 )
          [ mainButton setEnabled:NO ];
       else
@@ -256,26 +243,22 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
  */
 - (BOOL) windowShouldClose:(id)sender
 {
-   BOOL retval;
-   id alertPanel;
-
-   retval = YES;
    if( [ [ self window ] isDocumentEdited ] )
    {
-      alertPanel = NSGetCriticalAlertPanel( CSWINCTRLENTRY_LOC_NOTSAVED,
-                                            CSWINCTRLENTRY_LOC_NOTSAVEDCLOSE,
-                                            CSWINCTRLENTRY_LOC_CLOSEANYWAY,
-                                            CSWINCTRLENTRY_LOC_DONTCLOSE, nil );
+      id alertPanel = NSGetCriticalAlertPanel( CSWINCTRLENTRY_LOC_NOTSAVED,
+                                               CSWINCTRLENTRY_LOC_NOTSAVEDCLOSE,
+                                               CSWINCTRLENTRY_LOC_CLOSEANYWAY,
+                                               CSWINCTRLENTRY_LOC_DONTCLOSE,
+                                               nil );
       [ NSApp beginSheet:alertPanel
               modalForWindow:[ self window ]
               modalDelegate:self
-              didEndSelector:
-                 @selector( closeSheetDidEnd:returnCode:contextInfo: )
+              didEndSelector:@selector( closeSheetDidEnd:returnCode:contextInfo: )
               contextInfo:NULL ];
-      retval = NO;
+      return NO;
    }
 
-   return retval;
+   return YES;
 }
 
 
@@ -285,9 +268,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
  */
 - (void) windowWillClose:(NSNotification *)notification
 {
-   NSWindow *sheet;
-
-   sheet = [ [ self window ] attachedSheet ];
+   NSWindow *sheet = [ [ self window ] attachedSheet ];
    if( sheet != nil )
       [ NSApp endSheet:sheet ];
 }
@@ -299,9 +280,8 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
  */
 - (void) updateDocumentEditedStatus
 {
-   if( [ self nameChanged ] || [ self accountChanged ] ||
-       [ self passwordChanged ] || [ self urlChanged ] ||
-       [ self categoryChanged ] || [ self notesChanged ] )
+   if( [ self nameChanged ] || [ self accountChanged ] || [ self passwordChanged ] ||
+       [ self urlChanged ] || [ self categoryChanged ] || [ self notesChanged ] )
       [ [ self window ] setDocumentEdited:YES ];
    else
       [ [ self window ] setDocumentEdited:NO ];
@@ -325,8 +305,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
    return nil;
 }
 
-- (unsigned int) comboBox:(NSComboBox *)aComboBox
-                 indexOfItemWithStringValue:(NSString *)aString
+- (unsigned int) comboBox:(NSComboBox *)aComboBox indexOfItemWithStringValue:(NSString *)aString
 {
    if( [ aComboBox isEqual:category ] )
       return [ [ [ self document ] categories ] indexOfObject:aString ];
