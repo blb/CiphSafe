@@ -63,7 +63,7 @@
 // Copy/paste support (and drag/drop)
 - (BOOL) copyNames:(NSArray *)names toPasteboard:(NSPasteboard *)pboard;
 - (BOOL) retrieveEntriesFromPasteboard:(NSPasteboard *)pboard
-         undoName:(NSString *)undoName;
+                              undoName:(NSString *)undoName;
 
 // Category information
 - (NSArray *) categories;
@@ -82,24 +82,24 @@
 - (NSAttributedString *) RTFStringNotesAtRow:(int)row;
 - (int) rowForName:(NSString *)name;
 - (BOOL) addEntryWithName:(NSString *)name
-         account:(NSString *)account
-         password:(NSString *)password
-         URL:(NSString *)url
-         category:(NSString *)category
-         notesRTFD:(NSData *)notes;
+                  account:(NSString *)account
+                 password:(NSString *)password
+                      URL:(NSString *)url
+                 category:(NSString *)category
+                notesRTFD:(NSData *)notes;
 - (BOOL) changeEntryWithName:(NSString *)name
-         newName:(NSString *)newName
-         account:(NSString *)account
-         password:(NSString *)password
-         URL:(NSString *)url
-         category:(NSString *)category
-         notesRTFD:(NSData *)notes;
+                     newName:(NSString *)newName
+                     account:(NSString *)account
+                    password:(NSString *)password
+                         URL:(NSString *)url
+                    category:(NSString *)category
+                   notesRTFD:(NSData *)notes;
 - (unsigned) deleteEntriesWithNamesInArray:(NSArray *)nameArray;
 - (NSNumber *) firstRowBeginningWithString:(NSString *)findMe
-               ignoreCase:(BOOL)ignoreCase
-               forKey:(NSString *)key;
+                                ignoreCase:(BOOL)ignoreCase
+                                    forKey:(NSString *)key;
 - (NSArray *) rowsMatchingString:(NSString *)findMe
-              ignoreCase:(BOOL)ignoreCase
-              forKey:(NSString *)key;
+                      ignoreCase:(BOOL)ignoreCase
+                          forKey:(NSString *)key;
 
 @end
