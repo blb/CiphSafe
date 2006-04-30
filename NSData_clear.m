@@ -42,22 +42,19 @@
  */
 - (void) clearOutData
 {
-   BOOL isMutable;
-   char *someData;
-   int index, length;
-   Ivar ivar;
-
    if( [ self isKindOfClass:NSClassFromString( @"NSConcreteData" ) ] ||
        [ self isKindOfClass:NSClassFromString( @"NSConcreteMutableData" ) ] )
    {
+      BOOL isMutable;
       if( [ self isKindOfClass:NSClassFromString( @"NSConcreteData" ) ] )
          isMutable = NO;
       else
          isMutable = YES;
-      someData = NULL;
+      char *someData = NULL;
+      int index;
       for( index = 0; index < isa->ivars->ivar_count; index++ )
       {
-         ivar = &isa->ivars->ivar_list[ index ];
+         Ivar ivar = &isa->ivars->ivar_list[ index ];
          if( strcmp( ivar->ivar_name, "_bytes" ) == 0 )
          {
             if( isMutable )
@@ -68,7 +65,7 @@
       }
       if( someData != NULL )   // We found _bytes
       {
-         length = [ self length ];
+         int length = [ self length ];
          for( index = 0; index < length; index++ )
             someData[ index ] = 0;
       }
@@ -76,8 +73,7 @@
          NSLog( @"NSData_clear: warning, couldn't find _bytes\n" );
    }
    else
-      NSLog( @"NSData_clear: warning, can't clear class %@\n",
-             NSStringFromClass( [ self class ] ) );
+      NSLog( @"NSData_clear: warning, can't clear class %@\n", NSStringFromClass( [ self class ] ) );
 }
 
 @end
