@@ -42,33 +42,10 @@
 #include <unistd.h>
 #include <openssl/evp.h>
 
+
 // Localized strings
-#define NSDATA_CRYPTO_LOC_READERR \
-        NSLocalizedString( @"read() error in randomDataOfLength: %s (%d)", @"" )
-#define NSDATA_CRYPTO_LOC_FAILOPENRAND \
-        NSLocalizedString( @"failed to open /dev/random", @"" )
-#define NSDATA_CRYPTO_LOC_ENCRYPTFINALFAIL \
-        NSLocalizedString( @"EVP_EncryptFinal() failed", @"" )
-#define NSDATA_CRYPTO_LOC_ENCRYPTUPDATEFAIL \
-        NSLocalizedString( @"EVP_EncryptUpdate() failed", @"" )
-#define NSDATA_CRYPTO_LOC_ENCRYPTINITFAIL \
-        NSLocalizedString( @"EVP_EncryptInit() failed (setting key)", @"" )
-#define NSDATA_CRYPTO_LOC_SETKEYLENFAIL \
-        NSLocalizedString( @"EVP_CIPHER_CTX_set_key_length failed", @"" )
-#define NSDATA_CRYPTO_LOC_ENCRYPTINITINITIALFAIL \
-        NSLocalizedString( @"EVP_EncryptInit() failed (initial)", @"" )
-#define NSDATA_CRYPTO_LOC_IVBAD NSLocalizedString( @"iv is %d bytes, not 8", @"" )
-#define NSDATA_CRYPTO_LOC_DECRYPTFINALFAIL \
-        NSLocalizedString( @"EVP_DecryptFinal() failed", @"" )
-#define NSDATA_CRYPT_LOC_DECRYPTUPDATEFAIL \
-        NSLocalizedString( @"EVP_DecryptUpdate() failed", @"" )
-#define NSDATA_CRYPTO_LOC_DECRYPTINITSETKEYFAIL \
-        NSLocalizedString( @"EVP_DecryptInit() failed (setting key)", @"" )
-#define NSDATA_CRYPTO_LOC_DECRYPTINITINTIALFAIL \
-        NSLocalizedString( @"EVP_DecryptInit() failed (initial)", @"" )
-#define NSDATA_CRYPTO_LOC_DIGESTFINALFAIL \
-        NSLocalizedString( @"EVP_DigestFinal wrote %u bytes, not the expected " \
-        @"of %u", @"" )
+#define NSDATA_CRYPTO_LOC_SETKEYLENFAIL NSLocalizedString( @"EVP_CIPHER_CTX_set_key_length failed", @"" )
+#define NSDATA_CRYPTO_LOC_IVBAD         NSLocalizedString( @"iv is %d bytes, not 8", @"" )
 
 
 @implementation NSData (withay_crypto)
@@ -122,7 +99,9 @@ static BOOL cryptoLoggingEnabled = YES;
                                  len - amtRead );
          if( oneRead <= 0 && ( errno != EINTR && errno != EAGAIN ) )
          {
-            [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_READERR, strerror( errno ), errno ];
+            [ NSData logCryptoMessage:NSLocalizedString( @"read() error in randomDataOfLength: %s (%d)", @"" ),
+                                      strerror( errno ),
+                                      errno ];
             randomData = nil;
             break;
          }
@@ -131,7 +110,7 @@ static BOOL cryptoLoggingEnabled = YES;
       [ devRandom closeFile ];
    }
    else
-      [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_FAILOPENRAND ];
+      [ NSData logCryptoMessage:NSLocalizedString( @"failed to open /dev/random", @"" ) ];
 
    return randomData;
 }
@@ -172,20 +151,20 @@ static BOOL cryptoLoggingEnabled = YES;
                      [ encryptedData setLength:finalLen ];
                   }
                   else
-                     [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_ENCRYPTFINALFAIL ];
+                     [ NSData logCryptoMessage:NSLocalizedString( @"EVP_EncryptFinal() failed", @"" ) ];
                }
                else
-                  [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_ENCRYPTUPDATEFAIL ];
+                  [ NSData logCryptoMessage:NSLocalizedString( @"EVP_EncryptUpdate() failed", @"" ) ];
             }
             else
-               [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_ENCRYPTINITFAIL ];
+               [ NSData logCryptoMessage:NSLocalizedString( @"EVP_EncryptInit() failed (setting key)", @"" ) ];
          }
          else
             [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_SETKEYLENFAIL ];
          EVP_CIPHER_CTX_cleanup( &cipherContext );
       }
       else
-         [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_ENCRYPTINITINITIALFAIL ];
+         [ NSData logCryptoMessage:NSLocalizedString( @"EVP_EncryptInit() failed (initial)", @"" ) ];
    }
    else
       [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_IVBAD, [ iv length ] ];
@@ -232,20 +211,20 @@ static BOOL cryptoLoggingEnabled = YES;
                      [ plainData setLength:finalLen ];
                   }
                   else
-                     [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_DECRYPTFINALFAIL ];
+                     [ NSData logCryptoMessage:NSLocalizedString( @"EVP_DecryptFinal() failed", @"" ) ];
                }
                else
-                  [ NSData logCryptoMessage:NSDATA_CRYPT_LOC_DECRYPTUPDATEFAIL ];
+                  [ NSData logCryptoMessage:NSLocalizedString( @"EVP_DecryptUpdate() failed", @"" ) ];
             }
             else
-               [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_DECRYPTINITSETKEYFAIL ];
+               [ NSData logCryptoMessage:NSLocalizedString( @"EVP_DecryptInit() failed (setting key)", @"" ) ];
          }
          else
             [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_SETKEYLENFAIL ];
          EVP_CIPHER_CTX_cleanup( &cipherContext );
       }
       else
-         [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_DECRYPTINITINTIALFAIL ];
+         [ NSData logCryptoMessage:NSLocalizedString( @"EVP_DecryptInit() failed (initial)", @"" ) ];
    }
    else
       [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_IVBAD, [ iv length ] ];
@@ -271,7 +250,10 @@ static BOOL cryptoLoggingEnabled = YES;
    EVP_DigestFinal( &digestContext, [ hashValue mutableBytes ], &writtenLen );
    if( writtenLen != hashLen )
    {
-      [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_DIGESTFINALFAIL, writtenLen, hashLen ];
+      [ NSData logCryptoMessage:NSLocalizedString( @"EVP_DigestFinal wrote %u bytes, not the expected of %u",
+                                                   @"" ),
+                                writtenLen,
+                                hashLen ];
       hashValue = nil;
    }
 
