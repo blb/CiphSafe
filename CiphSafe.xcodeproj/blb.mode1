@@ -415,9 +415,9 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>64F7895409FE12AC007E847C</string>
+				<string>64ED8F5E0A0536160054CA26</string>
 				<string>1CE0B1FE06471DED0097A5F4</string>
-				<string>64F7895509FE12AC007E847C</string>
+				<string>64ED8F5F0A0536160054CA26</string>
 				<string>1CE0B20306471E060097A5F4</string>
 				<string>1CE0B20506471E060097A5F4</string>
 			</array>
@@ -536,7 +536,7 @@
 	<key>StatusbarIsVisible</key>
 	<true/>
 	<key>TimeStamp</key>
-	<real>167645868.89781299</real>
+	<real>168144819.72884801</real>
 	<key>ToolbarDisplayMode</key>
 	<integer>1</integer>
 	<key>ToolbarIsVisible</key>
@@ -552,6 +552,7 @@
 	<key>WindowOrderList</key>
 	<array>
 		<string>1C0AD2B3069F1EA900FABCE6</string>
+		<string>1C530D57069F1CE1000CFCEE</string>
 		<string>64FCAE2809E8744700F59756</string>
 		<string>/Users/blb/devel/build/CiphSafe/update104/CiphSafe.xcodeproj</string>
 	</array>
@@ -599,7 +600,7 @@
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXBuildLogShowsTranscriptDefaultKey</key>
-								<string>{{0, 130}, {500, 324}}</string>
+								<string>{{0, 118}, {500, 336}}</string>
 								<key>PBXProjectModuleGUID</key>
 								<string>XCMainBuildResultsModuleGUID</string>
 								<key>PBXProjectModuleLabel</key>
@@ -637,7 +638,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>64FCAE2809E8744700F59756</string>
-				<string>64F7893209FE0F7D007E847C</string>
+				<string>64ED8F6E0A053BE80054CA26</string>
 				<string>1CD0528F0623707200166675</string>
 				<string>XCMainBuildResultsModuleGUID</string>
 			</array>
@@ -679,8 +680,8 @@
 										<string>yes</string>
 										<key>sizes</key>
 										<array>
-											<string>{{0, 0}, {359, 192}}</string>
-											<string>{{359, 0}, {496, 192}}</string>
+											<string>{{0, 0}, {342, 189}}</string>
+											<string>{{342, 0}, {513, 189}}</string>
 										</array>
 									</dict>
 									<key>VerticalSplitView</key>
@@ -695,8 +696,8 @@
 										<string>yes</string>
 										<key>sizes</key>
 										<array>
-											<string>{{0, 0}, {855, 192}}</string>
-											<string>{{0, 192}, {855, 273}}</string>
+											<string>{{0, 0}, {855, 189}}</string>
+											<string>{{0, 189}, {855, 276}}</string>
 										</array>
 									</dict>
 								</dict>
@@ -743,14 +744,14 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1CD10A99069EF8BA00B06720</string>
-				<string>64FAB0F809F60BC400C6FDBA</string>
+				<string>64E6C7970A02BB5E00064073</string>
 				<string>1C162984064C10D400B95A72</string>
-				<string>64FAB0F909F60BC400C6FDBA</string>
-				<string>64FAB0FA09F60BC400C6FDBA</string>
-				<string>64FAB0FB09F60BC400C6FDBA</string>
-				<string>64FAB0FC09F60BC400C6FDBA</string>
-				<string>64FAB0FD09F60BC400C6FDBA</string>
-				<string>64FAB0FE09F60BC400C6FDBA</string>
+				<string>64E6C7980A02BB5E00064073</string>
+				<string>64E6C7990A02BB5E00064073</string>
+				<string>64E6C79A0A02BB5E00064073</string>
+				<string>64E6C79B0A02BB5E00064073</string>
+				<string>64E6C79C0A02BB5E00064073</string>
+				<string>64E6C79D0A02BB5E00064073</string>
 			</array>
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.debug</string>
@@ -840,8 +841,8 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1C530D57069F1CE1000CFCEE</string>
-				<string>64EC74B209FDB14D0063DFA3</string>
-				<string>64EC74B309FDB14D0063DFA3</string>
+				<string>64ED8F700A053BE80054CA26</string>
+				<string>64ED8F710A053BE80054CA26</string>
 				<string>1CDD528C0622207200134675</string>
 				<string>1CD0528E0623707200166675</string>
 			</array>
@@ -869,8 +870,6 @@
 					<key>Dock</key>
 					<array>
 						<dict>
-							<key>BecomeActive</key>
-							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
@@ -906,7 +905,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>64F0C80009F48C700027748E</string>
-				<string>64FAB0FF09F60BC400C6FDBA</string>
+				<string>64E6C79E0A02BB5E00064073</string>
 				<string>1C78EAAC065D492600B07095</string>
 			</array>
 			<key>WindowString</key>
@@ -951,8 +950,8 @@
 										<string>yes</string>
 										<key>sizes</key>
 										<array>
-											<string>{{0, 0}, {367, 168}}</string>
-											<string>{{0, 173}, {367, 270}}</string>
+											<string>{{0, 0}, {366, 168}}</string>
+											<string>{{0, 173}, {366, 270}}</string>
 										</array>
 									</dict>
 									<key>VerticalSplitView</key>
@@ -1001,9 +1000,9 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1C0AD2B3069F1EA900FABCE6</string>
-				<string>64F7895109FE12A1007E847C</string>
+				<string>64ED8F950A0542A30054CA26</string>
 				<string>1CD0528B0623707200166675</string>
-				<string>64F7895209FE12A1007E847C</string>
+				<string>64ED8F960A0542A30054CA26</string>
 			</array>
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.run</string>

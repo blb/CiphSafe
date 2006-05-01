@@ -29,8 +29,6 @@
 		64FCADCC09E870ED00F59756 /* NSData_compress.m in Sources */ = {isa = PBXBuildFile; fileRef = 64FCADB809E870ED00F59756 /* NSData_compress.m */; };
 		64FCADCD09E870ED00F59756 /* NSData_crypto.m in Sources */ = {isa = PBXBuildFile; fileRef = 64FCADBA09E870ED00F59756 /* NSData_crypto.m */; };
 		64FCADCE09E870ED00F59756 /* ReadMe.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 64FCADBB09E870ED00F59756 /* ReadMe.rtf */; };
-		64FCADCF09E870ED00F59756 /* sortArrowDown.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 64FCADBC09E870ED00F59756 /* sortArrowDown.tiff */; };
-		64FCADD009E870ED00F59756 /* sortArrowUp.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 64FCADBD09E870ED00F59756 /* sortArrowUp.tiff */; };
 		64FCAE1409E8725700F59756 /* CSDocument.nib in Resources */ = {isa = PBXBuildFile; fileRef = 64FCADFA09E8725700F59756 /* CSDocument.nib */; };
 		64FCAE1509E8725700F59756 /* CSDocumentAdd.nib in Resources */ = {isa = PBXBuildFile; fileRef = 64FCADFC09E8725700F59756 /* CSDocumentAdd.nib */; };
 		64FCAE1609E8725700F59756 /* CSDocumentChange.nib in Resources */ = {isa = PBXBuildFile; fileRef = 64FCADFE09E8725700F59756 /* CSDocumentChange.nib */; };
@@ -103,8 +101,6 @@
 		64FCADB909E870ED00F59756 /* NSData_crypto.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = NSData_crypto.h; sourceTree = "<group>"; };
 		64FCADBA09E870ED00F59756 /* NSData_crypto.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NSData_crypto.m; sourceTree = "<group>"; };
 		64FCADBB09E870ED00F59756 /* ReadMe.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = ReadMe.rtf; sourceTree = "<group>"; };
-		64FCADBC09E870ED00F59756 /* sortArrowDown.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = sortArrowDown.tiff; sourceTree = "<group>"; };
-		64FCADBD09E870ED00F59756 /* sortArrowUp.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = sortArrowUp.tiff; sourceTree = "<group>"; };
 		64FCADFB09E8725700F59756 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/CSDocument.nib; sourceTree = "<group>"; };
 		64FCADFD09E8725700F59756 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/CSDocumentAdd.nib; sourceTree = "<group>"; };
 		64FCADFF09E8725700F59756 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/CSDocumentChange.nib; sourceTree = "<group>"; };
@@ -211,8 +207,6 @@
 				64FCAE0209E8725700F59756 /* Localizable.strings */,
 				2A37F4B6FDCFA73011CA2CEA /* MainMenu.nib */,
 				64FCADBB09E870ED00F59756 /* ReadMe.rtf */,
-				64FCADBC09E870ED00F59756 /* sortArrowDown.tiff */,
-				64FCADBD09E870ED00F59756 /* sortArrowUp.tiff */,
 				6478D27C09F2EF020023B67B /* DefaultCategories.plist */,
 				6412E63509F3619000F421C0 /* DefaultPrefs.plist */,
 			);
@@ -283,6 +277,7 @@
 				8D15AC2B0486D014006FF6A4 /* Resources */,
 				8D15AC300486D014006FF6A4 /* Sources */,
 				8D15AC330486D014006FF6A4 /* Frameworks */,
+				64188A660A049063006D7A24 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -326,8 +321,6 @@
 				8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */,
 				64FCADC009E870ED00F59756 /* CiphSafe.icns in Resources */,
 				64FCADCE09E870ED00F59756 /* ReadMe.rtf in Resources */,
-				64FCADCF09E870ED00F59756 /* sortArrowDown.tiff in Resources */,
-				64FCADD009E870ED00F59756 /* sortArrowUp.tiff in Resources */,
 				64FCAE1409E8725700F59756 /* CSDocument.nib in Resources */,
 				64FCAE1509E8725700F59756 /* CSDocumentAdd.nib in Resources */,
 				64FCAE1609E8725700F59756 /* CSDocumentChange.nib in Resources */,
@@ -341,6 +334,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		64188A660A049063006D7A24 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = /Users/blb/scripts/xcode_svn_infoplist.py;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8D15AC300486D014006FF6A4 /* Sources */ = {
@@ -454,6 +463,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = CiphSafe;
+				WARNING_CFLAGS = "-Wall";
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = YES;
 			};
@@ -471,6 +481,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = CiphSafe;
+				WARNING_CFLAGS = "-Wall";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
