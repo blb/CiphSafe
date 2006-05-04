@@ -367,6 +367,18 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
 
 
 /*
+ * Sent by the prefs window
+ */
+- (BOOL) windowShouldClose:(id)sender
+{
+   if( [ sender isEqual:prefsWindow ] )
+      return [ sender makeFirstResponder:nil ];
+
+   return YES;
+}
+
+
+/*
  * Enable only valid menu items
  */
 - (BOOL) validateMenuItem:(id <NSMenuItem>)menuItem
