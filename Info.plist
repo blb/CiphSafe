@@ -52,7 +52,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.3beta1</string>
+	<string>1.3beta2</string>
 	<key>CFBundleVersion</key>
 	<string>@@SVN_REVISION@@</string>
 	<key>NSMainNibFile</key>
