@@ -10,7 +10,6 @@
 		6412E63609F3619000F421C0 /* DefaultPrefs.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6412E63509F3619000F421C0 /* DefaultPrefs.plist */; };
 		6478D27D09F2EF020023B67B /* DefaultCategories.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6478D27C09F2EF020023B67B /* DefaultCategories.plist */; };
 		64D6E3AA09E99F2400904206 /* CiphSafe Help in Resources */ = {isa = PBXBuildFile; fileRef = 64D6E39B09E99F2400904206 /* CiphSafe Help */; };
-		64D6E3D409E9B25500904206 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8D15AC360486D014006FF6A4 /* Info.plist */; };
 		64F0C7E609F486390027748E /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64F0C7BB09F486390027748E /* CoreFoundation.framework */; };
 		64F7893709FE0FFE007E847C /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 64F7893609FE0FFE007E847C /* libz.dylib */; };
 		64FCADBE09E870ED00F59756 /* BLBTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 64FCAD9D09E870ED00F59756 /* BLBTableView.m */; };
@@ -109,7 +108,7 @@
 		64FCAE1E09E8732200F59756 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
 		64FCAE2009E8734200F59756 /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = /usr/lib/libssl.dylib; sourceTree = "<absolute>"; };
 		8D15AC360486D014006FF6A4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		8D15AC370486D014006FF6A4 /* CiphSafe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiphSafe.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D15AC370486D014006FF6A4 /* CiphSafe.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CiphSafe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -327,7 +326,6 @@
 				64FCAE1709E8725700F59756 /* CSPassphrase.nib in Resources */,
 				64FCAE1809E8725700F59756 /* Localizable.strings in Resources */,
 				64D6E3AA09E99F2400904206 /* CiphSafe Help in Resources */,
-				64D6E3D409E9B25500904206 /* Info.plist in Resources */,
 				6478D27D09F2EF020023B67B /* DefaultCategories.plist in Resources */,
 				6412E63609F3619000F421C0 /* DefaultPrefs.plist in Resources */,
 			);
@@ -460,6 +458,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G4;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = DEBUG;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = CiphSafe;
@@ -478,6 +477,7 @@
 				);
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G4;
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = DEBUG;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = CiphSafe;
