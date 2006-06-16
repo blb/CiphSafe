@@ -106,8 +106,28 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
       // XXX And again, setStringValue:?
       [ passphrasePhrase1 setStringValue:@"" ];
    }
-   
+
    NSData *passphraseData = [ passphrase dataUsingEncoding:NSUnicodeStringEncoding ];
+   const unsigned char *dataBytes = [ passphraseData bytes ];
+   /*
+    * When CiphSafe was originally written, and PowerPC was the only architecture, this innocent-looking
+    * use of dataUsingEncoding: above was safe.  Now, however, with Intel-based Macs, this returns a
+    * little endian representation, and will cause it to fail with older documents.  We need to detect
+    * this and reverse bytes to put it into big endian.
+    */
+   if( dataBytes[ 0 ] == 0xFF && dataBytes[ 1 ] == 0xFE )
+   {
+      NSMutableData *newData = [ NSMutableData dataWithLength:[ passphraseData length ] ];
+      unsigned char *newBytes = [ newData mutableBytes ];
+      unsigned int position;
+      for( position = 0; position < [ passphraseData length ]; position += 2 )
+      {
+         newBytes[ position ] = dataBytes[ position + 1 ];
+         newBytes[ position + 1 ] = dataBytes[ position ];
+      }
+      [ passphraseData clearOutData ];
+      passphraseData = newData;
+   }
    int pdLen = [ passphraseData length ];
    NSData *dataFirst = [ passphraseData subdataWithRange:NSMakeRange( 0, pdLen / 2 ) ];
    NSData *dataSecond = [ passphraseData subdataWithRange:NSMakeRange( pdLen / 2, pdLen - pdLen / 2 ) ];
