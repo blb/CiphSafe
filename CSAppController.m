@@ -252,9 +252,14 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
           object:[ NSApp windowsMenu ] ];
    NSUserDefaults *userDefaults = [ NSUserDefaults standardUserDefaults ];
    if( [ userDefaults boolForKey:CSPrefDictKey_AutoOpen ] )
-      [ [ NSDocumentController sharedDocumentController ]
-        openDocumentWithContentsOfFile:[ userDefaults objectForKey:CSPrefDictKey_AutoOpenPath ]
-                               display:YES ];
+   {
+      NSDocumentController *sharedDocController = [ NSDocumentController sharedDocumentController ];
+      if( [ [ sharedDocController documents ] count ] == 0 )
+      {
+         NSURL *fileURL = [ NSURL fileURLWithPath:[ userDefaults objectForKey:CSPrefDictKey_AutoOpenPath ] ];
+         [ sharedDocController openDocumentWithContentsOfURL:fileURL display:YES error:NULL ];
+      }
+   }
    lastPBChangeCount = [ [ NSPasteboard generalPasteboard ] changeCount ] - 1;
 }
 
