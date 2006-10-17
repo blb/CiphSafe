@@ -670,7 +670,7 @@ static NSArray *searchWhatArray;
 {
    SEL menuItemAction = [ menuItem action ];
    if( menuItemAction == @selector( copy: ) || menuItemAction == @selector( cut: ) ||
-       menuItemAction == @selector( setCategory: ) )
+       menuItemAction == @selector( setCategory: ) || menuItemAction == @selector( delete: ) )
       return ( [ documentView numberOfSelectedRows ] > 0 );
    else if( menuItemAction == @selector( paste: ) )
       return ( [ [ NSPasteboard generalPasteboard ] 
