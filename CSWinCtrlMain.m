@@ -97,7 +97,6 @@ static NSArray *searchWhatArray;
    if( self != nil )
    {
       [ self setShouldCloseDocument:YES ];
-      currentSearchCategory = CSWinCtrlMainTag_Name;
       searchResultList = nil;
    }
 
@@ -339,10 +338,9 @@ static NSArray *searchWhatArray;
       NSString *searchKey = [ searchWhatArray objectAtIndex:currentSearchCategory ];
       if( [ searchKey isEqualToString:@"all" ] )   // For all, use a nil key
          searchKey = nil;
-      [ self setSearchResultList:[ [ self document ]
-                                   rowsMatchingString:searchString
-                                           ignoreCase:YES
-                                               forKey:searchKey ] ];
+      [ self setSearchResultList:[ [ self document ] rowsMatchingString:searchString
+                                                             ignoreCase:YES
+                                                                 forKey:searchKey ] ];
    }
    else
       [ self setSearchResultList:nil ];
@@ -477,6 +475,7 @@ static NSArray *searchWhatArray;
  */
 - (void) awakeFromNib
 {
+   // Load window/table info from prefs when opening a document, otherwise use defaults
    if( [ [ self document ] fileName ] != nil )
    {
       [ self loadSavedWindowState ];
@@ -492,18 +491,35 @@ static NSArray *searchWhatArray;
    previouslySelectedColumn = [ documentView tableColumnWithIdentifier:[ [ self document ] sortKey ] ];
    [ documentView setHighlightedTableColumn:previouslySelectedColumn ];
    [ self setSortingImageForColumn:previouslySelectedColumn ];
-   /*
-    * The table view is set as the initialFirstResponder, but we have to do
-    * this as well
-    */
+
+   // The table view is set as the initialFirstResponder, but we have to do this as well
    [ [ self window ] makeFirstResponder:documentView ];
+
    [ documentView registerForDraggedTypes:[ NSArray arrayWithObject:CSDocumentPboardType ] ];
+
+   // The corner view and header view both offer the menu for selecting what columns to show
    [ [ documentView cornerView ] setMenu:cmmTableHeader ];
    [ [ documentView headerView ] setMenu:cmmTableHeader ];
+
    [ self setTableViewSpacing ];
    [ self refreshWindow ];
-   [ [ searchField cell ] setPlaceholderString:NSLocalizedString( CSDocModelKey_Name, nil ) ];
+
+   // Load last-used search key from prefs, or All if none
    NSUserDefaults *stdDefaults = [ NSUserDefaults standardUserDefaults ];
+   NSString *currentSearchKey = [ stdDefaults stringForKey:CSPrefDictKey_CurrentSearchKey ];
+   if( currentSearchKey == nil )
+   {
+      [ [ searchField cell ] setPlaceholderString:NSLocalizedString( @"all", nil ) ];
+      currentSearchCategory = CSWinCtrlMainTag_All;
+   }
+   else
+   {
+      [ [ searchField cell ] setPlaceholderString:NSLocalizedString( currentSearchKey, nil ) ];
+      currentSearchCategory = [ searchWhatArray indexOfObject:currentSearchKey ];
+   }
+   [ [ searchCategoryMenu itemWithTag:currentSearchCategory ] setState:NSOnState ];
+
+   // Load stripe color from prefs, or the default blue if none
    NSColor *stripeColor = [ NSUnarchiver unarchiveObjectWithData:
                                             [ stdDefaults objectForKey:CSPrefDictKey_TableAltBackground ] ];
    if( stripeColor == nil )
@@ -513,6 +529,8 @@ static NSArray *searchWhatArray;
                                                                alpha:1.0 ] ];
    else
       [ documentView setStripeColor:stripeColor ];
+
+   // Finally, listen for changes to certain prefs
    [ stdDefaults addObserver:self forKeyPath:CSPrefDictKey_CellSpacing options:0 context:NULL ];
    [ stdDefaults addObserver:self forKeyPath:CSPrefDictKey_TableAltBackground options:0 context:NULL ];
    [ stdDefaults addObserver:self forKeyPath:CSPrefDictKey_IncludeDefaultCategories options:0 context:NULL ];
@@ -625,8 +643,10 @@ static NSArray *searchWhatArray;
    [ previousCategoryItem setState:NSOffState ];
    currentSearchCategory = [ sender tag ];
    [ sender setState:NSOnState ];
-   [ [ searchField cell ]
-     setPlaceholderString:NSLocalizedString( [ searchWhatArray objectAtIndex:currentSearchCategory ], nil ) ];
+   NSString *searchCategoryString = [ searchWhatArray objectAtIndex:currentSearchCategory ];
+   [ [ searchField cell ] setPlaceholderString:NSLocalizedString( searchCategoryString, nil ) ];
+   [ [ NSUserDefaults standardUserDefaults ] setObject:searchCategoryString
+                                                forKey:CSPrefDictKey_CurrentSearchKey ];
    [ self refreshWindow ];
 }
 

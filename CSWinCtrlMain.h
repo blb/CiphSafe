@@ -55,6 +55,7 @@ extern const int CSWinCtrlMainExportType_XML;
    IBOutlet NSTextField *documentStatus;
    IBOutlet NSMenu *contextualMenu;
    IBOutlet NSMenu *cmmTableHeader;
+   IBOutlet NSMenu *searchCategoryMenu;
    IBOutlet NSSearchField *searchField;
 
    // New Category window

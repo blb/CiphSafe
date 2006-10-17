@@ -51,6 +51,7 @@ extern NSString * const CSPrefDictKey_CloseTimeout;
 extern NSString * const CSPrefDictKey_CellSpacing;
 extern NSString * const CSPrefDictKey_TableAltBackground;
 extern NSString * const CSPrefDictKey_IncludeDefaultCategories;
+extern NSString * const CSPrefDictKey_CurrentSearchKey;
 
 // Name of our internal pasteboard type
 extern NSString * const CSDocumentPboardType;

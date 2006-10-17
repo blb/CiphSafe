@@ -20,7 +20,6 @@
         {
             ACTIONS = {
                 addEntry = id; 
-                changeExportFileType = id; 
                 cmmCopyField = id; 
                 cmmOpenURL = id; 
                 cornerSelectField = id; 
@@ -45,6 +44,7 @@
                 exportType = NSPopUpButton; 
                 newCategory = NSTextField; 
                 newCategoryWindow = NSPanel; 
+                searchCategoryMenu = NSMenu; 
                 searchField = NSSearchField; 
             }; 
             SUPERCLASS = NSWindowController; 
