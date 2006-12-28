@@ -292,7 +292,9 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 
 - (id) comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(int)index
 {
-   if( [ aComboBox isEqual:category ] )
+   if( index == -1 )   // Apparently, it'll ask for object at -1, so make sure to tell it it's being stupid
+      return nil;
+   else if( [ aComboBox isEqual:category ] )
       return [ [ [ self document ] categories ] objectAtIndex:index ];
    return nil;
 }
