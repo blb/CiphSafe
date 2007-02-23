@@ -421,6 +421,20 @@ static NSArray *searchWhatArray;
 
 
 /*
+ * Select all rows with names in the given array
+ */
+- (void) selectNames:(NSArray *)names
+{
+   NSEnumerator *nameEnumerator = [ names objectEnumerator ];
+   NSString *rowName;
+   NSMutableIndexSet *rowIndex = [ NSMutableIndexSet indexSet ];
+   while( ( rowName = [ nameEnumerator nextObject ] ) != nil )
+      [ rowIndex addIndex:[ [ self document ] rowForName:rowName ] ];
+   [ documentView selectRowIndexes:rowIndex byExtendingSelection:NO ];
+}
+
+
+/*
  * Called when the "really delete" sheet is done
  */
 - (void) deleteSheetDidEnd:(NSWindow *)sheet

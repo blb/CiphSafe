@@ -854,13 +854,21 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
                     category:(NSString *)category
                    notesRTFD:(NSData *)notes
 {
-   return [ [ self model ] changeEntryWithName:name
-                                       newName:newName
-                                       account:account
-                                      password:password
-                                           URL:url
-                                      category:category
-                                     notesRTFD:notes ];
+   NSMutableArray *selectedNames = [ NSMutableArray arrayWithArray:[ mainWindowController getSelectedNames ] ];
+   if( ![ name isEqualToString:newName ] )
+      [ selectedNames replaceObjectAtIndex:[ selectedNames indexOfObject:name ]
+                                withObject:newName ];
+   BOOL changeSuccessful = [ [ self model ] changeEntryWithName:name
+                                                        newName:newName
+                                                        account:account
+                                                       password:password
+                                                            URL:url
+                                                       category:category
+                                                      notesRTFD:notes ];
+   if( changeSuccessful )
+      [ mainWindowController selectNames:selectedNames ];
+
+   return changeSuccessful;
 }
 
 

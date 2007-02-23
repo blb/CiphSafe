@@ -96,6 +96,12 @@ extern const int CSWinCtrlMainExportType_XML;
 // List of selected items indices
 - (NSIndexSet *) selectedRowIndexes;
 
+// Array of the names for selected rows in the table view
+- (NSArray *) getSelectedNames;
+
+// Select all rows with names in the given array
+- (void) selectNames:(NSArray *)names;
+
 // Provide access to the export accessory view
 - (NSView *) exportAccessoryView;
 - (int) exportType;
