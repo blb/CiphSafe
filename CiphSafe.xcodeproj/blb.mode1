@@ -267,8 +267,6 @@
 			<key>Layout</key>
 			<array>
 				<dict>
-					<key>BecomeActive</key>
-					<true/>
 					<key>ContentConfiguration</key>
 					<dict>
 						<key>PBXBottomSmartGroupGIDs</key>
@@ -379,6 +377,8 @@
 							<string>0pt</string>
 						</dict>
 						<dict>
+							<key>BecomeActive</key>
+							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
@@ -415,9 +415,9 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>640D64630A428BD90001B16C</string>
+				<string>644952490B8E7A620032A2A3</string>
 				<string>1CE0B1FE06471DED0097A5F4</string>
-				<string>640D64640A428BD90001B16C</string>
+				<string>6449524A0B8E7A620032A2A3</string>
 				<string>1CE0B20306471E060097A5F4</string>
 				<string>1CE0B20506471E060097A5F4</string>
 			</array>
@@ -536,7 +536,7 @@
 	<key>StatusbarIsVisible</key>
 	<true/>
 	<key>TimeStamp</key>
-	<real>172133546.624652</real>
+	<real>193894603.69082499</real>
 	<key>ToolbarDisplayMode</key>
 	<integer>1</integer>
 	<key>ToolbarIsVisible</key>
@@ -551,8 +551,9 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>64FCAE2809E8744700F59756</string>
+		<string>1C530D57069F1CE1000CFCEE</string>
 		<string>1C0AD2B3069F1EA900FABCE6</string>
+		<string>64FCAE2809E8744700F59756</string>
 		<string>/Users/blb/devel/build/CiphSafe/update104/CiphSafe.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
@@ -586,7 +587,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {500, 0}}</string>
 								<key>RubberWindowFrame</key>
-								<string>469 318 500 500 0 0 1280 1002 </string>
+								<string>186 292 500 500 0 0 1280 1002 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
@@ -599,7 +600,7 @@
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXBuildLogShowsTranscriptDefaultKey</key>
-								<string>{{0, 181}, {500, 273}}</string>
+								<string>{{0, 134}, {500, 320}}</string>
 								<key>PBXProjectModuleGUID</key>
 								<string>XCMainBuildResultsModuleGUID</string>
 								<key>PBXProjectModuleLabel</key>
@@ -614,7 +615,7 @@
 								<key>Frame</key>
 								<string>{{0, 5}, {500, 454}}</string>
 								<key>RubberWindowFrame</key>
-								<string>469 318 500 500 0 0 1280 1002 </string>
+								<string>186 292 500 500 0 0 1280 1002 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXBuildResultsModule</string>
@@ -637,14 +638,14 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>64FCAE2809E8744700F59756</string>
-				<string>640D642D0A424CE70001B16C</string>
+				<string>6449524E0B8E7A9F0032A2A3</string>
 				<string>1CD0528F0623707200166675</string>
 				<string>XCMainBuildResultsModuleGUID</string>
 			</array>
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.build</string>
 			<key>WindowString</key>
-			<string>469 318 500 500 0 0 1280 1002 </string>
+			<string>186 292 500 500 0 0 1280 1002 </string>
 			<key>WindowToolGUID</key>
 			<string>64FCAE2809E8744700F59756</string>
 			<key>WindowToolIsVisible</key>
@@ -679,8 +680,8 @@
 										<string>yes</string>
 										<key>sizes</key>
 										<array>
-											<string>{{0, 0}, {342, 189}}</string>
-											<string>{{342, 0}, {513, 189}}</string>
+											<string>{{0, 0}, {342, 186}}</string>
+											<string>{{342, 0}, {513, 186}}</string>
 										</array>
 									</dict>
 									<key>VerticalSplitView</key>
@@ -695,8 +696,8 @@
 										<string>yes</string>
 										<key>sizes</key>
 										<array>
-											<string>{{0, 0}, {855, 189}}</string>
-											<string>{{0, 189}, {855, 276}}</string>
+											<string>{{0, 0}, {855, 186}}</string>
+											<string>{{0, 186}, {855, 279}}</string>
 										</array>
 									</dict>
 								</dict>
@@ -743,14 +744,14 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1CD10A99069EF8BA00B06720</string>
-				<string>64E6C7970A02BB5E00064073</string>
+				<string>6497B0C30B439E3E00471B1F</string>
 				<string>1C162984064C10D400B95A72</string>
-				<string>64E6C7980A02BB5E00064073</string>
-				<string>64E6C7990A02BB5E00064073</string>
-				<string>64E6C79A0A02BB5E00064073</string>
-				<string>64E6C79B0A02BB5E00064073</string>
-				<string>64E6C79C0A02BB5E00064073</string>
-				<string>64E6C79D0A02BB5E00064073</string>
+				<string>6497B0C40B439E3E00471B1F</string>
+				<string>6497B0C50B439E3E00471B1F</string>
+				<string>6497B0C60B439E3E00471B1F</string>
+				<string>6497B0C70B439E3E00471B1F</string>
+				<string>6497B0C80B439E3E00471B1F</string>
+				<string>6497B0C90B439E3E00471B1F</string>
 			</array>
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.debug</string>
@@ -838,8 +839,8 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1C530D57069F1CE1000CFCEE</string>
-				<string>641E54A20A3B90D40070D71B</string>
-				<string>641E54A30A3B90D40070D71B</string>
+				<string>644952680B8E91430032A2A3</string>
+				<string>644952690B8E91430032A2A3</string>
 				<string>1CDD528C0622207200134675</string>
 				<string>1CD0528E0623707200166675</string>
 			</array>
@@ -902,7 +903,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>64F0C80009F48C700027748E</string>
-				<string>64E6C79E0A02BB5E00064073</string>
+				<string>6497B0CA0B439E3E00471B1F</string>
 				<string>1C78EAAC065D492600B07095</string>
 			</array>
 			<key>WindowString</key>
@@ -947,8 +948,8 @@
 										<string>yes</string>
 										<key>sizes</key>
 										<array>
-											<string>{{0, 0}, {367, 168}}</string>
-											<string>{{0, 173}, {367, 270}}</string>
+											<string>{{0, 0}, {366, 168}}</string>
+											<string>{{0, 173}, {366, 270}}</string>
 										</array>
 									</dict>
 									<key>VerticalSplitView</key>
@@ -997,9 +998,9 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1C0AD2B3069F1EA900FABCE6</string>
-				<string>640D64210A4246890001B16C</string>
+				<string>6449524F0B8E7A9F0032A2A3</string>
 				<string>1CD0528B0623707200166675</string>
-				<string>640D64220A4246890001B16C</string>
+				<string>644952500B8E7A9F0032A2A3</string>
 			</array>
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.run</string>
