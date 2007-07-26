@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -52,6 +52,12 @@ extern NSString * const CSPrefDictKey_CellSpacing;
 extern NSString * const CSPrefDictKey_TableAltBackground;
 extern NSString * const CSPrefDictKey_IncludeDefaultCategories;
 extern NSString * const CSPrefDictKey_CurrentSearchKey;
+extern NSString * const CSPrefDictKey_CloseAfterTimeoutSaveOption;
+
+// Possible values for CloseAfterTimeoutSaveOption preference
+extern const int CSPrefCloseAfterTimeoutSaveOption_Save;
+extern const int CSPrefCloseAfterTimeoutSaveOption_Discard;
+extern const int CSPrefCloseAfterTimeoutSaveOption_Ask;
 
 // Name of our internal pasteboard type
 extern NSString * const CSDocumentPboardType;
@@ -59,6 +65,7 @@ extern NSString * const CSDocumentPboardType;
 @interface CSAppController : NSObject
 {
    int lastPBChangeCount;
+   BOOL closeAllFromTimeout;
 
    IBOutlet NSMenuItem *editMenuSetCategory;
    // Preferences window
@@ -67,6 +74,9 @@ extern NSString * const CSDocumentPboardType;
 
 // Note the general pasteboard's current change count
 - (void) notePBChangeCount;
+
+// Returns YES when a closeAll was caused by an app timeout
+- (BOOL) closeAllFromTimeout;
 
 // Give out the Set Category menu item
 - (id <NSMenuItem>) editMenuSetCategoryMenuItem;

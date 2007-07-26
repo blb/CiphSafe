@@ -35,5 +35,7 @@
    <data>
    BAt0eXBlZHN0cmVhbYED6IQBQISEhAdOU0NvbG9yAISECE5TT2JqZWN0AIWEAWMBhARmZmZmgz9t7e6DP3Ly8wEBhg==
    </data>
+   <key>CSPrefDictKey_CloseAfterTimeoutSaveOption</key>
+   <integer>0</integer>
 </dict>
 </plist>

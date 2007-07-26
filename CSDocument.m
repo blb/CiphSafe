@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -559,6 +559,30 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 - (CSWinCtrlMain *) mainWindowController
 {
    return mainWindowController;
+}
+
+
+/*
+ * Override so we can handle timeout-specific closes; save or discard changes if those options are set then
+ * fall to super's implementation.
+ */
+- (void) canCloseDocumentWithDelegate:(id)delegate
+                  shouldCloseSelector:(SEL)shouldCloseSelector
+                          contextInfo:(void *)contextInfo
+{
+   CSAppController *appController = (CSAppController *) [ NSApp delegate ];
+   if( [ appController closeAllFromTimeout ] )
+   {
+      int saveOption = [ [ NSUserDefaults standardUserDefaults ]
+                         integerForKey:CSPrefDictKey_CloseAfterTimeoutSaveOption ];
+      if( saveOption == CSPrefCloseAfterTimeoutSaveOption_Save )
+         [ self saveDocument:self ];
+      else if( saveOption == CSPrefCloseAfterTimeoutSaveOption_Discard )
+         [ self updateChangeCount:NSChangeCleared ];
+   }
+   [ super canCloseDocumentWithDelegate:delegate
+                    shouldCloseSelector:shouldCloseSelector
+                            contextInfo:contextInfo ]; 
 }
 
 

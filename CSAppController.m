@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -56,6 +56,12 @@ NSString * const CSPrefDictKey_CellSpacing = @"CSPrefDictKey_CellSpacing";
 NSString * const CSPrefDictKey_TableAltBackground = @"CSPrefDictKey_TableAltBackground";
 NSString * const CSPrefDictKey_IncludeDefaultCategories = @"CSPrefDictKey_IncludeDefaultCategories";
 NSString * const CSPrefDictKey_CurrentSearchKey = @"CSPrefDictKey_CurrentSearchKey";
+NSString * const CSPrefDictKey_CloseAfterTimeoutSaveOption = @"CSPrefDictKey_CloseAfterTimeoutSaveOption";
+
+// Values should match the tag values in IB
+const int CSPrefCloseAfterTimeoutSaveOption_Save = 0;
+const int CSPrefCloseAfterTimeoutSaveOption_Discard = 1;
+const int CSPrefCloseAfterTimeoutSaveOption_Ask = 2;
 
 NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 
@@ -116,6 +122,16 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
    ciphSafeCFAllocator = CFAllocatorCreate( NULL, &allocContext );
    CFAllocatorSetDefault( ciphSafeCFAllocator );
     */
+}
+
+
+- (id) init
+{
+   self = [ super init ];
+   if( self != nil )
+      closeAllFromTimeout = NO;
+
+   return self;
 }
 
 
@@ -330,6 +346,16 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
 
 
 /*
+ * Note if a close all was caused by the timeout option, so documents can decide whether to act on the
+ * close all save option, or just ask.
+ */
+- (BOOL) closeAllFromTimeout
+{
+   return closeAllFromTimeout;
+}
+
+
+/*
  * Give out the Set Category menu item
  */
 - (id <NSMenuItem>) editMenuSetCategoryMenuItem
@@ -398,14 +424,13 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
 
 
 /*
- * A selector is required for the closeAll... stuff for the document
- * controller
+ * Note that a timeout is no longer what caused a close all
  */
 - (void) docController:(NSDocumentController *)docController
            didCloseAll:(BOOL)didCloseAll
            contextInfo:(void *)contextInfo
 {
-   // We don't need to do anything
+   closeAllFromTimeout = NO;
 }
 
 
@@ -414,6 +439,8 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (IBAction) closeAll:(id)sender
 {
+   if( sender == self )
+      closeAllFromTimeout = YES;
    [ [ NSDocumentController sharedDocumentController ]
      closeAllDocumentsWithDelegate:self
                didCloseAllSelector:@selector( docController:didCloseAll:contextInfo: )
