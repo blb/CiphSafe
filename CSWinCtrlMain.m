@@ -786,7 +786,26 @@ static NSArray *searchWhatArray;
          writeRowsWithIndexes:(NSIndexSet *)rowIndexes
          toPasteboard:(NSPasteboard*)pboard
 {
-   return [ [ self document ] copyNames:[ self namesFromIndexes:rowIndexes ] toPasteboard:pboard ];
+   dragNamesArray = [ [ self namesFromIndexes:rowIndexes ] retain ];
+   return [ [ self document ] copyNames:dragNamesArray toPasteboard:pboard ];
+}
+
+
+/*
+ * Handle moving of data during a drag
+ */
+- (void) blbTableView:(BLBTableView *)tableView
+ completedDragAtPoint:(NSPoint)aPoint
+            operation:(NSDragOperation)operation
+{
+   if( operation == NSDragOperationMove )
+   {
+      [ [ self document ] deleteEntriesWithNamesInArray:dragNamesArray ];
+      [ [ [ self document ] undoManager ] setActionName:NSLocalizedString( @"Move", @"" ) ];
+      [ [ NSApp delegate ] notePBChangeCount ];
+   }
+   [ dragNamesArray release ];
+   dragNamesArray = nil;
 }
 
 
@@ -799,7 +818,10 @@ static NSArray *searchWhatArray;
                     proposedRow:(int)row
                     proposedDropOperation:(NSTableViewDropOperation)op
 {
-   return NSDragOperationCopy;
+   if( [ info draggingSourceOperationMask ] == NSDragOperationGeneric )
+      return NSDragOperationMove;
+   else
+      return NSDragOperationCopy;
 }
 
 

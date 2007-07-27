@@ -50,10 +50,14 @@
  * implement contextualMenuForBLBTableView:row:column: to add a contextual menu for
  * the given row and column
  * implement blbTableView:didReceiveKeyDownEvent: to handle key presses in the table
+ * implement blbTableView:completedDragAtPoint:operation: to handle any post-drag functionality
  */
 @interface NSObject (BLBTableViewDelegate)
 
 - (NSMenu *) contextualMenuForBLBTableView:(BLBTableView *)tableView row:(int)row column:(int)column;
 - (BOOL) blbTableView:(BLBTableView *)tableView didReceiveKeyDownEvent:(NSEvent *)theEvent;
+- (void) blbTableView:(BLBTableView *)tableView
+ completedDragAtPoint:(NSPoint)aPoint
+            operation:(NSDragOperation)operation;
 
 @end

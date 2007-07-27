@@ -48,6 +48,7 @@ extern const int CSWinCtrlMainExportType_XML;
    NSTableColumn *previouslySelectedColumn;
    NSArray *searchResultList;
    int currentSearchCategory;
+   NSArray *dragNamesArray;
 
    IBOutlet BLBTableView *documentView;
    IBOutlet NSButton *documentDeleteButton;

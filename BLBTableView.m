@@ -161,6 +161,17 @@
 
 
 /*
+ * Notify delegate when a drop operation is complete
+ */
+- (void) draggedImage:(NSImage *)anImage endedAt:(NSPoint)aPoint operation:(NSDragOperation)operation
+{
+   [ super draggedImage:anImage endedAt:aPoint operation:operation ];
+   if( [ [ self delegate ] respondsToSelector:@selector( blbTableView:completedDragAtPoint:operation: ) ] )
+      [ [ self delegate ] blbTableView:self completedDragAtPoint:aPoint operation:operation ];
+}
+
+
+/*
  * Cleanup
  */
 - (void) dealloc
