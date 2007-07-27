@@ -15,6 +15,10 @@
 			<string>CiphSafe</string>
 			<key>CFBundleTypeName</key>
 			<string>CiphSafe Document</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>****</string>
+			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSItemContentTypes</key>
@@ -48,7 +52,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.3beta2</string>
+	<string>1.3beta3</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
@@ -62,16 +66,16 @@
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>
-			<key>UTTypeIdentifier</key>
-			<string>com.withay.ciphsafe.doc</string>
-			<key>UTTypeDescription</key>
-			<string>CiphSafe Document</string>
-			<key>UTTypeIconFile</key>
-			<string>CiphSafe.icns</string>
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>public.data</string>
 			</array>
+			<key>UTTypeDescription</key>
+			<string>CiphSafe Document</string>
+			<key>UTTypeIconFile</key>
+			<string>CiphSafe.icns</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.withay.ciphsafe.doc</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>
@@ -83,4 +87,3 @@
 	</array>
 </dict>
 </plist>
-
