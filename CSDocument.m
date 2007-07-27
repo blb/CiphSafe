@@ -280,6 +280,31 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 
 
 /*
+ * Override so we can make sure the document is saved with mode 0600, read/write only for owner.
+ */
+- (NSDictionary *) fileAttributesToWriteToURL:(NSURL *)absoluteURL
+                                       ofType:(NSString *)typeName
+                             forSaveOperation:(NSSaveOperationType)saveOperation
+                          originalContentsURL:(NSURL *)absoluteOriginalContentsURL
+                                        error:(NSError **)outError
+{
+   NSDictionary *attrDictionary = [ super fileAttributesToWriteToURL:absoluteURL
+                                                              ofType:typeName
+                                                    forSaveOperation:saveOperation
+                                                 originalContentsURL:absoluteOriginalContentsURL
+                                                               error:outError ];
+   if( attrDictionary != nil )
+   {
+      NSMutableDictionary *newDictionary = [ NSMutableDictionary dictionaryWithDictionary:attrDictionary ];
+      [ newDictionary setValue:[ NSNumber numberWithUnsignedLong:0600 ] forKey:NSFilePosixPermissions ];
+      attrDictionary = newDictionary;
+   }
+
+   return attrDictionary;
+}
+
+
+/*
  * For save
  */
 - (NSData *) dataRepresentationOfType:(NSString *)aType
