@@ -383,6 +383,17 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (IBAction) prefsAutoOpenSelectPath:(id)sender
 {
+   /*
+    * Query the bundle information to get the file types we can handle; this way we avoid hardcoding it
+    * below in the beginSheet... call
+    */
+   NSArray *docTypes = [ [ [ NSBundle mainBundle ] infoDictionary ] objectForKey:@"CFBundleDocumentTypes" ];
+   NSMutableArray *extensionArray = [ NSMutableArray arrayWithCapacity:4 ];
+   NSEnumerator *typeEnumerator = [ docTypes objectEnumerator ];
+   id typeDictionary;
+   while( ( typeDictionary = [ typeEnumerator nextObject ] ) != nil )
+      [ extensionArray addObjectsFromArray:[ typeDictionary objectForKey:@"CFBundleTypeExtensions" ] ];
+
    NSOpenPanel *openPanel = [ NSOpenPanel openPanel ];
    [ openPanel setCanChooseFiles:YES ];
    [ openPanel setCanChooseDirectories:NO ];
@@ -390,7 +401,7 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
    [ openPanel beginSheetForDirectory:nil
                                  file:[ [ NSUserDefaults standardUserDefaults ]
                                         objectForKey:CSPrefDictKey_AutoOpenPath ]
-                                types:[ NSArray arrayWithObject:@"csd" ]
+                                types:extensionArray
                        modalForWindow:prefsWindow
                         modalDelegate:self
                        didEndSelector:@selector( selectPathSheetDidEnd:returnCode:contextInfo: )
