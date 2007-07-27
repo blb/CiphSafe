@@ -117,18 +117,6 @@
 
 
 /*
- * Allow dragging into other Cocoa apps
- */
-- (NSDragOperation) draggingSourceOperationMaskForLocal:(BOOL)flag
-{
-   if( flag )
-      return NSDragOperationEvery;
-   else
-      return NSDragOperationCopy;
-}
-
-
-/*
  * Add the call to draw striped background
  */
 - (void) highlightSelectionInClipRect:(NSRect)clipRect

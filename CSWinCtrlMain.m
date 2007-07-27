@@ -544,6 +544,9 @@ static NSArray *searchWhatArray;
    else
       [ documentView setStripeColor:stripeColor ];
 
+   [ documentView setDraggingSourceOperationMask:NSDragOperationEvery forLocal:YES ];
+   [ documentView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO ];
+
    // Finally, listen for changes to certain prefs
    [ stdDefaults addObserver:self forKeyPath:CSPrefDictKey_CellSpacing options:0 context:NULL ];
    [ stdDefaults addObserver:self forKeyPath:CSPrefDictKey_TableAltBackground options:0 context:NULL ];
