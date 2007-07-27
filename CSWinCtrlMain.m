@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -817,7 +817,7 @@ static NSArray *searchWhatArray;
  * Handle keypresses in the table view by scrolling to the first entry whose
  * name begins with the key pressed; spacebar is a pagedown equivalent
  */
-- (BOOL) tableView:(BLBTableView *)tableView
+- (BOOL) blbTableView:(BLBTableView *)tableView
    didReceiveKeyDownEvent:(NSEvent *)theEvent
 {
    if( [ [ theEvent characters ] characterAtIndex:0 ] == ' ' )
@@ -892,9 +892,9 @@ static NSArray *searchWhatArray;
  * Provide the contextual menu for the table view; select the view for good
  * visual feedback
  */
-- (NSMenu *) contextualMenuForTableView:(BLBTableView *)tableView
-             row:(int)row
-             column:(int)column
+- (NSMenu *) contextualMenuForBLBTableView:(BLBTableView *)tableView
+                                       row:(int)row
+                                    column:(int)column
 {
    [ tableView selectRow:row byExtendingSelection:NO ];
 

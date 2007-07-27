@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -47,13 +47,13 @@
 /*
  * Added methods for the delegate
  *
- * implement contextualMenuForTableView:row:column: to add a contextual menu for
+ * implement contextualMenuForBLBTableView:row:column: to add a contextual menu for
  * the given row and column
- * implement tableView:didReceiveKeyDownEvent: to handle key presses in the table
+ * implement blbTableView:didReceiveKeyDownEvent: to handle key presses in the table
  */
 @interface NSObject (BLBTableViewDelegate)
 
-- (NSMenu *) contextualMenuForTableView:(BLBTableView *)tableView row:(int)row column:(int)column;
-- (BOOL) tableView:(BLBTableView *)tableView didReceiveKeyDownEvent:(NSEvent *)theEvent;
+- (NSMenu *) contextualMenuForBLBTableView:(BLBTableView *)tableView row:(int)row column:(int)column;
+- (BOOL) blbTableView:(BLBTableView *)tableView didReceiveKeyDownEvent:(NSEvent *)theEvent;
 
 @end

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -140,21 +140,21 @@
 
 
 /*
- * The delegate must implement contextualMenuForTableView:row:column: for this
+ * The delegate must implement contextualMenuForBLBTableView:row:column: for this
  * to work
  */
 - (NSMenu *) menuForEvent:(NSEvent *)theEvent
 {
-   if( [ [ self delegate ] respondsToSelector:@selector( contextualMenuForTableView:row:column: ) ] )
+   if( [ [ self delegate ] respondsToSelector:@selector( contextualMenuForBLBTableView:row:column: ) ] )
    {
       NSPoint clickPoint = [ self convertPoint:[ theEvent locationInWindow ] fromView:nil ];
       int clickColumn = [ self columnAtPoint:clickPoint ];
       int clickRow = [ self rowAtPoint:clickPoint ];
 
       if( clickColumn >= 0 && clickRow >= 0 )
-         return [ [ self delegate ] contextualMenuForTableView:self
-                                                           row:clickRow
-                                                        column:clickColumn ];
+         return [ [ self delegate ] contextualMenuForBLBTableView:self
+                                                              row:clickRow
+                                                           column:clickColumn ];
    }
 
    return nil;
@@ -166,8 +166,8 @@
  */
 - (void) keyDown:(NSEvent *)theEvent
 {
-   if( ![ [ self delegate ] respondsToSelector:@selector( tableView:didReceiveKeyDownEvent: ) ] ||
-       ![ [ self delegate ] tableView:self didReceiveKeyDownEvent:theEvent ] )
+   if( ![ [ self delegate ] respondsToSelector:@selector( blbTableView:didReceiveKeyDownEvent: ) ] ||
+       ![ [ self delegate ] blbTableView:self didReceiveKeyDownEvent:theEvent ] )
       [ super keyDown:theEvent ];
 }
 
