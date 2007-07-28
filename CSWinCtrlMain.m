@@ -712,6 +712,21 @@ static NSArray *searchWhatArray;
    else if( menuItemAction == @selector( paste: ) )
       return ( [ [ NSPasteboard generalPasteboard ] 
                  availableTypeFromArray:[ NSArray arrayWithObject:CSDocumentPboardType ] ] != nil );
+   else if( menuItemAction == @selector( cmmCopyField: ) ||
+            menuItemAction == @selector( cmmOpenURL: ) )
+   {
+      int selectedRow = [ self rowForFilteredRow:[ documentView selectedRow ] ];
+      NSString *fieldName = nil;
+      if( menuItemAction == @selector( cmmOpenURL: ) )
+         fieldName = CSDocModelKey_URL;
+      else
+         fieldName = [ cmmCopyFields objectAtIndex:[ menuItem tag ] ];
+      NSString *fieldValue = [ [ self document ] stringForKey:fieldName atRow:selectedRow ];
+      if( fieldValue != nil && [ fieldValue length ] > 0 )
+         return YES;
+      else
+         return NO;
+   }
 
    return YES;
 }
