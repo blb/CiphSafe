@@ -95,6 +95,9 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 + (void) initialize
 {
+#if defined(DEBUG)
+   NSLog( @"CiphSafe debug build" );
+#endif
    NSString *defaultPrefsPath = [ [ NSBundle mainBundle ] pathForResource:@"DefaultPrefs"
                                                                    ofType:@"plist" ];
    NSDictionary *defaultPrefs = [ NSDictionary dictionaryWithContentsOfFile:defaultPrefsPath ];

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -157,7 +157,14 @@ static NSArray *keyArray;
 - (id) initWithEncryptedData:(NSData *)encryptedData bfKey:(NSData *)bfKey
 {
    if( encryptedData == nil || bfKey == nil )
+   {
+#if defined(DEBUG)
+      NSLog( @"CSDocModel initWithEncryptedData:bfKey: nil argument: %@ %@",
+             ( encryptedData == nil ? @"encryptedData" : @"" ),
+             ( bfKey == nil ? @"bfKey" : @"" ) );
+#endif
       return nil;
+   }
 
    self = [ super init ];
    if( self != nil )
@@ -183,8 +190,20 @@ static NSArray *keyArray;
                [ self setupSelf ];
                [ allEntries sortUsingFunction:sortEntries context:self ];
             }
+#if defined(DEBUG)
+            else
+               NSLog( @"CSDocModel initWithEncryptedData:bfKey: unarchiving of uncompressed data failed" );
+#endif
          }
+#if defined(DEBUG)
+         else
+            NSLog( @"CSDocModel initWithEncryptedData:bfKey: uncompressing of decrypted data failed" );
+#endif
       }
+#if defined(DEBUG)
+      else
+         NSLog( @"CSDocModel initWithEncryptedData:bfKey: decryption failed" );
+#endif
       if( allEntries == nil )
       {
          [ self release ];

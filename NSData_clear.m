@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -69,11 +69,15 @@
          for( index = 0; index < length; index++ )
             someData[ index ] = 0;
       }
+#if defined(DEBUG)
       else
          NSLog( @"NSData_clear: warning, couldn't find _bytes\n" );
+#endif
    }
+#if defined(DEBUG)
    else
       NSLog( @"NSData_clear: warning, can't clear class %@\n", NSStringFromClass( [ self class ] ) );
+#endif
 }
 
 @end
