@@ -42,10 +42,10 @@
  */
 - (void) awakeFromNib
 {
-   NSArray *tableColumns = [ self tableColumns ];
-   unsigned int index;
-   for( index = 0; index < [ tableColumns count ]; index++ )
-      [ [ [ tableColumns objectAtIndex:index ] dataCell ] setDrawsBackground:NO ];
+   NSEnumerator *columnEnumerator = [ [ self tableColumns ] objectEnumerator ];
+   id column;
+   while( ( column = [ columnEnumerator nextObject ] ) != nil )
+      [ [ column dataCell ] setDrawsBackground:NO ];
 }
 
 
