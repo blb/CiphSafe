@@ -225,11 +225,10 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (void) applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-   [ [ NSNotificationCenter defaultCenter ]
-     addObserver:self
-        selector:@selector( windowsMenuDidUpdate: )
-            name:NSMenuDidAddItemNotification
-          object:[ NSApp windowsMenu ] ];
+   [ [ NSNotificationCenter defaultCenter ] addObserver:self
+                                               selector:@selector( windowsMenuDidUpdate: )
+                                                   name:NSMenuDidAddItemNotification
+                                                 object:[ NSApp windowsMenu ] ];
    NSUserDefaults *userDefaults = [ NSUserDefaults standardUserDefaults ];
    if( [ userDefaults boolForKey:CSPrefDictKey_AutoOpen ] )
    {
@@ -237,7 +236,13 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
       if( [ [ sharedDocController documents ] count ] == 0 )
       {
          NSURL *fileURL = [ NSURL fileURLWithPath:[ userDefaults objectForKey:CSPrefDictKey_AutoOpenPath ] ];
-         [ sharedDocController openDocumentWithContentsOfURL:fileURL display:YES error:NULL ];
+         NSError *openError = nil;
+         [ sharedDocController openDocumentWithContentsOfURL:fileURL display:YES error:&openError ];
+#if defined(DEBUG)
+         if( openError != nil )
+            NSLog( @"CSAppController applicationDidFinishLaunching: errored at "
+                   @"openDocumentWithContentsOfURL:display:error: %@", openError );
+#endif
       }
    }
    lastPBChangeCount = [ [ NSPasteboard generalPasteboard ] changeCount ] - 1;
