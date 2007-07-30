@@ -154,13 +154,10 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
 {
    id target = [ menuItem target ];
    // Only windows may have window controllers
-   if( [ target isKindOfClass:[ NSWindow class ] ] )
-   {
-      NSWindowController *winController = [ target windowController ];
-      if( [ winController isKindOfClass:[ theClass class ] ] )
-         return YES;
-   }
-   
+   if( [ target isKindOfClass:[ NSWindow class ] ] &&
+       [ [ target windowController ] isKindOfClass:[ theClass class ] ] )
+      return YES;
+
    return NO;
 }
 
