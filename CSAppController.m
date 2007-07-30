@@ -108,9 +108,7 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (void) queuePendingCloseAll
 {
-   NSUserDefaults *userDefaults;
-   
-   userDefaults = [ NSUserDefaults standardUserDefaults ];
+   NSUserDefaults *userDefaults = [ NSUserDefaults standardUserDefaults ];
    if( [ userDefaults boolForKey:CSPrefDictKey_CloseAfterTimeout ] )
       [ self performSelector:@selector( closeAll: )
                   withObject:self
