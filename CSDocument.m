@@ -35,6 +35,7 @@
 
 #import "CSDocument.h"
 #import "CSDocModel.h"
+#import "CSPrefsController.h"
 #import "CSAppController.h"
 #import "CSWinCtrlAdd.h"
 #import "CSWinCtrlChange.h"

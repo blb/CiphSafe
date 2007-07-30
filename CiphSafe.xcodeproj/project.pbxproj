@@ -8,7 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		6412E63609F3619000F421C0 /* DefaultPrefs.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6412E63509F3619000F421C0 /* DefaultPrefs.plist */; };
+		6419C7040C5D5172006D9A6E /* lightswitch.png in Resources */ = {isa = PBXBuildFile; fileRef = 6419C7010C5D5172006D9A6E /* lightswitch.png */; };
+		6419C7050C5D5172006D9A6E /* mini window ciphsafe.png in Resources */ = {isa = PBXBuildFile; fileRef = 6419C7020C5D5172006D9A6E /* mini window ciphsafe.png */; };
+		6419C7060C5D5172006D9A6E /* padlock caution behind.png in Resources */ = {isa = PBXBuildFile; fileRef = 6419C7030C5D5172006D9A6E /* padlock caution behind.png */; };
 		6478D27D09F2EF020023B67B /* DefaultCategories.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6478D27C09F2EF020023B67B /* DefaultCategories.plist */; };
+		649B03D00C5C16CE00B599AC /* CSPrefsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 649B03CF0C5C16CE00B599AC /* CSPrefsController.m */; };
+		649B04220C5C288F00B599AC /* CSPreferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = 649B04200C5C288F00B599AC /* CSPreferences.nib */; };
 		64D6E3AA09E99F2400904206 /* CiphSafe Help in Resources */ = {isa = PBXBuildFile; fileRef = 64D6E39B09E99F2400904206 /* CiphSafe Help */; };
 		64F0C7E609F486390027748E /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64F0C7BB09F486390027748E /* CoreFoundation.framework */; };
 		64F7893709FE0FFE007E847C /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 64F7893609FE0FFE007E847C /* libz.dylib */; };
@@ -66,7 +71,13 @@
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		32DBCF750370BD2300C91783 /* CiphSafe_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CiphSafe_Prefix.pch; sourceTree = "<group>"; };
 		6412E63509F3619000F421C0 /* DefaultPrefs.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = DefaultPrefs.plist; sourceTree = "<group>"; };
+		6419C7010C5D5172006D9A6E /* lightswitch.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = lightswitch.png; sourceTree = "<group>"; };
+		6419C7020C5D5172006D9A6E /* mini window ciphsafe.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mini window ciphsafe.png"; sourceTree = "<group>"; };
+		6419C7030C5D5172006D9A6E /* padlock caution behind.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "padlock caution behind.png"; sourceTree = "<group>"; };
 		6478D23A09F2D1890023B67B /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = English; path = English.lproj/DefaultCategories.plist; sourceTree = "<group>"; };
+		649B03CE0C5C16CE00B599AC /* CSPrefsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CSPrefsController.h; sourceTree = "<group>"; };
+		649B03CF0C5C16CE00B599AC /* CSPrefsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CSPrefsController.m; sourceTree = "<group>"; };
+		649B04210C5C288F00B599AC /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/CSPreferences.nib; sourceTree = "<group>"; };
 		64D6E39C09E99F2400904206 /* English */ = {isa = PBXFileReference; lastKnownFileType = folder; name = English; path = "English.lproj/CiphSafe Help"; sourceTree = "<group>"; };
 		64F0C7BB09F486390027748E /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		64F7893609FE0FFE007E847C /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
@@ -195,6 +206,9 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				6419C7010C5D5172006D9A6E /* lightswitch.png */,
+				6419C7020C5D5172006D9A6E /* mini window ciphsafe.png */,
+				6419C7030C5D5172006D9A6E /* padlock caution behind.png */,
 				64D6E39B09E99F2400904206 /* CiphSafe Help */,
 				64FCADA009E870ED00F59756 /* CiphSafe.icns */,
 				64FCADFA09E8725700F59756 /* CSDocument.nib */,
@@ -208,6 +222,7 @@
 				64FCADBB09E870ED00F59756 /* ReadMe.rtf */,
 				6478D27C09F2EF020023B67B /* DefaultCategories.plist */,
 				6412E63509F3619000F421C0 /* DefaultPrefs.plist */,
+				649B04200C5C288F00B599AC /* CSPreferences.nib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -245,6 +260,8 @@
 				64FCADAE09E870ED00F59756 /* CSWinCtrlMain.m */,
 				64FCADAF09E870ED00F59756 /* CSWinCtrlPassphrase.h */,
 				64FCADB009E870ED00F59756 /* CSWinCtrlPassphrase.m */,
+				649B03CE0C5C16CE00B599AC /* CSPrefsController.h */,
+				649B03CF0C5C16CE00B599AC /* CSPrefsController.m */,
 			);
 			name = WindowControllers;
 			sourceTree = "<group>";
@@ -328,6 +345,10 @@
 				64D6E3AA09E99F2400904206 /* CiphSafe Help in Resources */,
 				6478D27D09F2EF020023B67B /* DefaultCategories.plist in Resources */,
 				6412E63609F3619000F421C0 /* DefaultPrefs.plist in Resources */,
+				649B04220C5C288F00B599AC /* CSPreferences.nib in Resources */,
+				6419C7040C5D5172006D9A6E /* lightswitch.png in Resources */,
+				6419C7050C5D5172006D9A6E /* mini window ciphsafe.png in Resources */,
+				6419C7060C5D5172006D9A6E /* padlock caution behind.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -369,6 +390,7 @@
 				64FCADCB09E870ED00F59756 /* NSData_clear.m in Sources */,
 				64FCADCC09E870ED00F59756 /* NSData_compress.m in Sources */,
 				64FCADCD09E870ED00F59756 /* NSData_crypto.m in Sources */,
+				649B03D00C5C16CE00B599AC /* CSPrefsController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -397,6 +419,14 @@
 				6478D23A09F2D1890023B67B /* English */,
 			);
 			name = DefaultCategories.plist;
+			sourceTree = "<group>";
+		};
+		649B04200C5C288F00B599AC /* CSPreferences.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				649B04210C5C288F00B599AC /* English */,
+			);
+			name = CSPreferences.nib;
 			sourceTree = "<group>";
 		};
 		64D6E39B09E99F2400904206 /* CiphSafe Help */ = {

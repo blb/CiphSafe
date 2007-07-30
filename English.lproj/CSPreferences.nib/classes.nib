@@ -1,11 +1,18 @@
 {
     IBClasses = (
         {
-            ACTIONS = {closeAll = id; openPreferences = id; }; 
+            ACTIONS = {closeAll = id; prefsAutoOpenSelectPath = id; }; 
             CLASS = CSAppController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {editMenuSetCategory = NSMenuItem; }; 
+            OUTLETS = {editMenuSetCategory = NSMenuItem; prefsWindow = NSWindow; }; 
             SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {prefsAutoOpenSelectPath = id; }; 
+            CLASS = CSPrefsController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {appearanceView = NSView; generalView = NSView; securityView = NSView; }; 
+            SUPERCLASS = NSWindowController; 
         }, 
         {
             ACTIONS = {

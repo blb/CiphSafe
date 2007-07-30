@@ -34,33 +34,10 @@
 
 #import <Cocoa/Cocoa.h>
 
-// Identifiers for preferences
-extern NSString * const CSPrefDictKey_SaveBackup;
-extern NSString * const CSPrefDictKey_CloseAdd;
-extern NSString * const CSPrefDictKey_CloseEdit;
-extern NSString * const CSPrefDictKey_ConfirmDelete;
-extern NSString * const CSPrefDictKey_ClearClipboard;
-extern NSString * const CSPrefDictKey_CreateNew;
-extern NSString * const CSPrefDictKey_GenSize;
-extern NSString * const CSPrefDictKey_AlphanumOnly;
-extern NSString * const CSPrefDictKey_IncludePasswd;
-extern NSString * const CSPrefDictKey_AutoOpen;
-extern NSString * const CSPrefDictKey_AutoOpenPath;
-extern NSString * const CSPrefDictKey_CloseAfterTimeout;
-extern NSString * const CSPrefDictKey_CloseTimeout;
-extern NSString * const CSPrefDictKey_CellSpacing;
-extern NSString * const CSPrefDictKey_TableAltBackground;
-extern NSString * const CSPrefDictKey_IncludeDefaultCategories;
-extern NSString * const CSPrefDictKey_CurrentSearchKey;
-extern NSString * const CSPrefDictKey_CloseAfterTimeoutSaveOption;
-
-// Possible values for CloseAfterTimeoutSaveOption preference
-extern const int CSPrefCloseAfterTimeoutSaveOption_Save;
-extern const int CSPrefCloseAfterTimeoutSaveOption_Discard;
-extern const int CSPrefCloseAfterTimeoutSaveOption_Ask;
 
 // Name of our internal pasteboard type
 extern NSString * const CSDocumentPboardType;
+
 
 @interface CSAppController : NSObject
 {
@@ -68,8 +45,6 @@ extern NSString * const CSDocumentPboardType;
    BOOL closeAllFromTimeout;
 
    IBOutlet NSMenuItem *editMenuSetCategory;
-   // Preferences window
-   IBOutlet NSWindow *prefsWindow;
 }
 
 // Note the general pasteboard's current change count
@@ -81,10 +56,10 @@ extern NSString * const CSDocumentPboardType;
 // Give out the Set Category menu item
 - (id <NSMenuItem>) editMenuSetCategoryMenuItem;
 
-// Actions for the prefs window
-- (IBAction) prefsAutoOpenSelectPath:(id)sender;
-
 // Close all open documents
 - (IBAction) closeAll:(id)sender;
+
+// Open prefs, passing it on to the prefs controller
+- (IBAction) openPreferences:(id)sender;
 
 @end

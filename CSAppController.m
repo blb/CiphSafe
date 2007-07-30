@@ -33,35 +33,12 @@
 /* CSAppController.m */
 
 #import "CSAppController.h"
+#import "CSPrefsController.h"
 #import "CSDocument.h"
 #import "CSWinCtrlEntry.h"
 #import "CSWinCtrlMain.h"
 #include <CoreFoundation/CoreFoundation.h>
 
-
-NSString * const CSPrefDictKey_SaveBackup = @"CSPrefDictKey_SaveBackup";
-NSString * const CSPrefDictKey_CloseAdd = @"CSPrefDictKey_CloseAdd";
-NSString * const CSPrefDictKey_CloseEdit = @"CSPrefDictKey_CloseEdit";
-NSString * const CSPrefDictKey_ConfirmDelete = @"CSPrefDictKey_ConfirmDelete";
-NSString * const CSPrefDictKey_ClearClipboard = @"CSPrefDictKey_ClearClipboard";
-NSString * const CSPrefDictKey_CreateNew = @"CSPrefDictKey_CreateNew";
-NSString * const CSPrefDictKey_GenSize = @"CSPrefDictKey_GenSize";
-NSString * const CSPrefDictKey_AlphanumOnly = @"CSPrefDictKey_AlphanumOnly";
-NSString * const CSPrefDictKey_IncludePasswd = @"CSPrefDictKey_IncludePasswd";
-NSString * const CSPrefDictKey_AutoOpen = @"CSPrefDictKey_AutoOpen";
-NSString * const CSPrefDictKey_AutoOpenPath = @"CSPrefDictKey_AutoOpenPath";
-NSString * const CSPrefDictKey_CloseAfterTimeout = @"CSPrefDictKey_CloseAfterTimeout";
-NSString * const CSPrefDictKey_CloseTimeout = @"CSPrefDictKey_CloseTimeout";
-NSString * const CSPrefDictKey_CellSpacing = @"CSPrefDictKey_CellSpacing";
-NSString * const CSPrefDictKey_TableAltBackground = @"CSPrefDictKey_TableAltBackground";
-NSString * const CSPrefDictKey_IncludeDefaultCategories = @"CSPrefDictKey_IncludeDefaultCategories";
-NSString * const CSPrefDictKey_CurrentSearchKey = @"CSPrefDictKey_CurrentSearchKey";
-NSString * const CSPrefDictKey_CloseAfterTimeoutSaveOption = @"CSPrefDictKey_CloseAfterTimeoutSaveOption";
-
-// Values should match the tag values in IB
-const int CSPrefCloseAfterTimeoutSaveOption_Save = 0;
-const int CSPrefCloseAfterTimeoutSaveOption_Discard = 1;
-const int CSPrefCloseAfterTimeoutSaveOption_Ask = 2;
 
 NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 
@@ -90,28 +67,16 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
 }
 */
 
+
 /*
- * Setup up default defaults
+ * Setup up custom allocator stuff
  */
 + (void) initialize
 {
 #if defined(DEBUG)
    NSLog( @"CiphSafe debug build" );
 #endif
-   NSString *defaultPrefsPath = [ [ NSBundle mainBundle ] pathForResource:@"DefaultPrefs"
-                                                                   ofType:@"plist" ];
-   NSDictionary *defaultPrefs = [ NSDictionary dictionaryWithContentsOfFile:defaultPrefsPath ];
-   NSUserDefaults *userDefaults = [ NSUserDefaults standardUserDefaults ];
-   [ userDefaults registerDefaults:defaultPrefs ];
-   [ [ NSUserDefaultsController sharedUserDefaultsController ] setInitialValues:defaultPrefs ];
-   // Sanity checks
-   if( [ userDefaults integerForKey:CSPrefDictKey_GenSize ] < 1 ||
-       [ userDefaults integerForKey:CSPrefDictKey_GenSize ] > 255 )
-      [ userDefaults setInteger:8 forKey:CSPrefDictKey_GenSize ];
-   if( [ userDefaults integerForKey:CSPrefDictKey_CloseTimeout ] < 1 ||
-       [ userDefaults integerForKey:CSPrefDictKey_CloseTimeout ] > 3600 )
-      [ userDefaults setInteger:10 forKey:CSPrefDictKey_CloseTimeout ];
-   /*
+/*   
    // Create CoreFoundation custom allocator so we can clear memory on deallocation
    originalCFAllocator = CFAllocatorGetDefault();
    CFRetain( originalCFAllocator );
@@ -124,7 +89,7 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
    allocContext.deallocate = ciphSafeCFDeallocate;
    ciphSafeCFAllocator = CFAllocatorCreate( NULL, &allocContext );
    CFAllocatorSetDefault( ciphSafeCFAllocator );
-    */
+   */
 }
 
 
@@ -368,63 +333,6 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
 
 
 /*
- * Open panel to select an autoopen file ended
- */
-- (void) selectPathSheetDidEnd:(NSOpenPanel *)sheet
-                    returnCode:(int)returnCode
-                   contextInfo:(void *)contextInfo
-{
-   if( returnCode == NSOKButton )
-      [ [ NSUserDefaults standardUserDefaults ] setObject:[ [ sheet filenames ] objectAtIndex:0 ]
-                                                   forKey:CSPrefDictKey_AutoOpenPath ];
-}
-
-
-/*
- * Create a sheet to allow user to select a file to automatically open on
- * program launch
- */
-- (IBAction) prefsAutoOpenSelectPath:(id)sender
-{
-   /*
-    * Query the bundle information to get the file types we can handle; this way we avoid hardcoding it
-    * below in the beginSheet... call
-    */
-   NSArray *docTypes = [ [ [ NSBundle mainBundle ] infoDictionary ] objectForKey:@"CFBundleDocumentTypes" ];
-   NSMutableArray *extensionArray = [ NSMutableArray arrayWithCapacity:4 ];
-   NSEnumerator *typeEnumerator = [ docTypes objectEnumerator ];
-   id typeDictionary;
-   while( ( typeDictionary = [ typeEnumerator nextObject ] ) != nil )
-      [ extensionArray addObjectsFromArray:[ typeDictionary objectForKey:@"CFBundleTypeExtensions" ] ];
-
-   NSOpenPanel *openPanel = [ NSOpenPanel openPanel ];
-   [ openPanel setCanChooseFiles:YES ];
-   [ openPanel setCanChooseDirectories:NO ];
-   [ openPanel setAllowsMultipleSelection:NO ];
-   [ openPanel beginSheetForDirectory:nil
-                                 file:[ [ NSUserDefaults standardUserDefaults ]
-                                        objectForKey:CSPrefDictKey_AutoOpenPath ]
-                                types:extensionArray
-                       modalForWindow:prefsWindow
-                        modalDelegate:self
-                       didEndSelector:@selector( selectPathSheetDidEnd:returnCode:contextInfo: )
-                          contextInfo:NULL ];
-}
-
-
-/*
- * Sent by the prefs window
- */
-- (BOOL) windowShouldClose:(id)sender
-{
-   if( [ sender isEqual:prefsWindow ] )
-      return [ sender makeFirstResponder:nil ];
-
-   return YES;
-}
-
-
-/*
  * Enable only valid menu items
  */
 - (BOOL) validateMenuItem:(id <NSMenuItem>)menuItem
@@ -459,6 +367,15 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
      closeAllDocumentsWithDelegate:self
                didCloseAllSelector:@selector( docController:didCloseAll:contextInfo: )
                        contextInfo:NULL ];
+}
+
+
+/*
+ * Tell the prefs controller to handle preferences
+ */
+- (IBAction) openPreferences:(id)sender
+{
+   [ [ CSPrefsController sharedPrefsController ] showWindow:sender ];
 }
 
 @end
