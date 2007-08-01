@@ -145,11 +145,11 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
    {
       NSArray *deletedNames = [ [ notification userInfo ]
                                 objectForKey:CSDocModelNotificationInfoKey_DeletedNames ];
-      unsigned int index;
-      for( index = 0; index < [ deletedNames count ]; index++ )
+      NSEnumerator *nameEnumerator = [ deletedNames objectEnumerator ];
+      id deletedName;
+      while( ( deletedName = [ nameEnumerator nextObject ] ) != nil )
       {
-         changeController = [ CSWinCtrlChange controllerForEntryName:[ deletedNames objectAtIndex:index ]
-                                                          inDocument:self ];
+         changeController = [ CSWinCtrlChange controllerForEntryName:deletedName inDocument:self ];
          if( changeController != nil )
             [ [ changeController window ] performClose:self ];
       }
@@ -242,10 +242,10 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  * Override this to allow us to get a passphrase when needed
  */
 - (void) saveToFile:(NSString *)fileName
-         saveOperation:(NSSaveOperationType)saveOperation
-         delegate:(id)delegate
-         didSaveSelector:(SEL)didSaveSelector
-         contextInfo:(void *)contextInfo
+      saveOperation:(NSSaveOperationType)saveOperation
+           delegate:(id)delegate
+    didSaveSelector:(SEL)didSaveSelector
+        contextInfo:(void *)contextInfo
 {
    /*
     * If a filename was given and we don't yet have a key, or we're doing a
@@ -273,10 +273,10 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
    }
    else
       [ super saveToFile:fileName
-              saveOperation:saveOperation
-              delegate:delegate
-              didSaveSelector:didSaveSelector
-              contextInfo:contextInfo ];
+           saveOperation:saveOperation
+                delegate:delegate
+         didSaveSelector:didSaveSelector
+             contextInfo:contextInfo ];
 }
 
 
@@ -383,15 +383,15 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (void) viewEntries:(NSArray *)namesArray
 {
-   unsigned index;
-   for( index = 0; index < [ namesArray count ]; index++ )
+   NSEnumerator *nameEnumerator = [ namesArray objectEnumerator ];
+   id oneName;
+   while( ( oneName = [ nameEnumerator nextObject ] ) != nil )
    {
-      CSWinCtrlChange *winController = [ CSWinCtrlChange controllerForEntryName:
-                                                            [ namesArray objectAtIndex:index ]
+      CSWinCtrlChange *winController = [ CSWinCtrlChange controllerForEntryName:oneName
                                                                      inDocument:self ];
       if( winController == nil )
       {
-         winController = [ [ CSWinCtrlChange alloc ] initForEntryName:[ namesArray objectAtIndex:index ] ];
+         winController = [ [ CSWinCtrlChange alloc ] initForEntryName:oneName ];
          [ self addWindowController:winController ];
          [ winController release ];
       }
@@ -443,7 +443,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
       NSArray *entryArray = [ [ self model ] stringArrayForEntryAtRow:rowIndex ];
       NSMutableString *entryString = [ NSMutableString string ];
       NSEnumerator *arrayEnum = [ entryArray objectEnumerator ];
-      NSString *entryField;
+      id entryField;
       while( ( entryField = [ arrayEnum nextObject ] ) != nil )
       {
          NSMutableString *newString = [ NSMutableString stringWithString:entryField ];
@@ -479,10 +479,9 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
         rowIndex = [ indexes indexGreaterThanIndex:rowIndex ] )
    {
       NSXMLElement *entryElement = [ NSXMLNode elementWithName:CSDocumentXML_EntryNode ];
-
-      NSEnumerator *keyEnum = [ keyArray objectEnumerator ];
-      NSString *key;
-      while( ( key = [ keyEnum nextObject ] ) != nil )
+      NSEnumerator *keyEnumerator = [ keyArray objectEnumerator ];
+      id key;
+      while( ( key = [ keyEnumerator nextObject ] ) != nil )
       {
          NSXMLNode *childElement;
          if( [ key isEqualToString:CSDocModelKey_Notes ] && !plainText )
@@ -648,11 +647,11 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
     *    NSTabularTextPboardType - simple string, each entry tab-delimited
     *    NSStringPboardType - same as NSTabularTextPboardType
     */
-   NSMutableArray *docArray = [ NSMutableArray arrayWithCapacity:10 ];
-   NSAttributedString *attrEOL = [ [ [ NSAttributedString alloc ] initWithString:@"\n" ] autorelease ];
+   NSMutableArray *docArray = [ NSMutableArray arrayWithCapacity:[ names count ] ];
+   NSAttributedString *attrEOL = [ [ NSAttributedString alloc ] initWithString:@"\n" ];
    NSMutableAttributedString *rtfdStringRows = [ [ NSMutableAttributedString alloc ] initWithString:@"" ];
    NSEnumerator *nameEnumerator = [ names objectEnumerator ];
-   NSString *nextName;
+   id nextName;
    while( ( nextName = [ nameEnumerator nextObject ] ) != nil )
    {
       /*
@@ -701,6 +700,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
    [ pboard setString:[ rtfdStringRows string ] forType:NSTabularTextPboardType ];
    [ pboard setString:[ rtfdStringRows string ] forType:NSStringPboardType ];
    [ rtfdStringRows release ];
+   [ attrEOL release ];
 
    return YES;
 }
@@ -710,24 +710,22 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  * Grab rows from the given pasteboard
  */
 - (BOOL) retrieveEntriesFromPasteboard:(NSPasteboard *)pboard
-         undoName:(NSString *)undoName
+                              undoName:(NSString *)undoName
 {
    BOOL retval = NO;
    NSArray *entryArray = [ NSUnarchiver unarchiveObjectWithData:[ pboard dataForType:CSDocumentPboardType ] ];
    if( entryArray != nil && [ entryArray count ] > 0 )
    {
-      unsigned int index;
-      for( index = 0; index < [ entryArray count ]; index++ )
+      NSEnumerator *entryEnumerator = [ entryArray objectEnumerator ];
+      id entryDictionary;
+      while( ( entryDictionary = [ entryEnumerator nextObject ] ) != nil )
       {
-         NSDictionary *entryDictionary = [ entryArray objectAtIndex:index ];
-         [ self addEntryWithName:
-                   [ self uniqueNameForName:
-                             [ entryDictionary objectForKey:CSDocModelKey_Name ] ]
-                account:[ entryDictionary objectForKey:CSDocModelKey_Acct ]
-                password:[ entryDictionary objectForKey:CSDocModelKey_Passwd ]
-                URL:[ entryDictionary objectForKey:CSDocModelKey_URL ]
-                category:[ entryDictionary objectForKey:CSDocModelKey_Category ]
-                notesRTFD:[ entryDictionary objectForKey:CSDocModelKey_Notes ] ];
+         [ self addEntryWithName:[ self uniqueNameForName:[ entryDictionary objectForKey:CSDocModelKey_Name ] ]
+                   account:[ entryDictionary objectForKey:CSDocModelKey_Acct ]
+                   password:[ entryDictionary objectForKey:CSDocModelKey_Passwd ]
+                   URL:[ entryDictionary objectForKey:CSDocModelKey_URL ]
+                   category:[ entryDictionary objectForKey:CSDocModelKey_Category ]
+                   notesRTFD:[ entryDictionary objectForKey:CSDocModelKey_Notes ] ];
       }
       [ [ self undoManager ] setActionName:undoName ];
       retval = YES;
