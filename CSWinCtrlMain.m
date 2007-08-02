@@ -39,7 +39,7 @@
 #import "CSDocModel.h"
 
 
-// Accessory view export type tags
+// Accessory view export type tags, make sure the match tag values as set in IB
 const int CSWinCtrlMainExportType_CSV = 0;
 const int CSWinCtrlMainExportType_XML = 1;
 
@@ -110,22 +110,14 @@ static NSArray *searchWhatArray;
  */
 - (void) setTableViewSpacing
 {
-   NSSize newSpacing = NSMakeSize( 3.0, 2.0 );
-   
-   switch( [ [ NSUserDefaults standardUserDefaults ] integerForKey:CSPrefDictKey_CellSpacing ] )
-   {
-      case 0:   // Small
-         newSpacing = NSMakeSize( 3.0, 2.0 );
-         break;
-         
-      case 1:   // Medium
-         newSpacing = NSMakeSize( 5.0, 2.0 );
-         break;
-         
-      case 2:   // Large
-         newSpacing = NSMakeSize( 7.0, 3.0 );
-         break;
-   }
+   int cellSpacing = [ [ NSUserDefaults standardUserDefaults ] integerForKey:CSPrefDictKey_CellSpacing ];
+   NSSize newSpacing;
+   if( cellSpacing == CSPrefCellSpacingOption_Small )
+      newSpacing = NSMakeSize( 3.0, 2.0 );
+   else if( cellSpacing == CSPrefCellSpacingOption_Medium )
+      newSpacing = NSMakeSize( 5.0, 2.0 );
+   else if( cellSpacing == CSPrefCellSpacingOption_Large )
+      newSpacing = NSMakeSize( 7.0, 3.0 );
    [ documentView setIntercellSpacing:newSpacing ];
 }
 

@@ -58,6 +58,9 @@ NSString * const CSPrefDictKey_CloseAfterTimeoutSaveOption = @"CSPrefDictKey_Clo
 const int CSPrefCloseAfterTimeoutSaveOption_Save = 0;
 const int CSPrefCloseAfterTimeoutSaveOption_Discard = 1;
 const int CSPrefCloseAfterTimeoutSaveOption_Ask = 2;
+const int CSPrefCellSpacingOption_Small = 0;
+const int CSPrefCellSpacingOption_Medium = 1;
+const int CSPrefCellSpacingOption_Large = 2;
 
 
 NSString * const CSPrefsControllerToolbarID_General = @"General";

@@ -60,6 +60,11 @@ extern const int CSPrefCloseAfterTimeoutSaveOption_Save;
 extern const int CSPrefCloseAfterTimeoutSaveOption_Discard;
 extern const int CSPrefCloseAfterTimeoutSaveOption_Ask;
 
+// Possible values for CellSpacing preference
+extern const int CSPrefCellSpacingOption_Small;
+extern const int CSPrefCellSpacingOption_Medium;
+extern const int CSPrefCellSpacingOption_Large;
+
 
 @interface CSPrefsController : NSWindowController
 {
