@@ -96,17 +96,17 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  * Find the controller responsible for the given entry
  */
 + (CSWinCtrlChange *) controllerForEntryName:(NSString *)entryName
-                      inDocument:(NSDocument *)document
+                                  inDocument:(NSDocument *)document
 {
    NSArray *arrayForDocument = [ controllerList objectForKey:[ CSWinCtrlChange numberForDocument:document ] ];
    if( arrayForDocument != nil )
    {
-      unsigned int index;
-      for( index = 0; index < [ arrayForDocument count ]; index++ )
+      NSEnumerator *controllerEnumerator = [ arrayForDocument objectEnumerator ];
+      id currentController;
+      while( ( currentController = [ controllerEnumerator nextObject ] ) != nil )
       {
-         CSWinCtrlChange *curController = [ arrayForDocument objectAtIndex:index ];
-         if( [ [ curController entryName ] isEqualToString:entryName ] )
-            return curController;
+         if( [ [ currentController entryName ] isEqualToString:entryName ] )
+            return currentController;
       }
    }
 
