@@ -68,6 +68,7 @@ NSString * const CSPrefsControllerToolbarID_Security = @"Security";
 @implementation CSPrefsController
 
 static NSArray *toolbarItemIDs;
+static CSPrefsController *sharedPrefsController = nil;
 
 
 /*
@@ -101,12 +102,25 @@ static NSArray *toolbarItemIDs;
  */
 + (CSPrefsController *) sharedPrefsController
 {
-   static CSPrefsController *sharedPrefsController = nil;
-
    if( sharedPrefsController == nil )
       sharedPrefsController = [ [ CSPrefsController alloc ] initWithWindowNibName:@"CSPreferences" ];
 
    return sharedPrefsController;
+}
+
+
+/*
+ * Enforce singleton
+ */
+- (id) initWithWindow:(NSWindow *)window
+{
+   if( sharedPrefsController != nil )
+   {
+      [ self release ];
+      return sharedPrefsController;
+   }
+
+   return [ super initWithWindow:window ];
 }
 
 
