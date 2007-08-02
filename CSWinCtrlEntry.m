@@ -68,16 +68,14 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
        * is dirty' status
        */
       notesUM = [ [ NSUndoManager alloc ] init ];
-      [ [ NSNotificationCenter defaultCenter ]
-        addObserver:self
-           selector:@selector( undoManagerDidChange: )
-               name:NSUndoManagerDidUndoChangeNotification
-             object:notesUM ];
-      [ [ NSNotificationCenter defaultCenter ]
-        addObserver:self
-           selector:@selector( undoManagerDidChange: )
-               name:NSUndoManagerDidRedoChangeNotification
-             object:notesUM ];
+      [ [ NSNotificationCenter defaultCenter ] addObserver:self
+                                                  selector:@selector( undoManagerDidChange: )
+                                                      name:NSUndoManagerDidUndoChangeNotification
+                                                    object:notesUM ];
+      [ [ NSNotificationCenter defaultCenter ] addObserver:self
+                                                  selector:@selector( undoManagerDidChange: )
+                                                      name:NSUndoManagerDidRedoChangeNotification
+                                                    object:notesUM ];
       // Undo manager for everything else in the window
       otherUM = [ [ NSUndoManager alloc ] init ];
    }
@@ -97,12 +95,12 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
    {
       // Close the window this way so the proper delegation is performed
       [ [ self window ] setDocumentEdited:NO ];
-      [ [ NSRunLoop currentRunLoop ]
-        performSelector:@selector( performClose: )
-                 target:[ self window ]
-               argument:self
-                  order:9999
-                  modes:[ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ] ];
+      NSArray *runLoopModes = [ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ];
+      [ [ NSRunLoop currentRunLoop ] performSelector:@selector( performClose: )
+                                              target:[ self window ]
+                                            argument:self
+                                               order:9999
+                                               modes:runLoopModes ];
    }
    [ sheet orderOut:self ];
    [ NSApp endSheet:sheet ];
@@ -222,7 +220,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 /*
  * Sent by the text view, but not for undo/redo
  */
-- (void)textDidChange:(NSNotification *)notification
+- (void) textDidChange:(NSNotification *)notification
 {
    [ self updateDocumentEditedStatus ];
 }
@@ -242,11 +240,11 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
                                                NSLocalizedString( @"Close Anyway", @"" ),
                                                NSLocalizedString( @"Don't Close", @"" ),
                                                nil );
-      [ NSApp beginSheet:alertPanel
+      [ NSApp     beginSheet:alertPanel
               modalForWindow:[ self window ]
-              modalDelegate:self
+               modalDelegate:self
               didEndSelector:@selector( closeSheetDidEnd:returnCode:contextInfo: )
-              contextInfo:NULL ];
+                 contextInfo:NULL ];
       return NO;
    }
 
