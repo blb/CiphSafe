@@ -107,5 +107,6 @@ extern const int CSWinCtrlMainExportType_XML;
 - (NSView *) exportAccessoryView;
 - (int) exportType;
 - (BOOL) exportCSVHeader;
+- (IBAction) exportTypeChanged:(id)sender;
 
 @end

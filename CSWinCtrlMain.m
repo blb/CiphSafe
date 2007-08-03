@@ -1044,6 +1044,18 @@ static NSArray *searchWhatArray;
 
 
 /*
+ * Enable/disable the CSV-specific checkbox
+ */
+- (IBAction) exportTypeChanged:(id)sender
+{
+   if( [ [ sender selectedItem ] tag ] == CSWinCtrlMainExportType_CSV )
+      [ exportCSVHeader setEnabled:YES ];
+   else
+      [ exportCSVHeader setEnabled:NO ];
+}
+
+
+/*
  * When the search field value is changed; set that the field is modified if
  * it has, setup filtering, and refresh the view
  */

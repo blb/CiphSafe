@@ -24,6 +24,7 @@
                 cmmOpenURL = id; 
                 cornerSelectField = id; 
                 delete = id; 
+                exportTypeChanged = id; 
                 limitSearch = id; 
                 newCategoryCancel = id; 
                 newCategoryOK = id; 
