@@ -903,7 +903,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
                    notesRTFD:(NSData *)notes
 {
    NSMutableArray *selectedNames = [ NSMutableArray arrayWithArray:[ mainWindowController getSelectedNames ] ];
-   if( ![ name isEqualToString:newName ] )
+   if( newName != nil && ![ name isEqualToString:newName ] )
       [ selectedNames replaceObjectAtIndex:[ selectedNames indexOfObject:name ]
                                 withObject:newName ];
    BOOL changeSuccessful = [ [ self model ] changeEntryWithName:name
