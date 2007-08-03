@@ -45,7 +45,6 @@ NSString * const CSDocumentPboardType = @"CSDocumentPboardType";
 
 @implementation CSAppController
 
-static NSString *MENUSPACE = @"   ";
 /*
 static CFAllocatorRef ciphSafeCFAllocator;
 static CFAllocatorRef originalCFAllocator;
@@ -169,24 +168,26 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
 - (void) rearrangeWindowMenu:(id)unused
 {
    NSMenu *windowMenu = [ NSApp windowsMenu ];
-   NSMutableArray *windowMenuSecondaryItems = [ NSMutableArray arrayWithCapacity:25 ];
-   NSEnumerator *itemEnumerator = [ [ windowMenu itemArray ] objectEnumerator ];
-   // First, remove all secondary items which we want to rearrange
+   /*
+    * Use a copy since we'll be modifying the original list below, and this protects us in case 
+    * the array from itemArray is just a reference to the original
+    */
+   NSArray *itemArrayCopy = [ [ windowMenu itemArray ] copy ];
+   NSEnumerator *itemEnumerator = [ itemArrayCopy objectEnumerator ];
    id menuItem;
+   NSMutableArray *windowMenuSecondaryItems = [ NSMutableArray arrayWithCapacity:25 ];
+   // First, remove all secondary items which we want to rearrange
    while( ( menuItem = [ itemEnumerator nextObject ] ) != nil )
    {
       // We only rearrange windows owned by CSWinCtrlEntry subclasses
       if( [ self isMenuItem:menuItem forWindowControllerClass:[ CSWinCtrlEntry class ] ] )
       {
-         // If it is already prefixed by spaces, we've already handled it
-         if( [ [ menuItem title ] characterAtIndex:0 ] != ' ' )
-         {
-            [ menuItem setTitle:[ MENUSPACE stringByAppendingString:[ menuItem title ] ] ];
-            [ windowMenuSecondaryItems addObject:menuItem ];
-            [ windowMenu removeItem:menuItem ];
-         }
+         [ menuItem setIndentationLevel:1 ];
+         [ windowMenuSecondaryItems addObject:menuItem ];
+         [ windowMenu removeItem:menuItem ];
       }
    }
+   [ itemArrayCopy release ];
    // Now put them in proper order
    if( [ windowMenuSecondaryItems count ] > 0 )
    {
