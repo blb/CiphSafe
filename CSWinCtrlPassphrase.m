@@ -38,12 +38,13 @@
 #import "NSData_crypto.h"
 #import "NSData_clear.h"
 
+
 NSString * const CSPassphraseNote_Save = @"Passphrase hint";
 NSString * const CSPassphraseNote_Load = @"Passphrase for file";
 NSString * const CSPassphraseNote_Change = @"New passphrase";
 
 // What's considered short
-#define CSWINCTRLPASSPHRASE_SHORT_PASSPHRASE 8
+static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
 
 // Defines for localized strings
 #define CSWINCTRLPASSPHRASE_LOC_ENTERAGAIN NSLocalizedString( @"Enter Again", @"" )
@@ -161,12 +162,12 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
                                                           docName ] ];
    [ passphraseNote1 setStringValue:NSLocalizedString( noteType, nil ) ];
    [ self setAndSizeWindowForView:nonConfirmView ];
-   [ [ NSRunLoop currentRunLoop ]
-     performSelector:@selector( makeFirstResponder: )
-              target:[ self window ]
-            argument:passphrasePhrase1
-               order:9999
-               modes:[ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ] ];
+   NSArray *runModeArray = [ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ];
+   [ [ NSRunLoop currentRunLoop ] performSelector:@selector( makeFirstResponder: )
+                                           target:[ self window ]
+                                         argument:passphrasePhrase1
+                                            order:9999
+                                            modes:runModeArray ];
    parentWindow = nil;
    int windowReturn = [ NSApp runModalForWindow:[ self window ] ];
    [ [ self window ] orderOut:self ];
@@ -193,12 +194,12 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
    [ [ self window ] setTitle:@"" ];
    [ passphraseNote2 setStringValue:NSLocalizedString( noteType, nil ) ];
    [ self setAndSizeWindowForView:confirmView ];
-   [ [ NSRunLoop currentRunLoop ]
-     performSelector:@selector( makeFirstResponder: )
-              target:[ self window ]
-            argument:passphrasePhrase2
-               order:9999
-               modes:[ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ] ];
+   NSArray *runModeArray = [ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ];
+   [ [ NSRunLoop currentRunLoop ] performSelector:@selector( makeFirstResponder: )
+                                           target:[ self window ]
+                                         argument:passphrasePhrase2
+                                            order:9999
+                                            modes:runModeArray ];
    parentWindow = window;
    modalDelegate = delegate;
    sheetEndSelector = selector;
@@ -237,7 +238,7 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
                             NSLocalizedString( @"The passphrases do not match; do you wish to enter again "
                                                @"or cancel?", @"" ) );
       }
-      else if( ( [ [ passphrasePhrase2 stringValue ] length ] < CSWINCTRLPASSPHRASE_SHORT_PASSPHRASE ) )
+      else if( ( [ [ passphrasePhrase2 stringValue ] length ] < CSWinCtrlPassphrase_ShortPassPhrase ) )
       {
          // Warn if it is short and the user pref is enabled
          NSBeginAlertSheet( NSLocalizedString( @"Short Passphrase", @"" ),
@@ -278,8 +279,9 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
 /*
  * End of the "passphrases don't match" sheet
  */
-- (void) noMatchSheetDidDismiss:(NSWindow *)sheet returnCode:(int)returnCode
-                    contextInfo:(void  *)contextInfo
+- (void) noMatchSheetDidDismiss:(NSWindow *)sheet
+                     returnCode:(int)returnCode
+                    contextInfo:(void *)contextInfo
 {
    if( returnCode == NSAlertDefaultReturn )   // Enter again
       [ NSApp beginSheet:[ self window ]
@@ -298,8 +300,9 @@ NSString * const CSPassphraseNote_Change = @"New passphrase";
 /*
  * End of the "short passphrase" warning sheet
  */
-- (void) shortPPSheetDidDismiss:(NSWindow *)sheet returnCode:(int)returnCode
-                    contextInfo:(void  *)contextInfo
+- (void) shortPPSheetDidDismiss:(NSWindow *)sheet
+                     returnCode:(int)returnCode
+                    contextInfo:(void *)contextInfo
 {
    if( returnCode == NSAlertDefaultReturn )   // Use it
       [ modalDelegate performSelector:sheetEndSelector withObject:[ self genKeyForConfirm:YES ] ];
