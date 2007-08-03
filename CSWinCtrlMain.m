@@ -164,7 +164,8 @@ static NSArray *searchWhatArray;
       [ newColumn setEditable:NO ];
       [ newColumn setResizingMask:( NSTableColumnAutoresizingMask | NSTableColumnUserResizingMask ) ];
       [ [ newColumn headerCell ] setStringValue:NSLocalizedString( colID, @"" ) ];
-      [ documentView addTableColumn:[ newColumn autorelease ] ];
+      [ documentView addTableColumn:newColumn ];
+      [ newColumn release ];
    }
 }
 
@@ -256,11 +257,10 @@ static NSArray *searchWhatArray;
    [ self setDisplayOfColumnID:@"url" enabled:YES ];
    [ self setDisplayOfColumnID:@"notes" enabled:YES ];
    // Without resizing, the columns are oddly sized...
-   NSArray *tableColumns = [ documentView tableColumns ];
-   NSEnumerator *colEnum = [ tableColumns objectEnumerator ];
+   NSEnumerator *colEnum = [ [ documentView tableColumns ] objectEnumerator ];
    id aColumn;
    while( ( aColumn = [ colEnum nextObject ] ) != nil )
-      [ aColumn setWidth:100 ];
+      [ aColumn setWidth:10 ];
    [ documentView sizeToFit ];
 }
 
@@ -294,7 +294,7 @@ static NSArray *searchWhatArray;
       while( ( oldItem = [ oldItemsEnum nextObject ] ) != nil )
          [ categoriesMenu removeItem:oldItem ];
       NSEnumerator *currentCategoriesEnum = [ [ [ self document ] categories ] objectEnumerator ];
-      NSString *newItem;
+      id newItem;
       while( ( newItem = [ currentCategoriesEnum nextObject ] ) != nil )
          [ categoriesMenu addItemWithTitle:newItem
                                     action:@selector( setCategory: )
@@ -386,9 +386,8 @@ static NSArray *searchWhatArray;
         rowIndex != NSNotFound;
         rowIndex = [ indexes indexGreaterThanIndex:rowIndex ] )
    {
-      [ nameArray addObject:[ [ self document ]
-                              stringForKey:CSDocModelKey_Name
-                                     atRow:[ self rowForFilteredRow:rowIndex ] ] ];
+      [ nameArray addObject:[ [ self document ] stringForKey:CSDocModelKey_Name
+                                                       atRow:[ self rowForFilteredRow:rowIndex ] ] ];
    }
 
    return nameArray;
@@ -418,9 +417,9 @@ static NSArray *searchWhatArray;
  */
 - (void) selectNames:(NSArray *)names
 {
-   NSEnumerator *nameEnumerator = [ names objectEnumerator ];
-   NSString *rowName;
    NSMutableIndexSet *rowIndex = [ NSMutableIndexSet indexSet ];
+   NSEnumerator *nameEnumerator = [ names objectEnumerator ];
+   id rowName;
    while( ( rowName = [ nameEnumerator nextObject ] ) != nil )
       [ rowIndex addIndex:[ [ self document ] rowForName:rowName ] ];
    [ documentView selectRowIndexes:rowIndex byExtendingSelection:NO ];
@@ -678,7 +677,7 @@ static NSArray *searchWhatArray;
  */
 - (IBAction) copy:(id)sender
 {
-   [ [ self document ] copyNames:[ self getSelectedNames ]toPasteboard:[ NSPasteboard generalPasteboard ] ];
+   [ [ self document ] copyNames:[ self getSelectedNames ] toPasteboard:[ NSPasteboard generalPasteboard ] ];
    [ [ NSApp delegate ] notePBChangeCount ];
 }
 
@@ -900,13 +899,13 @@ static NSArray *searchWhatArray;
    }
    else
       category = [ sender title ];
-   NSArray *selectedNamesArray = [ self getSelectedNames ];
    if( category != nil )
    {
-      unsigned int index;
-      for( index = 0; index < [ selectedNamesArray count ]; index++ )
+      NSEnumerator *selectedNamesEnumerator = [ [ self getSelectedNames ] objectEnumerator ];
+      id nextName;
+      while( ( nextName = [ selectedNamesEnumerator nextObject ] ) != nil )
       {
-         [ [ self document ] changeEntryWithName:[ selectedNamesArray objectAtIndex:index ]
+         [ [ self document ] changeEntryWithName:nextName
                                          newName:nil
                                          account:nil
                                         password:nil
