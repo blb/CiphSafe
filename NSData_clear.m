@@ -45,11 +45,9 @@
    if( [ self isKindOfClass:NSClassFromString( @"NSConcreteData" ) ] ||
        [ self isKindOfClass:NSClassFromString( @"NSConcreteMutableData" ) ] )
    {
-      BOOL isMutable;
+      BOOL isMutable = YES;
       if( [ self isKindOfClass:NSClassFromString( @"NSConcreteData" ) ] )
          isMutable = NO;
-      else
-         isMutable = YES;
       char *someData = NULL;
       int index;
       for( index = 0; index < isa->ivars->ivar_count; index++ )
@@ -65,8 +63,7 @@
       }
       if( someData != NULL )   // We found _bytes
       {
-         int length = [ self length ];
-         for( index = 0; index < length; index++ )
+         for( index = 0; index < [ self length ]; index++ )
             someData[ index ] = 0;
       }
 #if defined(DEBUG)
