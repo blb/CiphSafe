@@ -14,6 +14,7 @@
                 deselectAll = id; 
                 exportDocument = id; 
                 exportSelectedItems = id; 
+                miniaturizeAll = id; 
                 setCategory = id; 
             }; 
             CLASS = FirstResponder; 
