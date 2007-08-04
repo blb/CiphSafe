@@ -16,6 +16,7 @@
                 exportSelectedItems = id; 
                 miniaturizeAll = id; 
                 setCategory = id; 
+                toggleBaseWritingDirection = id; 
             }; 
             CLASS = FirstResponder; 
             LANGUAGE = ObjC; 
