@@ -15,6 +15,10 @@
                 exportDocument = id; 
                 exportSelectedItems = id; 
                 miniaturizeAll = id; 
+                orderFrontLinkPanel = id; 
+                orderFrontListPanel = id; 
+                orderFrontSpacingPanel = id; 
+                orderFrontTablePanel = id; 
                 setCategory = id; 
                 toggleBaseWritingDirection = id; 
             }; 
