@@ -90,19 +90,6 @@
 
 
 /*
- * Override so deselectAll: for a menu item is only enabled when something
- * is selected
- */
-- (BOOL) validateMenuItem:(NSMenuItem *)menuItem
-{
-   if( [ menuItem action ] == @selector( deselectAll: ) )
-      return ( [ self numberOfSelectedRows ] > 0 );
-
-   return YES;
-}
-
-
-/*
  * Set the stripe color (the one other than white)
  */
 - (void) setStripeColor:(NSColor *)newStripeColor
