@@ -551,7 +551,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
    [ savePanel setAllowsOtherFileTypes:YES ];
    [ savePanel beginSheetForDirectory:nil
                                  file:nil
-                       modalForWindow:[ mainWindowController window ]
+                       modalForWindow:[ self windowForSheet ]
                         modalDelegate:self
                        didEndSelector:@selector( exportPanelDidEnd:returnCode:contextInfo: )
                           contextInfo:NULL ];   
