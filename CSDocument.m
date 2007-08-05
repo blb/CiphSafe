@@ -51,33 +51,17 @@ NSString * const CSDocumentXML_RootNode = @"document";
 NSString * const CSDocumentXML_EntryNode = @"entry";
 
 
+@interface CSDocument (InternalMethods)
+- (CSDocModel *) model;
+- (void) setBFKey:(NSMutableData *)newKey;
+- (NSString *) uniqueNameForName:(NSString *)name;
+@end
+
+
 @implementation CSDocument
 
-/*
- * Return a name which doesn't yet exist (eg, 'name' would result in 'name' if
- * 'name' didn't already exist, 'name copy' if it did, then 'name copy #' if
- * 'name copy', etc)
- *
- * XXX Minor security issue here, as the autoreleased strings should be cleared
- * if they aren't used, but since this should really only be called when an
- * entry is dropped or copied, it's moot
- */
-- (NSString *) uniqueNameForName:(NSString *)name
-{
-   NSString *uniqueName = name;
-   int index;
-   for( index = 0; [ self rowForName:uniqueName ] != -1; index++ )
-   {
-      if( index )
-         uniqueName = [ NSString stringWithFormat:NSLocalizedString( @"%@ copy %d", @"" ), name, index ];
-      else
-         uniqueName = [ NSString stringWithFormat:NSLocalizedString( @"%@ copy", @"" ), name ];
-   }
-   
-   return uniqueName;
-}
-
-
+#pragma mark -
+#pragma mark Initialization
 /*
  * Register for notifications from the model and give it an undo manager
  */
@@ -107,96 +91,31 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 }
 
 
-/*
- * Accessor for the model, also creates when necessary
- */
-- (CSDocModel *) model
+- (id) init
 {
-   if( docModel == nil )
+   self = [ super init ];
+   if( self != nil )
    {
-      docModel = [ [ CSDocModel alloc ] init ];
-      [ self setupModel ];
+      // Note this window controller is NOT added to NSDocument's list
+      passphraseWindowController = [ [ CSWinCtrlPassphrase alloc ] init ];
    }
    
-   return docModel;
+   return self;
 }
 
 
 /*
- * Called on model notifications so we can redo the table view
+ * We need our own window controller...
  */
-- (void) updateViewForNotification:(NSNotification *)notification
+- (void) makeWindowControllers
 {
-   CSWinCtrlChange *changeController;
-   /*
-    * Need to keep change windows synchronized on changes and remove them
-    * on deletes, as undo/redo will change them outside our control
-    */
-   if( [ [ notification name ] isEqualToString:CSDocModelDidChangeEntryNotification ] )
-   {
-      NSString *oldName = [ [ notification userInfo ]
-                            objectForKey:CSDocModelNotificationInfoKey_ChangedNameFrom ];
-      changeController = [ CSWinCtrlChange controllerForEntryName:oldName inDocument:self ];
-      if( changeController != nil )
-         [ changeController setEntryName:[ [ notification userInfo ]
-                                           objectForKey:CSDocModelNotificationInfoKey_ChangedNameTo ] ];
-   }
-   else if( [ [ notification name ] isEqualToString:CSDocModelDidRemoveEntryNotification ] )
-   {
-      NSArray *deletedNames = [ [ notification userInfo ]
-                                objectForKey:CSDocModelNotificationInfoKey_DeletedNames ];
-      NSEnumerator *nameEnumerator = [ deletedNames objectEnumerator ];
-      id deletedName;
-      while( ( deletedName = [ nameEnumerator nextObject ] ) != nil )
-      {
-         changeController = [ CSWinCtrlChange controllerForEntryName:deletedName inDocument:self ];
-         if( changeController != nil )
-            [ [ changeController window ] performClose:self ];
-      }
-   }
-   
-   [ mainWindowController refreshWindow ];
+   mainWindowController = [ [ [ CSWinCtrlMain alloc ] init ] autorelease ];
+   [ self addWindowController:mainWindowController ];
 }
 
 
-/*
- * Set the Blowfish key to be used
- */
-- (void) setBFKey:(NSMutableData *)newKey
-{
-   /*
-    * Normally, we could just retain, release, and set, but since we clear, we
-    * have to check stuff first
-    */
-   if( ![ newKey isEqual:bfKey ] )
-   {
-      [ newKey retain ];
-      [ bfKey clearOutData ];
-      [ bfKey release ];
-      bfKey = newKey;
-   }
-}
-
-
-/*
- * Callback for the passphrase controller, when run document-modally; simply
- * invokes getKeyInvocation if the user didn't hit cancel 
- */
-- (void) getKeyResult:(NSMutableData *)newKey
-{
-   NSAssert( getKeyInvocation != nil, @"getKeyInvocation is nil" );
-   
-   if( newKey != nil )
-   {
-      [ self setBFKey:newKey ];
-      [ getKeyInvocation invoke ];
-   }
-   
-   [ getKeyInvocation release ];
-   getKeyInvocation = nil;
-}
-
-
+#pragma mark -
+#pragma mark Loading and Saving
 /*
  * This simply calls super's saveToFile:... as we need to pass some object
  * to NSInvocation as the target, and super won't work
@@ -212,29 +131,6 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
              delegate:delegate
       didSaveSelector:didSaveSelector
           contextInfo:contextInfo ];
-}
-
-
-- (id) init
-{
-   self = [ super init ];
-   if( self != nil )
-   {
-      // Note this window controller is NOT added to NSDocument's list
-      passphraseWindowController = [ [ CSWinCtrlPassphrase alloc ] init ];
-   }
-
-   return self;
-}
-
-
-/*
- * We need our own window controller...
- */
-- (void) makeWindowControllers
-{
-   mainWindowController = [ [ [ CSWinCtrlMain alloc ] init ] autorelease ];
-   [ self addWindowController:mainWindowController ];
 }
 
 
@@ -359,49 +255,38 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 }
 
 
+#pragma mark -
+#pragma mark Configuration
 /*
- * Whether or not to keep a backup file (determined by user pref)
+ * Accessor for the model, also creates when necessary
  */
-- (BOOL) keepBackupFile
+- (CSDocModel *) model
 {
-   return [ [ NSUserDefaults standardUserDefaults ] boolForKey:CSPrefDictKey_SaveBackup ];
-}
-
-
-/*
- * Open the window to add new entries, via CSWinCtrlAdd
- */
-- (void) openAddEntryWindow
-{
-   CSWinCtrlAdd *winController = [ [ self windowControllers ] firstObjectOfClass:[ CSWinCtrlAdd class ] ];
-   if( winController == nil )   // Doesn't exist yet
+   if( docModel == nil )
    {
-      winController = [ [ CSWinCtrlAdd alloc ] init ];
-      [ self addWindowController:winController ];
-      [ winController release ];
+      docModel = [ [ CSDocModel alloc ] init ];
+      [ self setupModel ];
    }
-   [ winController showWindow:self ];
+   
+   return docModel;
 }
 
 
 /*
- * Open a window for the given array of names, via CSWinCtrlChange
+ * Set the Blowfish key to be used
  */
-- (void) viewEntries:(NSArray *)namesArray
+- (void) setBFKey:(NSMutableData *)newKey
 {
-   NSEnumerator *nameEnumerator = [ namesArray objectEnumerator ];
-   id oneName;
-   while( ( oneName = [ nameEnumerator nextObject ] ) != nil )
+   /*
+    * Normally, we could just retain, release, and set, but since we clear, we
+    * have to check stuff first
+    */
+   if( ![ newKey isEqual:bfKey ] )
    {
-      CSWinCtrlChange *winController = [ CSWinCtrlChange controllerForEntryName:oneName
-                                                                     inDocument:self ];
-      if( winController == nil )
-      {
-         winController = [ [ CSWinCtrlChange alloc ] initForEntryName:oneName ];
-         [ self addWindowController:winController ];
-         [ winController release ];
-      }
-      [ winController showWindow:self ];
+      [ newKey retain ];
+      [ bfKey clearOutData ];
+      [ bfKey release ];
+      bfKey = newKey;
    }
 }
 
@@ -426,6 +311,78 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 }
 
 
+/*
+ * Override so we can handle timeout-specific closes; save or discard changes if those options are set then
+ * fall to super's implementation.
+ */
+- (void) canCloseDocumentWithDelegate:(id)delegate
+                  shouldCloseSelector:(SEL)shouldCloseSelector
+                          contextInfo:(void *)contextInfo
+{
+   CSAppController *appController = (CSAppController *) [ NSApp delegate ];
+   if( [ appController closeAllFromTimeout ] )
+   {
+      int saveOption = [ [ NSUserDefaults standardUserDefaults ]
+                         integerForKey:CSPrefDictKey_CloseAfterTimeoutSaveOption ];
+      if( saveOption == CSPrefCloseAfterTimeoutSaveOption_Save )
+         [ self saveDocument:self ];
+      else if( saveOption == CSPrefCloseAfterTimeoutSaveOption_Discard )
+         [ self updateChangeCount:NSChangeCleared ];
+   }
+   [ super canCloseDocumentWithDelegate:delegate
+                    shouldCloseSelector:shouldCloseSelector
+                            contextInfo:contextInfo ]; 
+}
+
+
+#pragma mark -
+#pragma mark Queries
+/*
+ * Whether or not to keep a backup file (determined by user pref)
+ */
+- (BOOL) keepBackupFile
+{
+   return [ [ NSUserDefaults standardUserDefaults ] boolForKey:CSPrefDictKey_SaveBackup ];
+}
+
+
+/*
+ * Return just the main window controller
+ */
+- (CSWinCtrlMain *) mainWindowController
+{
+   return mainWindowController;
+}
+
+
+/*
+ * Category information
+ */
+- (NSArray *) categories
+{
+   NSMutableArray *categories;
+   if( [ [ NSUserDefaults standardUserDefaults ] boolForKey:CSPrefDictKey_IncludeDefaultCategories ] )
+   {
+      NSString *defaultCategoriesValuesPath = [ [ NSBundle mainBundle ] pathForResource:@"DefaultCategories" 
+                                                                                 ofType:@"plist" ];
+      categories = [ NSMutableArray arrayWithContentsOfFile:defaultCategoriesValuesPath ];
+   }
+   else
+      categories = [ NSMutableArray arrayWithCapacity:10 ];
+   int index;
+   for( index = 0; index < [ self entryCount ]; index++ )
+   {
+      NSString *category = [ self stringForKey:CSDocModelKey_Category atRow:index ];
+      if( category != nil && ( [ category length ] > 0 ) && ![ categories containsObject:category ] )
+         [ categories addObject:category ];
+   }
+   
+   return [ categories sortedArrayUsingSelector:@selector( caseInsensitiveCompare: ) ];
+}
+
+
+#pragma mark -
+#pragma mark Export
 /*
  * Return CSV data for the given rows, wrapped in an NSData
  */
@@ -584,57 +541,8 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 }
 
 
-/*
- * Return just the main window controller
- */
-- (CSWinCtrlMain *) mainWindowController
-{
-   return mainWindowController;
-}
-
-
-/*
- * Override so we can handle timeout-specific closes; save or discard changes if those options are set then
- * fall to super's implementation.
- */
-- (void) canCloseDocumentWithDelegate:(id)delegate
-                  shouldCloseSelector:(SEL)shouldCloseSelector
-                          contextInfo:(void *)contextInfo
-{
-   CSAppController *appController = (CSAppController *) [ NSApp delegate ];
-   if( [ appController closeAllFromTimeout ] )
-   {
-      int saveOption = [ [ NSUserDefaults standardUserDefaults ]
-                         integerForKey:CSPrefDictKey_CloseAfterTimeoutSaveOption ];
-      if( saveOption == CSPrefCloseAfterTimeoutSaveOption_Save )
-         [ self saveDocument:self ];
-      else if( saveOption == CSPrefCloseAfterTimeoutSaveOption_Discard )
-         [ self updateChangeCount:NSChangeCleared ];
-   }
-   [ super canCloseDocumentWithDelegate:delegate
-                    shouldCloseSelector:shouldCloseSelector
-                            contextInfo:contextInfo ]; 
-}
-
-
-/*
- * Enable certain menu items only when it makes sense
- */
-- (BOOL) validateMenuItem:(NSMenuItem *)menuItem
-{
-   SEL menuItemAction = [ menuItem action ];
-
-   if( menuItemAction == @selector( changePassphrase: ) )
-      return ( bfKey != nil );
-   else if( menuItemAction == @selector( revertDocumentToSaved: ) )
-      return [ self isDocumentEdited ];
-   else if( menuItemAction == @selector( exportSelectedItems: ) )
-      return ( [ [ [ self mainWindowController ] selectedRowIndexes ] count ] > 0 );
-   else
-      return [ super validateMenuItem:menuItem ];
-}
-
-
+#pragma mark -
+#pragma mark Copy/Paste
 /*
  * Copy the given rows to the given pasteboard (rows must be an array of
  * entry names)
@@ -741,32 +649,8 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 }
 
 
-/*
- * Category information
- */
-- (NSArray *) categories
-{
-   NSMutableArray *categories;
-   if( [ [ NSUserDefaults standardUserDefaults ] boolForKey:CSPrefDictKey_IncludeDefaultCategories ] )
-   {
-      NSString *defaultCategoriesValuesPath = [ [ NSBundle mainBundle ] pathForResource:@"DefaultCategories" 
-                                                                                 ofType:@"plist" ];
-      categories = [ NSMutableArray arrayWithContentsOfFile:defaultCategoriesValuesPath ];
-   }
-   else
-      categories = [ NSMutableArray arrayWithCapacity:10 ];
-   int index;
-   for( index = 0; index < [ self entryCount ]; index++ )
-   {
-      NSString *category = [ self stringForKey:CSDocModelKey_Category atRow:index ];
-      if( category != nil && ( [ category length ] > 0 ) && ![ categories containsObject:category ] )
-         [ categories addObject:category ];
-   }
-
-   return [ categories sortedArrayUsingSelector:@selector( caseInsensitiveCompare: ) ];
-}
-
-
+#pragma mark -
+#pragma mark Proxied Methods to the Model
 /*
  * Proxy methods to the model
  */
@@ -898,7 +782,8 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 
 
 /*
- * Change the given entry
+ * Change the given entry; this does a bit more than simply proxy to the model in order to update the
+ * selections in the main window so those changed remain selected.
  */
 - (BOOL) changeEntryWithName:(NSString *)name
                      newName:(NSString *)newName
@@ -961,6 +846,120 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 }
 
 
+#pragma mark -
+#pragma mark Miscellaneous
+/*
+ * Called on model notifications so we can redo the table view
+ */
+- (void) updateViewForNotification:(NSNotification *)notification
+{
+   CSWinCtrlChange *changeController;
+   /*
+    * Need to keep change windows synchronized on changes and remove them
+    * on deletes, as undo/redo will change them outside our control
+    */
+   if( [ [ notification name ] isEqualToString:CSDocModelDidChangeEntryNotification ] )
+   {
+      NSString *oldName = [ [ notification userInfo ]
+                            objectForKey:CSDocModelNotificationInfoKey_ChangedNameFrom ];
+      changeController = [ CSWinCtrlChange controllerForEntryName:oldName inDocument:self ];
+      if( changeController != nil )
+         [ changeController setEntryName:[ [ notification userInfo ]
+                                           objectForKey:CSDocModelNotificationInfoKey_ChangedNameTo ] ];
+   }
+   else if( [ [ notification name ] isEqualToString:CSDocModelDidRemoveEntryNotification ] )
+   {
+      NSArray *deletedNames = [ [ notification userInfo ]
+                                objectForKey:CSDocModelNotificationInfoKey_DeletedNames ];
+      NSEnumerator *nameEnumerator = [ deletedNames objectEnumerator ];
+      id deletedName;
+      while( ( deletedName = [ nameEnumerator nextObject ] ) != nil )
+      {
+         changeController = [ CSWinCtrlChange controllerForEntryName:deletedName inDocument:self ];
+         if( changeController != nil )
+            [ [ changeController window ] performClose:self ];
+      }
+   }
+   
+   [ mainWindowController refreshWindow ];
+}
+
+
+/*
+ * Callback for the passphrase controller, when run document-modally; simply
+ * invokes getKeyInvocation if the user didn't hit cancel 
+ */
+- (void) getKeyResult:(NSMutableData *)newKey
+{
+   NSAssert( getKeyInvocation != nil, @"getKeyInvocation is nil" );
+   
+   if( newKey != nil )
+   {
+      [ self setBFKey:newKey ];
+      [ getKeyInvocation invoke ];
+   }
+   
+   [ getKeyInvocation release ];
+   getKeyInvocation = nil;
+}
+
+
+/*
+ * Open the window to add new entries, via CSWinCtrlAdd
+ */
+- (void) openAddEntryWindow
+{
+   CSWinCtrlAdd *winController = [ [ self windowControllers ] firstObjectOfClass:[ CSWinCtrlAdd class ] ];
+   if( winController == nil )   // Doesn't exist yet
+   {
+      winController = [ [ CSWinCtrlAdd alloc ] init ];
+      [ self addWindowController:winController ];
+      [ winController release ];
+   }
+   [ winController showWindow:self ];
+}
+
+
+/*
+ * Open a window for the given array of names, via CSWinCtrlChange
+ */
+- (void) viewEntries:(NSArray *)namesArray
+{
+   NSEnumerator *nameEnumerator = [ namesArray objectEnumerator ];
+   id oneName;
+   while( ( oneName = [ nameEnumerator nextObject ] ) != nil )
+   {
+      CSWinCtrlChange *winController = [ CSWinCtrlChange controllerForEntryName:oneName
+                                                                     inDocument:self ];
+      if( winController == nil )
+      {
+         winController = [ [ CSWinCtrlChange alloc ] initForEntryName:oneName ];
+         [ self addWindowController:winController ];
+         [ winController release ];
+      }
+      [ winController showWindow:self ];
+   }
+}
+
+
+/*
+ * Enable certain menu items only when it makes sense
+ */
+- (BOOL) validateMenuItem:(NSMenuItem *)menuItem
+{
+   SEL menuItemAction = [ menuItem action ];
+   
+   if( menuItemAction == @selector( changePassphrase: ) )
+      return ( bfKey != nil );
+   else if( menuItemAction == @selector( revertDocumentToSaved: ) )
+      return [ self isDocumentEdited ];
+   else if( menuItemAction == @selector( exportSelectedItems: ) )
+      return ( [ [ [ self mainWindowController ] selectedRowIndexes ] count ] > 0 );
+   else
+      return [ super validateMenuItem:menuItem ];
+}
+
+
 /*
  * Cleanup
  */
@@ -970,6 +969,31 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
    [ passphraseWindowController release ];
    [ docModel release ];
    [ super dealloc ];
+}
+
+
+/*
+ * Return a name which doesn't yet exist (eg, 'name' would result in 'name' if
+ * 'name' didn't already exist, 'name copy' if it did, then 'name copy #' if
+ * 'name copy', etc)
+ *
+ * XXX Minor security issue here, as the autoreleased strings should be cleared
+ * if they aren't used, but since this should really only be called when an
+ * entry is dropped or copied, it's moot
+ */
+- (NSString *) uniqueNameForName:(NSString *)name
+{
+   NSString *uniqueName = name;
+   int index;
+   for( index = 0; [ self rowForName:uniqueName ] != -1; index++ )
+   {
+      if( index )
+         uniqueName = [ NSString stringWithFormat:NSLocalizedString( @"%@ copy %d", @"" ), name, index ];
+      else
+         uniqueName = [ NSString stringWithFormat:NSLocalizedString( @"%@ copy", @"" ), name ];
+   }
+   
+   return uniqueName;
 }
 
 @end
