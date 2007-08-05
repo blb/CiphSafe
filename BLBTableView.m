@@ -37,6 +37,8 @@
 
 @implementation BLBTableView
 
+#pragma mark -
+#pragma mark Initialization
 /*
  * Set the cells to not draw a background, so the striping works nicely
  */
@@ -49,6 +51,8 @@
 }
 
 
+#pragma mark -
+#pragma mark Stripe Handling
 /*
  * This routine does the actual stripe drawing, filling in every other row
  * of the table with some color for the background so you can follow the rows easier with
@@ -114,6 +118,8 @@
 }
 
 
+#pragma mark -
+#pragma mark Additional Delegations
 /*
  * The delegate must implement contextualMenuForBLBTableView:row:column: for this
  * to work
@@ -158,6 +164,8 @@
 }
 
 
+#pragma mark -
+#pragma mark Finalization
 /*
  * Cleanup
  */
