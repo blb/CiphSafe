@@ -62,11 +62,18 @@ NSString * const CSDocModelNotificationInfoKey_DeletedNames = @"CSDocModelNotifi
 // Used to sort the array
 int sortEntries( id dict1, id dict2, void *context );
 
+@interface CSDocModel (InternalMethods)
+- (NSString *) nonNilStringFrom:(NSDictionary *)dict forKey:(NSString *)key;
+- (NSData *) nonNilDataFrom:(NSDictionary *)dict forKey:(NSString *)key;
+@end
+
 
 @implementation CSDocModel
 
 static NSArray *keyArray;
 
+#pragma mark -
+#pragma mark Initialization
 + (void) initialize
 {
 #if defined(DEBUG)
@@ -83,53 +90,12 @@ static NSArray *keyArray;
 
 
 /*
- * Return the entry for the given name, or nil if not found
- */
-- (NSMutableDictionary *) findEntryWithName:(NSString *)name
-{
-   NSEnumerator *enumerator = [ allEntries objectEnumerator ];
-   id oneEntry;
-   while( ( ( oneEntry = [ enumerator nextObject ] ) != nil ) &&
-          ![ [ oneEntry objectForKey:CSDocModelKey_Name ] isEqualToString:name ] )
-      ;   // Just loop through...
-   
-   return oneEntry;
-}
-
-
-/*
  * Setup our configuration
  */
 - (void) setupSelf
 {
    sortKey = CSDocModelKey_Name;
    sortAscending = YES;
-}
-
-
-/*
- * Return a valid string (empty, @"", if necessary)
- */
-- (NSString *) stringFrom:(NSDictionary *)dict forKey:(NSString *)key
-{
-   NSString *result = [ dict objectForKey:key ];
-   if( result == nil )
-      result = @"";
-   
-   return result;
-}
-
-
-/*
- * Return valid data (empty if necessary)
- */
-- (NSData *) dataFrom:(NSDictionary *)dict forKey:(NSString *)key
-{
-   NSData *result = [ dict objectForKey:key ];
-   if( result == nil )
-      result = [ NSData data ];
-   
-   return result;
 }
 
 
@@ -145,7 +111,7 @@ static NSArray *keyArray;
       entryASCache = [ [ NSMutableDictionary alloc ] initWithCapacity:25 ];
       [ self setupSelf ];
    }
-
+   
    return self;
 }
 
@@ -165,7 +131,7 @@ static NSArray *keyArray;
 #endif
       return nil;
    }
-
+   
    self = [ super init ];
    if( self != nil )
    {
@@ -173,7 +139,7 @@ static NSArray *keyArray;
       // Separate into the IV and compressed & encrypted data
       NSData *iv = [ encryptedData subdataWithRange:NSMakeRange( 0, 8 ) ];
       NSData *ceData = [ encryptedData subdataWithRange:NSMakeRange( 8, [ encryptedData length ] - 8 ) ];
-
+      
       NSMutableData *decryptedData = [ ceData blowfishDecryptedDataWithKey:bfKey iv:iv ];
       if( decryptedData != nil )
       {
@@ -210,8 +176,25 @@ static NSArray *keyArray;
          self = nil;
       }
    }
-
+   
    return self;
+}
+
+
+#pragma mark -
+#pragma mark Queries
+/*
+ * Return the entry for the given name, or nil if not found
+ */
+- (NSMutableDictionary *) findEntryWithName:(NSString *)name
+{
+   NSEnumerator *enumerator = [ allEntries objectEnumerator ];
+   id oneEntry;
+   while( ( ( oneEntry = [ enumerator nextObject ] ) != nil ) &&
+          ![ [ oneEntry objectForKey:CSDocModelKey_Name ] isEqualToString:name ] )
+      ;   // Just loop through...
+   
+   return oneEntry;
 }
 
 
@@ -234,6 +217,181 @@ static NSArray *keyArray;
 }
 
 
+/*
+ * Return total number of entries
+ */
+- (int) entryCount
+{
+   return [ allEntries count ];
+}
+
+
+/*
+ * Return the value for the given key on the given row
+ */
+- (NSString *) stringForKey:(NSString *)key atRow:(int)row
+{
+   NSString *result;
+   if( [ key isEqualToString:CSDocModelKey_Notes ] )
+      result = [ [ self RTFDStringNotesAtRow:row ] string ];
+   else
+      result = [ [ allEntries objectAtIndex:row ] objectForKey:key ];
+   if( result == nil )
+      result = @"";
+   
+   return result;
+}
+
+
+/*
+ * Return an array of strings for the entry at the given row
+ */
+- (NSArray *) stringArrayForEntryAtRow:(int)row
+{
+   NSMutableArray *stringArray = [ NSMutableArray arrayWithCapacity:6 ];
+   NSEnumerator *keyEnumerator = [ keyArray objectEnumerator ];
+   id oneKey;
+   while( ( oneKey = [ keyEnumerator nextObject ] ) != nil )
+      [ stringArray addObject:[ self stringForKey:oneKey atRow:row ] ];
+   
+   return stringArray;
+}
+
+
+/*
+ * Return the RTFD for the notes on the given row
+ */
+- (NSData *) RTFDNotesAtRow:(int)row
+{
+   return [ [ allEntries objectAtIndex:row ] objectForKey:CSDocModelKey_Notes ];
+}
+
+
+/*
+ * Return the RTF version for the notes on the given row
+ *
+ * XXX Note this returns an autoreleased NSData with possibly sensitive
+ * information
+ */
+- (NSData *) RTFNotesAtRow:(int)row
+{
+   return [ [ self RTFDStringNotesAtRow:row ] RTFWithDocumentAttributes:NULL ];
+}
+
+
+/*
+ * Return an attributed string with the RTFD notes on the given row; this
+ * string is cached as it is quite popular...
+ *
+ * XXX Note this returns an autoreleased NSString with possibly sensitive
+ * information
+ */
+- (NSAttributedString *) RTFDStringNotesAtRow:(int)row
+{
+   NSString *cacheKey = [ self stringForKey:CSDocModelKey_Name atRow:row ];
+   NSAttributedString *rtfdString = [ entryASCache objectForKey:cacheKey ];
+   if( rtfdString == nil )
+   {
+      NSData *rtfdData = [ self RTFDNotesAtRow:row ];
+      if( rtfdData != nil )
+      {
+         rtfdString = [ [ NSAttributedString alloc ] initWithRTFD:rtfdData documentAttributes:NULL ];
+         [ entryASCache setObject:rtfdString forKey:cacheKey ];
+         [ rtfdString release ];   // entryASCache has it retained now
+      }
+   }
+   
+   return rtfdString;
+}
+
+
+/*
+ * Return an attributed string with the RTF notes on the given row
+ *
+ * XXX Note this returns an autoreleased NSString with possibly sensitive
+ * information
+ */
+- (NSAttributedString *) RTFStringNotesAtRow:(int)row
+{
+   return [ [ [ NSAttributedString alloc ]
+              initWithRTF:[ self RTFNotesAtRow:row ] documentAttributes:NULL ]
+      autorelease ];
+}
+
+
+/*
+ * Return the row number for the given name, -1 if not found
+ */
+- (int) rowForName:(NSString *)name
+{
+   int rowNum = -1;
+   int index;
+   for( index = 0; index < [ self entryCount ] && rowNum == -1; index++ )
+   {
+      if( [ [ self stringForKey:CSDocModelKey_Name atRow:index ] isEqualToString:name ] )
+         rowNum = index;
+   }
+   
+   return rowNum;
+}
+
+
+/*
+ * Return the row number of the first matching entry
+ */
+- (NSNumber *) firstRowBeginningWithString:(NSString *)findString
+                                ignoreCase:(BOOL)ignoreCase
+                                    forKey:(NSString *)key
+{
+   NSRange searchRange = NSMakeRange( 0, [ findString length ] );
+   unsigned int compareOptions = 0;
+   if( ignoreCase )
+      compareOptions = NSCaseInsensitiveSearch;
+   NSNumber *retval = nil;
+   int index;
+   for( index = 0; index < [ self entryCount ] && retval == nil; index++ )
+   {
+      if( [ [ self stringForKey:key atRow:index ] compare:findString
+                                                  options:compareOptions
+                                                    range:searchRange ] == NSOrderedSame )
+         retval = [ NSNumber numberWithInt:index ];
+   }
+   
+   return retval;
+}
+
+
+/*
+ * Return an array (of elements supporting intValue message) of all
+ * matching entries
+ */
+- (NSArray *) rowsMatchingString:(NSString *)findString
+                      ignoreCase:(BOOL)ignoreCase
+                          forKey:(NSString *)key
+{
+   NSMutableArray *retval = [ NSMutableArray arrayWithCapacity:10 ];
+   unsigned compareOptions = 0;
+   if( ignoreCase )
+      compareOptions = NSCaseInsensitiveSearch;
+   int index;
+   for( index = 0; index < [ self entryCount ]; index++ )
+   {
+      NSString *stringToSearch;
+      if( key == nil )
+         stringToSearch = [ [ self stringArrayForEntryAtRow:index ] componentsJoinedByString:@" " ];
+      else
+         stringToSearch = [ self stringForKey:key atRow:index ];
+      NSRange searchResult = [ stringToSearch rangeOfString:findString options:compareOptions ];
+      if( searchResult.location != NSNotFound )
+         [ retval addObject:[ NSNumber numberWithInt:index ] ];
+   }
+   
+   return retval;
+}
+
+
+#pragma mark -
+#pragma mark Configuration
 /*
  * Set the undo manager used by the model (if any)
  */
@@ -309,125 +467,8 @@ static NSArray *keyArray;
 }
 
 
-/*
- * Return total number of entries
- */
-- (int) entryCount
-{
-   return [ allEntries count ];
-}
-
-
-/*
- * Return the value for the given key on the given row
- */
-- (NSString *) stringForKey:(NSString *)key atRow:(int)row
-{
-   NSString *result;
-   if( [ key isEqualToString:CSDocModelKey_Notes ] )
-      result = [ [ self RTFDStringNotesAtRow:row ] string ];
-   else
-      result = [ [ allEntries objectAtIndex:row ] objectForKey:key ];
-   if( result == nil )
-      result = @"";
-
-   return result;
-}
-
-
-/*
- * Return an array of strings for the entry at the given row
- */
-- (NSArray *) stringArrayForEntryAtRow:(int)row
-{
-   NSMutableArray *stringArray = [ NSMutableArray arrayWithCapacity:6 ];
-   NSEnumerator *keyEnumerator = [ keyArray objectEnumerator ];
-   id oneKey;
-   while( ( oneKey = [ keyEnumerator nextObject ] ) != nil )
-      [ stringArray addObject:[ self stringForKey:oneKey atRow:row ] ];
-
-   return stringArray;
-}
-
-
-/*
- * Return the RTFD for the notes on the given row
- */
-- (NSData *) RTFDNotesAtRow:(int)row
-{
-   return [ [ allEntries objectAtIndex:row ] objectForKey:CSDocModelKey_Notes ];
-}
-
-
-/*
- * Return the RTF version for the notes on the given row
- *
- * XXX Note this returns an autoreleased NSData with possibly sensitive
- * information
- */
-- (NSData *) RTFNotesAtRow:(int)row
-{
-   return [ [ self RTFDStringNotesAtRow:row ] RTFWithDocumentAttributes:NULL ];
-}
-
-
-/*
- * Return an attributed string with the RTFD notes on the given row; this
- * string is cached as it is quite popular...
- *
- * XXX Note this returns an autoreleased NSString with possibly sensitive
- * information
- */
-- (NSAttributedString *) RTFDStringNotesAtRow:(int)row
-{
-   NSString *cacheKey = [ self stringForKey:CSDocModelKey_Name atRow:row ];
-   NSAttributedString *rtfdString = [ entryASCache objectForKey:cacheKey ];
-   if( rtfdString == nil )
-   {
-      NSData *rtfdData = [ self RTFDNotesAtRow:row ];
-      if( rtfdData != nil )
-      {
-         rtfdString = [ [ NSAttributedString alloc ] initWithRTFD:rtfdData documentAttributes:NULL ];
-         [ entryASCache setObject:rtfdString forKey:cacheKey ];
-         [ rtfdString release ];   // entryASCache has it retained now
-      }
-   }
-
-   return rtfdString;
-}
-
-
-/*
- * Return an attributed string with the RTF notes on the given row
- *
- * XXX Note this returns an autoreleased NSString with possibly sensitive
- * information
- */
-- (NSAttributedString *) RTFStringNotesAtRow:(int)row
-{
-   return [ [ [ NSAttributedString alloc ]
-              initWithRTF:[ self RTFNotesAtRow:row ] documentAttributes:NULL ]
-            autorelease ];
-}
-
-
-/*
- * Return the row number for the given name, -1 if not found
- */
-- (int) rowForName:(NSString *)name
-{
-   int rowNum = -1;
-   int index;
-   for( index = 0; index < [ self entryCount ] && rowNum == -1; index++ )
-   {
-      if( [ [ self stringForKey:CSDocModelKey_Name atRow:index ] isEqualToString:name ] )
-         rowNum = index;
-   }
-
-   return rowNum;
-}
-
-
+#pragma mark -
+#pragma mark Changing the Model
 /*
  * Add a new entry with the given data; returns YES if all went okay, NO if
  * an entry with that name already exists.
@@ -436,11 +477,11 @@ static NSArray *keyArray;
  * and is also given to the notification center
  */
 - (BOOL) addEntryWithName:(NSString *)name
-         account:(NSString *)account
-         password:(NSString *)password
-         URL:(NSString *)url
-         category:(NSString *)category
-         notesRTFD:(NSData *)notes
+                  account:(NSString *)account
+                 password:(NSString *)password
+                      URL:(NSString *)url
+                 category:(NSString *)category
+                notesRTFD:(NSData *)notes
 {
    // If it already exists, we're outta here
    if( [ self rowForName:name ] != -1 )
@@ -482,12 +523,12 @@ static NSArray *keyArray;
  * and both the old and new names are given to the notification center
  */
 - (BOOL) changeEntryWithName:(NSString *)name
-         newName:(NSString *)newName
-         account:(NSString *)account
-         password:(NSString *)password
-         URL:(NSString *)url
-         category:(NSString *)category
-         notesRTFD:(NSData *)notes
+                     newName:(NSString *)newName
+                     account:(NSString *)account
+                    password:(NSString *)password
+                         URL:(NSString *)url
+                    category:(NSString *)category
+                   notesRTFD:(NSData *)notes
 {
    NSMutableDictionary *theEntry = [ self findEntryWithName:name ];
    /*
@@ -505,11 +546,11 @@ static NSArray *keyArray;
       [ [ undoManager prepareWithInvocationTarget:self ]
         changeEntryWithName:realNewName
                     newName:name
-                    account:[ self stringFrom:theEntry forKey:CSDocModelKey_Acct ]
-                   password:[ self stringFrom:theEntry forKey:CSDocModelKey_Passwd ]
-                        URL:[ self stringFrom:theEntry forKey:CSDocModelKey_URL ]
-                   category:[ self stringFrom:theEntry forKey:CSDocModelKey_Category ]
-                  notesRTFD:[ self dataFrom:theEntry forKey:CSDocModelKey_Notes ] ];
+                    account:[ self nonNilStringFrom:theEntry forKey:CSDocModelKey_Acct ]
+                   password:[ self nonNilStringFrom:theEntry forKey:CSDocModelKey_Passwd ]
+                        URL:[ self nonNilStringFrom:theEntry forKey:CSDocModelKey_URL ]
+                   category:[ self nonNilStringFrom:theEntry forKey:CSDocModelKey_Category ]
+                  notesRTFD:[ self nonNilDataFrom:theEntry forKey:CSDocModelKey_Notes ] ];
       if( ![ undoManager isUndoing ] && ![ undoManager isRedoing ] )
          [ undoManager setActionName:NSLocalizedString( @"Change", @"" ) ];
    }
@@ -602,57 +643,31 @@ static NSArray *keyArray;
 }
 
 
+#pragma mark -
+#pragma mark Miscellaneous
 /*
- * Return the row number of the first matching entry
+ * Return a valid string (empty, @"", if necessary)
  */
-- (NSNumber *) firstRowBeginningWithString:(NSString *)findString
-                                ignoreCase:(BOOL)ignoreCase
-                                    forKey:(NSString *)key
+- (NSString *) nonNilStringFrom:(NSDictionary *)dict forKey:(NSString *)key
 {
-   NSRange searchRange = NSMakeRange( 0, [ findString length ] );
-   unsigned int compareOptions = 0;
-   if( ignoreCase )
-      compareOptions = NSCaseInsensitiveSearch;
-   NSNumber *retval = nil;
-   int index;
-   for( index = 0; index < [ self entryCount ] && retval == nil; index++ )
-   {
-      if( [ [ self stringForKey:key atRow:index ] compare:findString
-                                                  options:compareOptions
-                                                    range:searchRange ] == NSOrderedSame )
-         retval = [ NSNumber numberWithInt:index ];
-   }
-
-   return retval;
+   NSString *result = [ dict objectForKey:key ];
+   if( result == nil )
+      result = @"";
+   
+   return result;
 }
 
 
 /*
- * Return an array (of elements supporting intValue message) of all
- * matching entries
+ * Return valid data (empty if necessary)
  */
-- (NSArray *) rowsMatchingString:(NSString *)findString
-                      ignoreCase:(BOOL)ignoreCase
-                          forKey:(NSString *)key
+- (NSData *) nonNilDataFrom:(NSDictionary *)dict forKey:(NSString *)key
 {
-   NSMutableArray *retval = [ NSMutableArray arrayWithCapacity:10 ];
-   unsigned compareOptions = 0;
-   if( ignoreCase )
-      compareOptions = NSCaseInsensitiveSearch;
-   int index;
-   for( index = 0; index < [ self entryCount ]; index++ )
-   {
-      NSString *stringToSearch;
-      if( key == nil )
-         stringToSearch = [ [ self stringArrayForEntryAtRow:index ] componentsJoinedByString:@" " ];
-      else
-         stringToSearch = [ self stringForKey:key atRow:index ];
-      NSRange searchResult = [ stringToSearch rangeOfString:findString options:compareOptions ];
-      if( searchResult.location != NSNotFound )
-         [ retval addObject:[ NSNumber numberWithInt:index ] ];
-   }
-
-   return retval;
+   NSData *result = [ dict objectForKey:key ];
+   if( result == nil )
+      result = [ NSData data ];
+   
+   return result;
 }
 
 
