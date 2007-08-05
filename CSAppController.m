@@ -67,6 +67,8 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
 */
 
 
+#pragma mark -
+#pragma mark Initialization
 /*
  * Setup up custom allocator stuff
  */
@@ -102,8 +104,41 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
 }
 
 
-/* 
-* Queue up a close all message, if enabled
+/*
+ * Listen for additions to the window menu (to rearrange it), and record
+ * the current pasteboard changecount, but one less since we haven't
+ * touched it yet
+ */
+- (void) applicationDidFinishLaunching:(NSNotification *)aNotification
+{
+   [ [ NSNotificationCenter defaultCenter ] addObserver:self
+                                               selector:@selector( windowsMenuDidUpdate: )
+                                                   name:NSMenuDidAddItemNotification
+                                                 object:[ NSApp windowsMenu ] ];
+   NSUserDefaults *userDefaults = [ NSUserDefaults standardUserDefaults ];
+   if( [ userDefaults boolForKey:CSPrefDictKey_AutoOpen ] )
+   {
+      NSDocumentController *sharedDocController = [ NSDocumentController sharedDocumentController ];
+      if( [ [ sharedDocController documents ] count ] == 0 )
+      {
+         NSURL *fileURL = [ NSURL fileURLWithPath:[ userDefaults objectForKey:CSPrefDictKey_AutoOpenPath ] ];
+         NSError *openError = nil;
+         [ sharedDocController openDocumentWithContentsOfURL:fileURL display:YES error:&openError ];
+#if defined(DEBUG)
+         if( openError != nil )
+            NSLog( @"CSAppController applicationDidFinishLaunching: errored at "
+                   @"openDocumentWithContentsOfURL:display:error: %@", openError );
+#endif
+      }
+   }
+   lastPBChangeCount = [ [ NSPasteboard generalPasteboard ] changeCount ] - 1;
+}
+
+
+#pragma mark -
+#pragma mark CloseAll Support
+/*
+ * Queue up a close all message, if enabled
  */
 - (void) queuePendingCloseAll
 {
@@ -126,6 +161,61 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
 }
 
 
+/*
+ * When we lose active status, queue up a closeAll: if enabled
+ */
+- (void) applicationDidResignActive:(NSNotification *)aNotification
+{
+   [ self queuePendingCloseAll ];
+}
+
+
+/*
+ * When activated, cancel any pending closeAll
+ */
+- (void) applicationDidBecomeActive:(NSNotification *)aNotification
+{
+   [ self cancelPendingCloseAll ];
+}
+
+
+/*
+ * Note if a close all was caused by the timeout option, so documents can decide whether to act on the
+ * close all save option, or just ask.
+ */
+- (BOOL) closeAllFromTimeout
+{
+   return closeAllFromTimeout;
+}
+
+
+/*
+ * Note that a timeout is no longer what caused a close all
+ */
+- (void) docController:(NSDocumentController *)docController
+           didCloseAll:(BOOL)didCloseAll
+           contextInfo:(void *)contextInfo
+{
+   closeAllFromTimeout = NO;
+}
+
+
+/*
+ * Close all open documents
+ */
+- (IBAction) closeAll:(id)sender
+{
+   if( sender == self )
+      closeAllFromTimeout = YES;
+   [ [ NSDocumentController sharedDocumentController ]
+     closeAllDocumentsWithDelegate:self
+               didCloseAllSelector:@selector( docController:didCloseAll:contextInfo: )
+                       contextInfo:NULL ];
+}
+
+
+#pragma mark -
+#pragma mark Special Window Menu Handling
 /*
  * We get here when a menu item is added to the window menu
  */
@@ -219,37 +309,32 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
 }
 
 
+#pragma mark -
+#pragma mark Menu Item Handling
 /*
- * Listen for additions to the window menu (to rearrange it), and record
- * the current pasteboard changecount, but one less since we haven't
- * touched it yet
+ * Give out the Set Category menu item
  */
-- (void) applicationDidFinishLaunching:(NSNotification *)aNotification
+- (id <NSMenuItem>) editMenuSetCategoryMenuItem
 {
-   [ [ NSNotificationCenter defaultCenter ] addObserver:self
-                                               selector:@selector( windowsMenuDidUpdate: )
-                                                   name:NSMenuDidAddItemNotification
-                                                 object:[ NSApp windowsMenu ] ];
-   NSUserDefaults *userDefaults = [ NSUserDefaults standardUserDefaults ];
-   if( [ userDefaults boolForKey:CSPrefDictKey_AutoOpen ] )
-   {
-      NSDocumentController *sharedDocController = [ NSDocumentController sharedDocumentController ];
-      if( [ [ sharedDocController documents ] count ] == 0 )
-      {
-         NSURL *fileURL = [ NSURL fileURLWithPath:[ userDefaults objectForKey:CSPrefDictKey_AutoOpenPath ] ];
-         NSError *openError = nil;
-         [ sharedDocController openDocumentWithContentsOfURL:fileURL display:YES error:&openError ];
-#if defined(DEBUG)
-         if( openError != nil )
-            NSLog( @"CSAppController applicationDidFinishLaunching: errored at "
-                   @"openDocumentWithContentsOfURL:display:error: %@", openError );
-#endif
-      }
-   }
-   lastPBChangeCount = [ [ NSPasteboard generalPasteboard ] changeCount ] - 1;
+   return editMenuSetCategory;
 }
 
 
+/*
+ * Enable only valid menu items
+ */
+- (BOOL) validateMenuItem:(id <NSMenuItem>)menuItem
+{
+   SEL menuItemAction = [ menuItem action ];
+   if( menuItemAction == @selector( closeAll: ) )
+      return ( [ [ [ NSDocumentController sharedDocumentController ] documents ] count ] > 0 );
+   
+   return YES;
+}
+
+
+#pragma mark -
+#pragma mark Miscellaneous
 /*
  * Do we open a new document on start, or when the icon is clicked in the
  * Dock while we have no document open?
@@ -270,20 +355,21 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
 
 
 /*
- * When activated, cancel any pending closeAll
+ * Note current change count, so we know if we need to clear the pasteboard on
+ * exit
  */
-- (void) applicationDidBecomeActive:(NSNotification *)aNotification
+- (void) notePBChangeCount
 {
-   [ self cancelPendingCloseAll ];
+   lastPBChangeCount = [ [ NSPasteboard generalPasteboard ] changeCount ];
 }
 
 
 /*
- * When we lose active status, queue up a closeAll: if enabled
+ * Tell the prefs controller to handle preferences
  */
-- (void) applicationDidResignActive:(NSNotification *)aNotification
+- (IBAction) openPreferences:(id)sender
 {
-   [ self queuePendingCloseAll ];
+   [ [ CSPrefsController sharedPrefsController ] showWindow:sender ];
 }
 
 
@@ -301,82 +387,6 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
       [ generalPB declareTypes:[ NSArray arrayWithObject:@"" ] owner:nil ];
       [ generalPB setString:@"" forType:@"" ];
    }
-}
-
-
-/*
- * Note current change count, so we know if we need to clear the pasteboard on
- * exit
- */
-- (void) notePBChangeCount
-{
-   lastPBChangeCount = [ [ NSPasteboard generalPasteboard ] changeCount ];
-}
-
-
-/*
- * Note if a close all was caused by the timeout option, so documents can decide whether to act on the
- * close all save option, or just ask.
- */
-- (BOOL) closeAllFromTimeout
-{
-   return closeAllFromTimeout;
-}
-
-
-/*
- * Give out the Set Category menu item
- */
-- (id <NSMenuItem>) editMenuSetCategoryMenuItem
-{
-   return editMenuSetCategory;
-}
-
-
-/*
- * Enable only valid menu items
- */
-- (BOOL) validateMenuItem:(id <NSMenuItem>)menuItem
-{
-   SEL menuItemAction = [ menuItem action ];
-   if( menuItemAction == @selector( closeAll: ) )
-      return ( [ [ [ NSDocumentController sharedDocumentController ] documents ] count ] > 0 );
-
-   return YES;
-}
-
-
-/*
- * Note that a timeout is no longer what caused a close all
- */
-- (void) docController:(NSDocumentController *)docController
-           didCloseAll:(BOOL)didCloseAll
-           contextInfo:(void *)contextInfo
-{
-   closeAllFromTimeout = NO;
-}
-
-
-/*
- * Close all open documents
- */
-- (IBAction) closeAll:(id)sender
-{
-   if( sender == self )
-      closeAllFromTimeout = YES;
-   [ [ NSDocumentController sharedDocumentController ]
-     closeAllDocumentsWithDelegate:self
-               didCloseAllSelector:@selector( docController:didCloseAll:contextInfo: )
-                       contextInfo:NULL ];
-}
-
-
-/*
- * Tell the prefs controller to handle preferences
- */
-- (IBAction) openPreferences:(id)sender
-{
-   [ [ CSPrefsController sharedPrefsController ] showWindow:sender ];
 }
 
 @end
