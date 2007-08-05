@@ -240,7 +240,7 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
       }
       else if( ( [ [ passphrasePhrase2 stringValue ] length ] < CSWinCtrlPassphrase_ShortPassPhrase ) )
       {
-         // Warn if it is short and the user pref is enabled
+         // Warn if it is short
          NSBeginAlertSheet( NSLocalizedString( @"Short Passphrase", @"" ),
                             NSLocalizedString( @"Use It", @"" ),
                             CSWINCTRLPASSPHRASE_LOC_ENTERAGAIN,

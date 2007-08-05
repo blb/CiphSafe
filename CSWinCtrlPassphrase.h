@@ -34,7 +34,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-// Note types used with getEncryptionKeyWithNote:warnOnShortPassphrase:
+// Note types used with getEncryptionKeyWithNote:... methods
 extern NSString * const CSPassphraseNote_Save;
 extern NSString * const CSPassphraseNote_Load;
 extern NSString * const CSPassphraseNote_Change;
