@@ -251,7 +251,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
     * If a filename was given and we don't yet have a key, or we're doing a
     * save as
     */
-   if( fileName != nil && ( bfKey == nil || ![ fileName isEqualToString:[ self fileName ] ] ) )
+   if( fileName != nil && ( bfKey == nil || ![ fileName isEqualToString:[ [ self fileURL ] path ] ] ) )
    {
       // Setup to call [ self superSaveToFile:... ] on successful passphrase request
       SEL mySelector = @selector( superSaveToFile:saveOperation:delegate:didSaveSelector:contextInfo: );
@@ -308,9 +308,9 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 /*
  * For save
  */
-- (NSData *) dataRepresentationOfType:(NSString *)aType
+- (NSData *) dataOfType:(NSString *)typeName error:(NSError **)outError
 {
-   NSAssert( [ aType isEqualToString:CSDocument_Name ], @"Unknown file type" );
+   NSAssert( [ typeName isEqualToString:CSDocument_Name ], @"Unknown file type" );
    NSAssert( bfKey != nil, @"key is nil" );
 
    return [ [ self model ] encryptedDataWithKey:bfKey ];
@@ -320,9 +320,9 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 /*
  * For open
  */
-- (BOOL) loadDataRepresentation:(NSData *)data ofType:(NSString *)aType
+- (BOOL) readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError
 {
-   NSAssert( [ aType isEqualToString:CSDocument_Name ], @"Unknown file type" );
+   NSAssert( [ typeName isEqualToString:CSDocument_Name ], @"Unknown file type" );
 
    if( docModel != nil )   // This'll happen on revert
    {
