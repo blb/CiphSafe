@@ -482,7 +482,7 @@ static NSArray *searchWhatArray;
 - (void) awakeFromNib
 {
    // Load window/table info from prefs when opening a document, otherwise use defaults
-   if( [ [ self document ] fileName ] != nil )
+   if( [ [ self document ] fileURL ] != nil )
    {
       [ self loadSavedWindowState ];
       if( ![ self loadSavedTableState ] )
@@ -871,7 +871,8 @@ static NSArray *searchWhatArray;
          int filteredRow = [ self filteredRowForRow:[ rowForKey intValue ] ];
          if( filteredRow >= 0 )
          {
-            [ tableView selectRow:filteredRow byExtendingSelection:NO ];
+            [ tableView selectRowIndexes:[ NSIndexSet indexSetWithIndex:filteredRow ]
+                    byExtendingSelection:NO ];
             [ tableView scrollRowToVisible:filteredRow ];
             return YES;
          }
@@ -928,7 +929,7 @@ static NSArray *searchWhatArray;
                                        row:(int)row
                                     column:(int)column
 {
-   [ tableView selectRow:row byExtendingSelection:NO ];
+   [ tableView selectRowIndexes:[ NSIndexSet indexSetWithIndex:row ] byExtendingSelection:NO ];
 
    return contextualMenu;
 }
@@ -1073,7 +1074,7 @@ static NSArray *searchWhatArray;
  */
 - (void) setDocument:(NSDocument *)document
 {
-   if( [ self document ] != nil && document == nil && [ [ self document ] fileName ] != nil )
+   if( [ self document ] != nil && document == nil && [ [ self document ] fileURL ] != nil )
    {
       [ self saveWindowState ];
       [ self saveTableState ];
