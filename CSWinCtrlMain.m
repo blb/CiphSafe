@@ -53,6 +53,9 @@ const int CSWinCtrlMainTag_Category = 5;
 const int CSWinCtrlMainTag_Notes = 6;
 
 
+NSString *CSWinCtrlMainSearch_All = @"all";
+
+
 @implementation CSWinCtrlMain
 
 static NSArray *cmmCopyFields;
@@ -77,7 +80,7 @@ static NSArray *searchWhatArray;
                                                               CSDocModelKey_Category,
                                                               CSDocModelKey_Notes,
                                                               nil ];
-   searchWhatArray = [ [ NSArray alloc ] initWithObjects:@"all",
+   searchWhatArray = [ [ NSArray alloc ] initWithObjects:CSWinCtrlMainSearch_All,
                                                          CSDocModelKey_Name,
                                                          CSDocModelKey_Acct,
                                                          CSDocModelKey_Passwd,
@@ -252,10 +255,10 @@ static NSArray *searchWhatArray;
  */
 - (void) setupDefaultTableViewColumns
 {
-   [ self setDisplayOfColumnID:@"name" enabled:YES ];
-   [ self setDisplayOfColumnID:@"account" enabled:YES ];
-   [ self setDisplayOfColumnID:@"url" enabled:YES ];
-   [ self setDisplayOfColumnID:@"notes" enabled:YES ];
+   [ self setDisplayOfColumnID:CSDocModelKey_Name enabled:YES ];
+   [ self setDisplayOfColumnID:CSDocModelKey_Acct enabled:YES ];
+   [ self setDisplayOfColumnID:CSDocModelKey_URL enabled:YES ];
+   [ self setDisplayOfColumnID:CSDocModelKey_Notes enabled:YES ];
    // Without resizing, the columns are oddly sized...
    NSEnumerator *colEnum = [ [ documentView tableColumns ] objectEnumerator ];
    id aColumn;
@@ -329,7 +332,7 @@ static NSArray *searchWhatArray;
    if( searchString != nil && [ searchString length ] > 0 )
    {
       NSString *searchKey = [ searchWhatArray objectAtIndex:currentSearchCategory ];
-      if( [ searchKey isEqualToString:@"all" ] )   // For all, use a nil key
+      if( [ searchKey isEqualToString:CSWinCtrlMainSearch_All ] )   // For all, use a nil key
          searchKey = nil;
       [ self setSearchResultList:[ [ self document ] rowsMatchingString:searchString
                                                              ignoreCase:YES
@@ -515,7 +518,7 @@ static NSArray *searchWhatArray;
    NSString *currentSearchKey = [ stdDefaults stringForKey:CSPrefDictKey_CurrentSearchKey ];
    if( currentSearchKey == nil )
    {
-      [ [ searchField cell ] setPlaceholderString:NSLocalizedString( @"all", nil ) ];
+      [ [ searchField cell ] setPlaceholderString:NSLocalizedString( CSWinCtrlMainSearch_All, nil ) ];
       currentSearchCategory = CSWinCtrlMainTag_All;
    }
    else
