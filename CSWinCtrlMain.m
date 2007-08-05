@@ -543,6 +543,8 @@ static NSArray *searchWhatArray;
    [ stdDefaults addObserver:self forKeyPath:CSPrefDictKey_CellSpacing options:0 context:NULL ];
    [ stdDefaults addObserver:self forKeyPath:CSPrefDictKey_TableAltBackground options:0 context:NULL ];
    [ stdDefaults addObserver:self forKeyPath:CSPrefDictKey_IncludeDefaultCategories options:0 context:NULL ];
+
+   tableIsDragging = NO;
 }
 
 
@@ -793,6 +795,7 @@ static NSArray *searchWhatArray;
          writeRowsWithIndexes:(NSIndexSet *)rowIndexes
          toPasteboard:(NSPasteboard*)pboard
 {
+   tableIsDragging = YES;
    dragNamesArray = [ [ self namesFromIndexes:rowIndexes ] retain ];
    return [ [ self document ] copyNames:dragNamesArray toPasteboard:pboard ];
 }
@@ -813,6 +816,7 @@ static NSArray *searchWhatArray;
    }
    [ dragNamesArray release ];
    dragNamesArray = nil;
+   tableIsDragging = NO;
 }
 
 
@@ -825,7 +829,9 @@ static NSArray *searchWhatArray;
                     proposedRow:(int)row
                     proposedDropOperation:(NSTableViewDropOperation)op
 {
-   if( [ info draggingSourceOperationMask ] == NSDragOperationGeneric )
+   if( tableIsDragging )
+      return NSDragOperationNone;
+   else if( [ info draggingSourceOperationMask ] == NSDragOperationGeneric )
       return NSDragOperationMove;
    else
       return NSDragOperationCopy;

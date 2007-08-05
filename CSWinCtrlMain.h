@@ -49,6 +49,7 @@ extern const int CSWinCtrlMainExportType_XML;
    NSArray *searchResultList;
    int currentSearchCategory;
    NSArray *dragNamesArray;
+   BOOL tableIsDragging;
 
    IBOutlet BLBTableView *documentView;
    IBOutlet NSButton *documentDeleteButton;
