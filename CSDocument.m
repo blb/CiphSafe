@@ -346,7 +346,13 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
             [ self setBFKey:nil ];
       }
       else
+      {
+         /* The error object must be set (even though this isn't a true error) or doing a cancel twice
+          * will cause it to crash in the depths of NSDocumentController code
+         */
+         *outError = [ NSError errorWithDomain:@"CiphSafe" code:0 userInfo:nil ];
          break;   // User cancelled
+      }
    }
 
    return ( docModel != nil );
