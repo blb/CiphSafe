@@ -39,10 +39,18 @@
 #import "CSPrefsController.h"
 
 
+@interface CSWinCtrlChange (InternalMethods)
+- (void) updateFields;
+@end
+
+
 @implementation CSWinCtrlChange
 
 static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 
+
+#pragma mark -
+#pragma mark Initialization
 /*
  * Create our controller list
  */
@@ -52,6 +60,21 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 }
 
 
+/*
+ * Initialize for the given entry
+ */
+- (id) initForEntryName:(NSString *)name
+{
+   self = [ super initWithWindowNibName:@"CSDocumentChange" ];
+   if( self != nil )
+      myEntryName = [ name copy ];
+   
+   return self;
+}
+
+
+#pragma mark -
+#pragma mark Controller List Helpers
 /*
  * Return an NSNumber representing the document
  */
@@ -128,54 +151,8 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 }
 
 
-/*
- * Initialize for the given entry
- */
-- (id) initForEntryName:(NSString *)name
-{
-   self = [ super initWithWindowNibName:@"CSDocumentChange" ];
-   if( self != nil )
-      myEntryName = [ name copy ];
-
-   return self;
-}
-
-
-/*
- * Return YES if the value in the given field matches the represented entry's
- * original value for the given key
- */
-- (BOOL) doesField:(NSTextField *)field matchStringWithKey:(NSString *)key
-{
-   int row = [ [ self document ] rowForName:myEntryName ];
-
-   return [ [ field stringValue ] isEqualToString:[ [ self document ] stringForKey:key atRow:row ] ];
-}
-
-
-/*
- * Update all the fields in the window
- */
-- (void) updateFields
-{
-   // XXX If it were possible, we'd clear out controls here
-   [ nameText setStringValue:myEntryName ];
-   int myEntryRowNum = [ [ self document ] rowForName:myEntryName ];
-   if( myEntryRowNum >= 0 )
-   {
-      [ mainButton setEnabled:YES ];
-      CSDocument *document = [ self document ];
-      [ accountText setStringValue:[ document stringForKey:CSDocModelKey_Acct atRow:myEntryRowNum ] ];
-      [ passwordText setStringValue:[ document stringForKey:CSDocModelKey_Passwd atRow:myEntryRowNum ] ];
-      [ urlText setStringValue:[ document stringForKey:CSDocModelKey_URL atRow:myEntryRowNum ] ];
-      [ category setStringValue:[ document stringForKey:CSDocModelKey_Category atRow:myEntryRowNum ] ];
-      NSRange fullNotesRange = NSMakeRange( 0, [ [ notes textStorage ] length ] );
-      [ notes replaceCharactersInRange:fullNotesRange withRTFD:[ document RTFDNotesAtRow:myEntryRowNum ] ];
-      [ self updateDocumentEditedStatus ];
-   }
-}
-
-
+#pragma mark -
+#pragma mark Configuration
 /*
  * Override so we can setup to be on the list for this document
  */
@@ -186,7 +163,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 }
 
 
-/* 
+/*
  * Return the entry for which we are in charge
  */
 - (NSString *) entryName
@@ -210,28 +187,8 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 }
 
 
-/*
- * Update the fields and set first responder to the name field
- */
-- (IBAction) showWindow:(id)sender
-{
-   [ self updateFields ];
-   [ [ self window ] makeFirstResponder:nameText ];
-   [ super showWindow:sender ];
-}
-
-
-/*
- * We don't want to have the file represented (icon) in the title bar
- */
-- (void) synchronizeWindowTitleWithDocumentName
-{
-   [ [ self window ] setTitle:[ NSString stringWithFormat:NSLocalizedString( @"View/Change %@ in %@", @"" ),
-                                                          myEntryName,
-                                                          [ [ self document ] displayName ] ] ];
-}
-
-
+#pragma mark -
+#pragma mark Button Handling
 /*
  * Change the entry
  */
@@ -275,6 +232,19 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 }
 
 
+#pragma mark -
+#pragma mark Window Handling
+/*
+ * Update the fields and set first responder to the name field
+ */
+- (IBAction) showWindow:(id)sender
+{
+   [ self updateFields ];
+   [ [ self window ] makeFirstResponder:nameText ];
+   [ super showWindow:sender ];
+}
+
+
 /*
  * Remove this instance from the list when the window closes (use ShouldClose:
  * as the document reference is lost by the time WillClose: is called)
@@ -284,11 +254,71 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
    BOOL superShouldClose = [ super windowShouldClose:sender ];
    if( superShouldClose )
       [ CSWinCtrlChange removeController:self forDocument:[ self document ] ];
-
+   
    return superShouldClose;
 }
 
 
+/*
+ * We don't want to have the file represented (icon) in the title bar
+ */
+- (void) synchronizeWindowTitleWithDocumentName
+{
+   [ [ self window ] setTitle:[ NSString stringWithFormat:NSLocalizedString( @"View/Change %@ in %@", @"" ),
+      myEntryName,
+      [ [ self document ] displayName ] ] ];
+}
+
+
+#pragma mark -
+#pragma mark Miscellaneous
+/*
+ * Return YES if the value in the given field matches the represented entry's
+ * original value for the given key
+ */
+- (BOOL) doesField:(NSTextField *)field matchStringWithKey:(NSString *)key
+{
+   int row = [ [ self document ] rowForName:myEntryName ];
+   
+   return [ [ field stringValue ] isEqualToString:[ [ self document ] stringForKey:key atRow:row ] ];
+}
+
+
+/*
+ * Update all the fields in the window
+ */
+- (void) updateFields
+{
+   // XXX If it were possible, we'd clear out controls here
+   [ nameText setStringValue:myEntryName ];
+   int myEntryRowNum = [ [ self document ] rowForName:myEntryName ];
+   if( myEntryRowNum >= 0 )
+   {
+      [ mainButton setEnabled:YES ];
+      CSDocument *document = [ self document ];
+      [ accountText setStringValue:[ document stringForKey:CSDocModelKey_Acct atRow:myEntryRowNum ] ];
+      [ passwordText setStringValue:[ document stringForKey:CSDocModelKey_Passwd atRow:myEntryRowNum ] ];
+      [ urlText setStringValue:[ document stringForKey:CSDocModelKey_URL atRow:myEntryRowNum ] ];
+      [ category setStringValue:[ document stringForKey:CSDocModelKey_Category atRow:myEntryRowNum ] ];
+      NSRange fullNotesRange = NSMakeRange( 0, [ [ notes textStorage ] length ] );
+      [ notes replaceCharactersInRange:fullNotesRange withRTFD:[ document RTFDNotesAtRow:myEntryRowNum ] ];
+      [ self updateDocumentEditedStatus ];
+   }
+}
+
+
+/*
+ * Cleanup
+ */
+- (void) dealloc
+{
+   [ myEntryName release ];
+   [ super dealloc ];
+}
+
+
+#pragma mark -
+#pragma mark Flagging Changes
 /*
  * Check if any of the fields have been changed
  */
@@ -322,16 +352,6 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
    int row = [ [ self document ] rowForName:myEntryName ];
 
    return ![ [ notes textStorage ] isEqualToAttributedString:[ [ self document ] RTFDStringNotesAtRow:row ] ];
-}
-
-
-/*
- * Cleanup
- */
-- (void) dealloc
-{
-   [ myEntryName release ];
-   [ super dealloc ];
 }
 
 @end
