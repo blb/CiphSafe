@@ -68,12 +68,20 @@ NSString * const CSPrefsControllerToolbarID_Appearance = @"Appearance";
 NSString * const CSPrefsControllerToolbarID_Security = @"Security";
 
 
+@interface CSPrefsController (InternalMethods)
+- (NSToolbarItem *) createToolbarItemWithID:(NSString *)itemID imageNamed:(NSString *)imageName;
+- (void) setWindowContentToView:(NSView *)newView;
+@end
+
+
 @implementation CSPrefsController
 
 static NSArray *toolbarItemIDs;
 static CSPrefsController *sharedPrefsController = nil;
 
 
+#pragma mark -
+#pragma mark Initialization
 /*
  * Setup up default defaults
  */
@@ -101,18 +109,6 @@ static CSPrefsController *sharedPrefsController = nil;
 
 
 /*
- * Only have a single prefs controller
- */
-+ (CSPrefsController *) sharedPrefsController
-{
-   if( sharedPrefsController == nil )
-      sharedPrefsController = [ [ CSPrefsController alloc ] initWithWindowNibName:@"CSPreferences" ];
-
-   return sharedPrefsController;
-}
-
-
-/*
  * Enforce singleton
  */
 - (id) initWithWindow:(NSWindow *)window
@@ -122,42 +118,8 @@ static CSPrefsController *sharedPrefsController = nil;
       [ self release ];
       return sharedPrefsController;
    }
-
+   
    return [ super initWithWindow:window ];
-}
-
-
-/*
- * Create and return a toolbar item for the prefs window toolbar
- */
-- (NSToolbarItem *) createToolbarItemWithID:(NSString *)itemID imageNamed:(NSString *)imageName
-{
-   NSToolbarItem *newItem = [ [ NSToolbarItem alloc ] initWithItemIdentifier:itemID ];
-   [ newItem setAction:@selector( toolbarSelectedAnItem: ) ];
-   [ newItem setImage:[ NSImage imageNamed:imageName ] ];
-   [ newItem setLabel:NSLocalizedString( itemID, @"" ) ];
-   [ newItem setTarget:self ];
-
-   return newItem;
-}
-
-
-/*
- * Set the current content view of the prefs window to the given view, resizing as necessary
- */
-- (void) setWindowContentToView:(NSView *)newView
-{
-   NSWindow *window = [ self window ];
-   NSView *currentView = [ window contentView ];
-   if( ![ currentView isEqual:newView ] )
-   {
-      NSRect windowFrame = [ window frame ];
-      NSRect newFrame = [ window frameRectForContentRect:[ newView frame ] ];
-      newFrame.origin = windowFrame.origin;
-      newFrame.origin.y -= NSHeight( newFrame ) - NSHeight( windowFrame );
-      [ [ self window ] setContentView:newView ];   
-      [ window setFrame:newFrame display:YES animate:YES ];
-   }
 }
 
 
@@ -180,13 +142,13 @@ static CSPrefsController *sharedPrefsController = nil;
    [ generalItem release ];
    [ appearanceItem release ];
    [ securityItem release ];
-
+   
    toolbarViews = [ [ NSDictionary alloc ] initWithObjectsAndKeys:
       generalView, CSPrefsControllerToolbarID_General,
       appearanceView, CSPrefsControllerToolbarID_Appearance,
       securityView, CSPrefsControllerToolbarID_Security,
       nil ];
-
+   
    NSToolbar *toolbar = [ [ NSToolbar alloc ] initWithIdentifier:@"PreferencesToolbar" ];
    [ toolbar setAllowsUserCustomization:NO ];
    [ toolbar setAutosavesConfiguration:NO ];
@@ -198,6 +160,23 @@ static CSPrefsController *sharedPrefsController = nil;
    [ [ self window ] setShowsToolbarButton:NO ];
    [ [ self window ] setToolbar:toolbar ];
    [ toolbar release ];
+}
+
+
+#pragma mark -
+#pragma mark Toolbar Item Handling
+/*
+ * Create and return a toolbar item for the prefs window toolbar
+ */
+- (NSToolbarItem *) createToolbarItemWithID:(NSString *)itemID imageNamed:(NSString *)imageName
+{
+   NSToolbarItem *newItem = [ [ NSToolbarItem alloc ] initWithItemIdentifier:itemID ];
+   [ newItem setAction:@selector( toolbarSelectedAnItem: ) ];
+   [ newItem setImage:[ NSImage imageNamed:imageName ] ];
+   [ newItem setLabel:NSLocalizedString( itemID, @"" ) ];
+   [ newItem setTarget:self ];
+
+   return newItem;
 }
 
 
@@ -245,6 +224,39 @@ static CSPrefsController *sharedPrefsController = nil;
 - (void) toolbarSelectedAnItem:(NSToolbarItem *)toolbarItem
 {
    [ self setWindowContentToView:[ toolbarViews objectForKey:[ toolbarItem itemIdentifier ] ] ];
+}
+
+
+#pragma mark -
+#pragma mark Miscellaneous
+/*
+ * Only have a single prefs controller
+ */
++ (CSPrefsController *) sharedPrefsController
+{
+   if( sharedPrefsController == nil )
+      sharedPrefsController = [ [ CSPrefsController alloc ] initWithWindowNibName:@"CSPreferences" ];
+   
+   return sharedPrefsController;
+}
+
+
+/*
+ * Set the current content view of the prefs window to the given view, resizing as necessary
+ */
+- (void) setWindowContentToView:(NSView *)newView
+{
+   NSWindow *window = [ self window ];
+   NSView *currentView = [ window contentView ];
+   if( ![ currentView isEqual:newView ] )
+   {
+      NSRect windowFrame = [ window frame ];
+      NSRect newFrame = [ window frameRectForContentRect:[ newView frame ] ];
+      newFrame.origin = windowFrame.origin;
+      newFrame.origin.y -= NSHeight( newFrame ) - NSHeight( windowFrame );
+      [ [ self window ] setContentView:newView ];   
+      [ window setFrame:newFrame display:YES animate:YES ];
+   }
 }
 
 
