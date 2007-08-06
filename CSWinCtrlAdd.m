@@ -41,6 +41,8 @@
 
 @implementation CSWinCtrlAdd
 
+#pragma mark -
+#pragma mark Initialization
 - (id) init
 {
    self = [ super initWithWindowNibName:@"CSDocumentAdd" ];
@@ -58,16 +60,8 @@
 }
 
 
-/*
- * We don't want to have the file represented (icon) in the title bar
- */
-- (void) synchronizeWindowTitleWithDocumentName
-{
-   [ [ self window ] setTitle:[ NSString stringWithFormat:NSLocalizedString( @"Add to %@", @"" ),
-                                            [ [ self document ] displayName ] ] ];
-}
-
-
+#pragma mark -
+#pragma mark Button Handling
 /*
  * Clear out all the fields
  */
@@ -127,6 +121,20 @@
 }
 
 
+#pragma mark -
+#pragma mark Miscellaneous
+/*
+ * We don't want to have the file represented (icon) in the title bar
+ */
+- (void) synchronizeWindowTitleWithDocumentName
+{
+   [ [ self window ] setTitle:[ NSString stringWithFormat:NSLocalizedString( @"Add to %@", @"" ),
+      [ [ self document ] displayName ] ] ];
+}
+
+
+#pragma mark -
+#pragma mark Flagging Changes
 /*
  * Fields have changed when they are not empty
  */
