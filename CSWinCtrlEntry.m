@@ -55,6 +55,9 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
                                  "xXyYzZ0123456789~!@#$%^&*()_+`-=[]\\{}|;':\",."
                                  "/<>?~!@#$%^&*()_+`-=[]\\{}|;':\",./<>?";
 
+
+#pragma mark -
+#pragma mark Initialization
 - (id) initWithWindowNibName:(NSString *)windowNibName
 {
    self = [ super initWithWindowNibName:windowNibName ];
@@ -84,40 +87,8 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 }
 
 
-/*
- * Handle the "should close" sheet
- */
-- (void) closeSheetDidEnd:(NSWindow *)sheet
-               returnCode:(int)returnCode
-              contextInfo:(void *)contextInfo
-{
-   if( returnCode == NSAlertDefaultReturn )
-   {
-      // Close the window this way so the proper delegation is performed
-      [ [ self window ] setDocumentEdited:NO ];
-      NSArray *runLoopModes = [ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ];
-      [ [ NSRunLoop currentRunLoop ] performSelector:@selector( performClose: )
-                                              target:[ self window ]
-                                            argument:self
-                                               order:9999
-                                               modes:runLoopModes ];
-   }
-   [ sheet orderOut:self ];
-   [ NSApp endSheet:sheet ];
-   NSReleaseAlertPanel( sheet );
-}
-
-
-/*
- * When the undo manager for the notes text view performs undo or redo, we
- * update the edited status
- */
-- (void) undoManagerDidChange:(NSNotification *)notification
-{
-   [ self updateDocumentEditedStatus ];
-}
-
-
+#pragma mark -
+#pragma mark Button Handling
 /*
  * Generate a random password
  */
@@ -168,6 +139,18 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 }
 
 
+#pragma mark -
+#pragma mark Undo Manager
+/*
+ * When the undo manager for the notes text view performs undo or redo, we
+ * update the edited status
+ */
+- (void) undoManagerDidChange:(NSNotification *)notification
+{
+   [ self updateDocumentEditedStatus ];
+}
+
+
 /*
  * When the window needs an undo manager, we give it the notes one for that
  * view, or the rest-of-the-window manager
@@ -181,16 +164,8 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 }
 
 
-/*
- * We ignore this as changes in the main document don't affect entry
- * controllers; we handle edited state separately
- */
-- (void) setDocumentEdited:(BOOL)dirtyFlag
-{
-   // Do nothing
-}
-
-
+#pragma mark -
+#pragma mark Text Field Handling
 /*
  * Sent by the text fields
  */
@@ -209,15 +184,6 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 
 
 /*
- * Sent by the category combo box
- */
-- (void) comboBoxWillDismiss:(NSNotification *)notification
-{
-   [ self updateDocumentEditedStatus ];
-}
-
-
-/*
  * Sent by the text view, but not for undo/redo
  */
 - (void) textDidChange:(NSNotification *)notification
@@ -226,6 +192,8 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 }
 
 
+#pragma mark -
+#pragma mark Window Handling
 /*
  * If the window has been edited, ask about the close first
  */
@@ -278,6 +246,17 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 }
 
 
+#pragma mark -
+#pragma mark ComboBox Handling
+/*
+ * Sent by the category combo box
+ */
+- (void) comboBoxWillDismiss:(NSNotification *)notification
+{
+   [ self updateDocumentEditedStatus ];
+}
+
+
 /*
  * Provide information to combo boxes for categories
  */
@@ -305,6 +284,55 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 }
 
 
+#pragma mark -
+#pragma mark Miscellaneous
+/*
+ * We ignore this as changes in the main document don't affect entry
+ * controllers; we handle edited state separately
+ */
+- (void) setDocumentEdited:(BOOL)dirtyFlag
+{
+   // Do nothing
+}
+
+
+/*
+ * Handle the "should close" sheet
+ */
+- (void) closeSheetDidEnd:(NSWindow *)sheet
+               returnCode:(int)returnCode
+              contextInfo:(void *)contextInfo
+{
+   if( returnCode == NSAlertDefaultReturn )
+   {
+      // Close the window this way so the proper delegation is performed
+      [ [ self window ] setDocumentEdited:NO ];
+      NSArray *runLoopModes = [ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ];
+      [ [ NSRunLoop currentRunLoop ] performSelector:@selector( performClose: )
+                                              target:[ self window ]
+                                            argument:self
+                                               order:9999
+                                               modes:runLoopModes ];
+   }
+   [ sheet orderOut:self ];
+   [ NSApp endSheet:sheet ];
+   NSReleaseAlertPanel( sheet );
+}
+
+
+/*
+ * Cleanup
+ */
+- (void) dealloc
+{
+   [ notesUM release ];
+   [ otherUM release ];
+   [ super dealloc ];
+}
+
+
+#pragma mark -
+#pragma mark Flagging Changes
 /*
  * The ...Changed are meant to be overridden in subclasses
  */
@@ -336,17 +364,6 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 - (BOOL) notesChanged
 {
    return YES;
-}
-
-
-/*
- * Cleanup
- */
-- (void) dealloc
-{
-   [ notesUM release ];
-   [ otherUM release ];
-   [ super dealloc ];
 }
 
 @end
