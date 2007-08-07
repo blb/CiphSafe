@@ -56,12 +56,28 @@ const int CSWinCtrlMainTag_Notes = 6;
 NSString *CSWinCtrlMainSearch_All = @"all";
 
 
+@interface CSWinCtrlMain (InternalMethods)
+- (void) loadSavedWindowState;
+- (BOOL) loadSavedTableState;
+- (void) setupDefaultTableViewColumns;
+- (void) updateCornerMenu;
+- (void) setSortingImageForColumn:(NSTableColumn *)tableColumn;
+- (void) setTableViewSpacing;
+- (void) addTableColumnWithID:(NSString *)colID;
+- (NSArray *) namesFromIndexes:(NSIndexSet *)indexes;
+- (void) updateStatusField;
+@end
+
+
 @implementation CSWinCtrlMain
 
 static NSArray *cmmCopyFields;
 static NSArray *columnSelectionArray;
 static NSArray *searchWhatArray;
 
+
+#pragma mark -
+#pragma mark Initialization
 + (void) initialize
 {
    // Mapping from CMM tags for copy to field names
@@ -109,22 +125,79 @@ static NSArray *searchWhatArray;
 
 
 /*
- * Do like it says
+ * Initial setup of the window
  */
-- (void) setTableViewSpacing
+- (void) awakeFromNib
 {
-   int cellSpacing = [ [ NSUserDefaults standardUserDefaults ] integerForKey:CSPrefDictKey_CellSpacing ];
-   NSSize newSpacing;
-   if( cellSpacing == CSPrefCellSpacingOption_Small )
-      newSpacing = NSMakeSize( 3.0, 2.0 );
-   else if( cellSpacing == CSPrefCellSpacingOption_Medium )
-      newSpacing = NSMakeSize( 5.0, 2.0 );
-   else if( cellSpacing == CSPrefCellSpacingOption_Large )
-      newSpacing = NSMakeSize( 7.0, 3.0 );
-   [ documentView setIntercellSpacing:newSpacing ];
+   // Load window/table info from prefs when opening a document, otherwise use defaults
+   if( [ [ self document ] fileURL ] != nil )
+   {
+      [ self loadSavedWindowState ];
+      if( ![ self loadSavedTableState ] )
+         [ self setupDefaultTableViewColumns ];
+      [ self setShouldCascadeWindows:NO ];
+   }
+   else
+      [ self setupDefaultTableViewColumns ];
+   
+   [ self updateCornerMenu ];
+   [ documentView setDoubleAction:@selector( viewEntry: ) ];
+   previouslySelectedColumn = [ documentView tableColumnWithIdentifier:[ [ self document ] sortKey ] ];
+   [ documentView setHighlightedTableColumn:previouslySelectedColumn ];
+   [ self setSortingImageForColumn:previouslySelectedColumn ];
+   
+   // The table view is set as the initialFirstResponder, but we have to do this as well
+   [ [ self window ] makeFirstResponder:documentView ];
+   
+   [ documentView registerForDraggedTypes:[ NSArray arrayWithObject:CSDocumentPboardType ] ];
+   
+   // The corner view and header view both offer the menu for selecting what columns to show
+   [ [ documentView cornerView ] setMenu:cmmTableHeader ];
+   [ [ documentView headerView ] setMenu:cmmTableHeader ];
+   
+   [ self setTableViewSpacing ];
+   [ self refreshWindow ];
+   
+   // Load last-used search key from prefs, or All if none
+   NSUserDefaults *stdDefaults = [ NSUserDefaults standardUserDefaults ];
+   NSString *currentSearchKey = [ stdDefaults stringForKey:CSPrefDictKey_CurrentSearchKey ];
+   if( currentSearchKey == nil )
+   {
+      [ [ searchField cell ] setPlaceholderString:NSLocalizedString( CSWinCtrlMainSearch_All, nil ) ];
+      currentSearchCategory = CSWinCtrlMainTag_All;
+   }
+   else
+   {
+      [ [ searchField cell ] setPlaceholderString:NSLocalizedString( currentSearchKey, nil ) ];
+      currentSearchCategory = [ searchWhatArray indexOfObject:currentSearchKey ];
+   }
+   [ [ searchCategoryMenu itemWithTag:currentSearchCategory ] setState:NSOnState ];
+   
+   // Load stripe color from prefs, or the default blue if none
+   NSColor *stripeColor = [ NSUnarchiver unarchiveObjectWithData:
+      [ stdDefaults objectForKey:CSPrefDictKey_TableAltBackground ] ];
+   if( stripeColor == nil )
+      [ documentView setStripeColor:[ NSColor colorWithCalibratedRed:0.93
+                                                               green:0.95
+                                                                blue:1.0
+                                                               alpha:1.0 ] ];
+   else
+      [ documentView setStripeColor:stripeColor ];
+   
+   [ documentView setDraggingSourceOperationMask:NSDragOperationEvery forLocal:YES ];
+   [ documentView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO ];
+   
+   // Finally, listen for changes to certain prefs
+   [ stdDefaults addObserver:self forKeyPath:CSPrefDictKey_CellSpacing options:0 context:NULL ];
+   [ stdDefaults addObserver:self forKeyPath:CSPrefDictKey_TableAltBackground options:0 context:NULL ];
+   [ stdDefaults addObserver:self forKeyPath:CSPrefDictKey_IncludeDefaultCategories options:0 context:NULL ];
+   
+   tableIsDragging = NO;
 }
 
 
+#pragma mark -
+#pragma mark Configuration State Handling
 /*
  * Method to return a good, hopefully-unique string to use as a key into the prefs for saving a window
  */
@@ -153,23 +226,6 @@ static NSArray *searchWhatArray;
 {
    [ [ NSUserDefaults standardUserDefaults ] setObject:[ [ self window ] stringWithSavedFrame ]
                                                 forKey:[ self windowPrefKey ] ];
-}
-
-
-/*
- * Add a table column for the given column, if it isn't already there
- */
-- (void) addTableColumnWithID:(NSString *)colID
-{
-   if( [ documentView columnWithIdentifier:colID ] == -1 )
-   {
-      NSTableColumn *newColumn = [ [ NSTableColumn alloc ] initWithIdentifier:colID ];
-      [ newColumn setEditable:NO ];
-      [ newColumn setResizingMask:( NSTableColumnAutoresizingMask | NSTableColumnUserResizingMask ) ];
-      [ [ newColumn headerCell ] setStringValue:NSLocalizedString( colID, @"" ) ];
-      [ documentView addTableColumn:newColumn ];
-      [ newColumn release ];
-   }
 }
 
 
@@ -231,6 +287,246 @@ static NSArray *searchWhatArray;
 }
 
 
+#pragma mark -
+#pragma mark Searching
+/*
+ * Update the matching list for the search, and tell the table view to update
+ */
+- (void) setSearchResultList:(NSArray *)newList
+{
+   if( newList != searchResultList )
+   {
+      [ searchResultList autorelease ];
+      searchResultList = [ newList retain ];
+   }
+}
+
+
+/*
+ * Filter the view of the document based on the search string
+ */
+- (void) filterView
+{
+   NSString *searchString = [ searchField stringValue ];
+   if( searchString != nil && [ searchString length ] > 0 )
+   {
+      NSString *searchKey = [ searchWhatArray objectAtIndex:currentSearchCategory ];
+      if( [ searchKey isEqualToString:CSWinCtrlMainSearch_All ] )   // For all, use a nil key
+         searchKey = nil;
+      [ self setSearchResultList:[ [ self document ] rowsMatchingString:searchString
+                                                             ignoreCase:YES
+                                                                 forKey:searchKey ] ];
+   }
+   else
+      [ self setSearchResultList:nil ];
+}
+
+
+/*
+ * Return the search-list row number for a given basic row number
+ */
+- (int) rowForFilteredRow:(int)row
+{
+   if( searchResultList != nil )
+      return [ [ searchResultList objectAtIndex:row ] intValue ];
+   else
+      return row;
+}
+
+
+/*
+ * Return the original row number for a filtered row number
+ */
+- (int) filteredRowForRow:(int)row
+{
+   if( searchResultList != nil )
+   {
+      unsigned int index;
+      for( index = 0; index < [ searchResultList count ]; index++ )
+      {
+         if( [ [ searchResultList objectAtIndex:index ] intValue ] == row )
+            return index;
+      }
+      return -1;
+   }
+   else
+      return row;
+}
+
+
+/*
+ * Select which category to search
+ */
+- (IBAction) limitSearch:(id)sender
+{
+   NSMenuItem *previousCategoryItem = [ [ sender menu ] itemWithTag:currentSearchCategory ];
+   [ previousCategoryItem setState:NSOffState ];
+   currentSearchCategory = [ sender tag ];
+   [ sender setState:NSOnState ];
+   NSString *searchCategoryString = [ searchWhatArray objectAtIndex:currentSearchCategory ];
+   [ [ searchField cell ] setPlaceholderString:NSLocalizedString( searchCategoryString, nil ) ];
+   [ [ NSUserDefaults standardUserDefaults ] setObject:searchCategoryString
+                                                forKey:CSPrefDictKey_CurrentSearchKey ];
+   [ self refreshWindow ];
+}
+
+
+#pragma mark -
+#pragma mark Selection Handling
+/*
+ * Return a set of the selected row indices
+ */
+- (NSIndexSet *) selectedRowIndexes
+{
+   return [ documentView selectedRowIndexes ];
+}
+
+
+/*
+ * Return an array of the names for selected rows in the table view
+ */
+- (NSArray *) getSelectedNames
+{
+   return [ self namesFromIndexes:[ self selectedRowIndexes ] ];
+}
+
+
+/*
+ * Select all rows with names in the given array
+ */
+- (void) selectNames:(NSArray *)names
+{
+   NSMutableIndexSet *rowIndex = [ NSMutableIndexSet indexSet ];
+   NSEnumerator *nameEnumerator = [ names objectEnumerator ];
+   id rowName;
+   while( ( rowName = [ nameEnumerator nextObject ] ) != nil )
+      [ rowIndex addIndex:[ [ self document ] rowForName:rowName ] ];
+   [ documentView selectRowIndexes:rowIndex byExtendingSelection:NO ];
+}
+
+
+#pragma mark -
+#pragma mark Button Handling
+/*
+ * Tell the document to do whatever to allow for a new entry
+ */
+- (IBAction) addEntry:(id)sender
+{
+   [ [ self document ] openAddEntryWindow ];
+}
+
+
+/*
+ * Tell the document to view the certain entries
+ */
+- (IBAction) viewEntry:(id)sender
+{
+   [ [ self document ] viewEntries:[ self getSelectedNames ] ];
+}
+
+
+/*
+ * Tell the document to delete certain entries
+ */
+- (IBAction) delete:(id)sender
+{
+   if( [ [ NSUserDefaults standardUserDefaults ] boolForKey:CSPrefDictKey_ConfirmDelete ] )
+   {
+      NSString *sheetQuestion;
+      if( [ documentView numberOfSelectedRows ] > 1 )
+         sheetQuestion = NSLocalizedString( @"Are you sure you want to delete the selected rows?", @"" );
+      else
+         sheetQuestion = NSLocalizedString( @"Are you sure you want to delete the selected row?", @"" );
+      NSBeginCriticalAlertSheet( NSLocalizedString( @"Are You Sure?", @"" ),
+                                 NSLocalizedString( @"Delete", @"" ),
+                                 NSLocalizedString( @"Cancel", @"" ),
+                                 nil,
+                                 [ self window ],
+                                 self,
+                                 @selector( deleteSheetDidEnd:returnCode:contextInfo: ),
+                                 nil,
+                                 NULL,
+                                 sheetQuestion );
+   }
+   else
+      [ [ self document ] deleteEntriesWithNamesInArray:[ self getSelectedNames ] ];
+}
+
+
+#pragma mark -
+#pragma mark Copy/Paste
+/*
+ * Cut selected rows
+ */
+- (IBAction) cut:(id)sender
+{
+   [ [ self document ] copyNames:[ self getSelectedNames ] toPasteboard:[ NSPasteboard generalPasteboard ] ];
+   [ [ self document ] deleteEntriesWithNamesInArray:[ self getSelectedNames ] ];
+   [ [ [ self document ] undoManager ] setActionName:NSLocalizedString( @"Cut", @"" ) ];
+   [ [ NSApp delegate ] notePBChangeCount ];
+}
+
+
+/*
+ * Copy selected rows to the general pasteboard
+ */
+- (IBAction) copy:(id)sender
+{
+   [ [ self document ] copyNames:[ self getSelectedNames ] toPasteboard:[ NSPasteboard generalPasteboard ] ];
+   [ [ NSApp delegate ] notePBChangeCount ];
+}
+
+
+/*
+ * Paste rows from the general pasteboard
+ */
+- (IBAction) paste:(id)sender
+{
+   [ [ self document ] retrieveEntriesFromPasteboard:[ NSPasteboard generalPasteboard ]
+                                            undoName:NSLocalizedString( @"Paste", @"" ) ];
+}
+
+
+#pragma mark -
+#pragma mark TableView Handling
+/*
+ * Table view methods
+ */
+
+/*
+ * Do like it says
+ */
+- (void) setTableViewSpacing
+{
+   int cellSpacing = [ [ NSUserDefaults standardUserDefaults ] integerForKey:CSPrefDictKey_CellSpacing ];
+   NSSize newSpacing;
+   if( cellSpacing == CSPrefCellSpacingOption_Small )
+      newSpacing = NSMakeSize( 3.0, 2.0 );
+   else if( cellSpacing == CSPrefCellSpacingOption_Medium )
+      newSpacing = NSMakeSize( 5.0, 2.0 );
+   else if( cellSpacing == CSPrefCellSpacingOption_Large )
+      newSpacing = NSMakeSize( 7.0, 3.0 );
+   [ documentView setIntercellSpacing:newSpacing ];
+}
+
+
+/*
+ * Add a table column for the given column, if it isn't already there
+ */
+- (void) addTableColumnWithID:(NSString *)colID
+{
+   if( [ documentView columnWithIdentifier:colID ] == -1 )
+   {
+      NSTableColumn *newColumn = [ [ NSTableColumn alloc ] initWithIdentifier:colID ];
+      [ newColumn setEditable:NO ];
+      [ newColumn setResizingMask:( NSTableColumnAutoresizingMask | NSTableColumnUserResizingMask ) ];
+      [ [ newColumn headerCell ] setStringValue:NSLocalizedString( colID, @"" ) ];
+      [ documentView addTableColumn:newColumn ];
+      [ newColumn release ];
+   }
+}
+
+
 /*
  * Show or hide the given column
  */
@@ -283,455 +579,6 @@ static NSArray *searchWhatArray;
    }
 }
 
-
-/*
- * Update list of possible categories for the menu
- */
-- (void) updateSetCategoryMenu
-{
-   if( [ [ self window ] isKeyWindow ] )
-   {
-      NSMenu *categoriesMenu = [ [ [ NSApp delegate ] editMenuSetCategoryMenuItem ] submenu ];
-      NSEnumerator *oldItemsEnum = [ [ categoriesMenu itemArray ] objectEnumerator ];
-      id oldItem;
-      while( ( oldItem = [ oldItemsEnum nextObject ] ) != nil )
-         [ categoriesMenu removeItem:oldItem ];
-      NSEnumerator *currentCategoriesEnum = [ [ [ self document ] categories ] objectEnumerator ];
-      id newItem;
-      while( ( newItem = [ currentCategoriesEnum nextObject ] ) != nil )
-         [ categoriesMenu addItemWithTitle:newItem
-                                    action:@selector( setCategory: )
-                             keyEquivalent:@"" ];
-      [ categoriesMenu addItem:[ NSMenuItem separatorItem ] ];
-      [ categoriesMenu addItemWithTitle:NSLocalizedString( @"New Category", @"" )
-                                 action:@selector( setCategory: )
-                          keyEquivalent:@"" ];
-   }
-}
-
-
-/*
- * Update the matching list for the search, and tell the table view to update
- */
-- (void) setSearchResultList:(NSArray *)newList
-{
-   if( newList != searchResultList )
-   {
-      [ searchResultList autorelease ];
-      searchResultList = [ newList retain ];
-   }
-}
-
-
-/*
- * Filter the view of the document based on the search string
- */
-- (void) filterView
-{
-   NSString *searchString = [ searchField stringValue ];
-   if( searchString != nil && [ searchString length ] > 0 )
-   {
-      NSString *searchKey = [ searchWhatArray objectAtIndex:currentSearchCategory ];
-      if( [ searchKey isEqualToString:CSWinCtrlMainSearch_All ] )   // For all, use a nil key
-         searchKey = nil;
-      [ self setSearchResultList:[ [ self document ] rowsMatchingString:searchString
-                                                             ignoreCase:YES
-                                                                 forKey:searchKey ] ];
-   }
-   else
-      [ self setSearchResultList:nil ];
-}
-
-
-/*
- * Update the status field with current information
- */
-- (void) updateStatusField
-{
-   int entryCount = [ self numberOfRowsInTableView:documentView ];
-   int selectedCount = [ documentView numberOfSelectedRows ];
-   NSString *statusString;
-   if( entryCount == 1 )
-      statusString = [ NSString stringWithFormat:NSLocalizedString( @"1 entry, %d selected", @"" ),
-                                                 selectedCount ];
-   else
-      statusString = [ NSString stringWithFormat:NSLocalizedString( @"%d entries, %d selected", @"" ),
-                                                 entryCount,
-                                                 selectedCount ];
-   if( searchResultList != nil )
-      statusString = [ NSString stringWithFormat:@"%@ (%@)",
-                                                 statusString,
-                                                 NSLocalizedString( @"filtered", @"" ) ];
-   [ documentStatus setStringValue:statusString ];
-}
-
-
-/*
- * Return the search-list row number for a given basic row number
- */
-- (int) rowForFilteredRow:(int)row
-{
-   if( searchResultList != nil )
-      return [ [ searchResultList objectAtIndex:row ] intValue ];
-   else
-      return row;
-}
-
-
-/*
- * Convert an index set of row numbers to an array of names
- */
-- (NSArray *) namesFromIndexes:(NSIndexSet *)indexes
-{
-   NSMutableArray *nameArray = [ NSMutableArray arrayWithCapacity:[ indexes count ] ];
-   unsigned int rowIndex;
-   for( rowIndex = [ indexes firstIndex ];
-        rowIndex != NSNotFound;
-        rowIndex = [ indexes indexGreaterThanIndex:rowIndex ] )
-   {
-      [ nameArray addObject:[ [ self document ] stringForKey:CSDocModelKey_Name
-                                                       atRow:[ self rowForFilteredRow:rowIndex ] ] ];
-   }
-
-   return nameArray;
-}
-
-
-/*
- * Return a set of the selected row indices
- */
-- (NSIndexSet *) selectedRowIndexes
-{
-   return [ documentView selectedRowIndexes ];
-}
-
-
-/*
- * Return an array of the names for selected rows in the table view
- */
-- (NSArray *) getSelectedNames
-{
-   return [ self namesFromIndexes:[ self selectedRowIndexes ] ];
-}
-
-
-/*
- * Select all rows with names in the given array
- */
-- (void) selectNames:(NSArray *)names
-{
-   NSMutableIndexSet *rowIndex = [ NSMutableIndexSet indexSet ];
-   NSEnumerator *nameEnumerator = [ names objectEnumerator ];
-   id rowName;
-   while( ( rowName = [ nameEnumerator nextObject ] ) != nil )
-      [ rowIndex addIndex:[ [ self document ] rowForName:rowName ] ];
-   [ documentView selectRowIndexes:rowIndex byExtendingSelection:NO ];
-}
-
-
-/*
- * Called when the "really delete" sheet is done
- */
-- (void) deleteSheetDidEnd:(NSWindow *)sheet
-                returnCode:(int)returnCode
-               contextInfo:(void *)contextInfo
-{
-   if( returnCode == NSAlertDefaultReturn )   // They said delete...
-      [ [ self document ] deleteEntriesWithNamesInArray:[ self getSelectedNames ] ];
-}
-
-
-/*
- * Setup the given column to have the correct indicator image, and remove the
- * one from the previous column
- */
-- (void) setSortingImageForColumn:(NSTableColumn *)tableColumn
-{
-   if( [ [ self document ] isSortAscending ] )
-      [ documentView setIndicatorImage:[ NSImage imageNamed:@"NSAscendingSortIndicator" ]
-                         inTableColumn:tableColumn ];
-   else
-      [ documentView setIndicatorImage:[ NSImage imageNamed:@"NSDescendingSortIndicator" ]
-                         inTableColumn:tableColumn ];
-   if( ![ previouslySelectedColumn isEqual:tableColumn ] )
-      [ documentView setIndicatorImage:nil inTableColumn:previouslySelectedColumn ];
-   previouslySelectedColumn = tableColumn;
-}
-
-
-/*
- * Return the original row number for a filtered row number
- */
-- (int) filteredRowForRow:(int)row
-{
-   if( searchResultList != nil )
-   {
-      unsigned int index;
-      for( index = 0; index < [ searchResultList count ]; index++ )
-      {
-         if( [ [ searchResultList objectAtIndex:index ] intValue ] == row )
-            return index;
-      }
-      return -1;
-   }
-   else
-      return row;
-}
-
-
-/*
- * Initial setup of the window
- */
-- (void) awakeFromNib
-{
-   // Load window/table info from prefs when opening a document, otherwise use defaults
-   if( [ [ self document ] fileURL ] != nil )
-   {
-      [ self loadSavedWindowState ];
-      if( ![ self loadSavedTableState ] )
-         [ self setupDefaultTableViewColumns ];
-      [ self setShouldCascadeWindows:NO ];
-   }
-   else
-      [ self setupDefaultTableViewColumns ];
-
-   [ self updateCornerMenu ];
-   [ documentView setDoubleAction:@selector( viewEntry: ) ];
-   previouslySelectedColumn = [ documentView tableColumnWithIdentifier:[ [ self document ] sortKey ] ];
-   [ documentView setHighlightedTableColumn:previouslySelectedColumn ];
-   [ self setSortingImageForColumn:previouslySelectedColumn ];
-
-   // The table view is set as the initialFirstResponder, but we have to do this as well
-   [ [ self window ] makeFirstResponder:documentView ];
-
-   [ documentView registerForDraggedTypes:[ NSArray arrayWithObject:CSDocumentPboardType ] ];
-
-   // The corner view and header view both offer the menu for selecting what columns to show
-   [ [ documentView cornerView ] setMenu:cmmTableHeader ];
-   [ [ documentView headerView ] setMenu:cmmTableHeader ];
-
-   [ self setTableViewSpacing ];
-   [ self refreshWindow ];
-
-   // Load last-used search key from prefs, or All if none
-   NSUserDefaults *stdDefaults = [ NSUserDefaults standardUserDefaults ];
-   NSString *currentSearchKey = [ stdDefaults stringForKey:CSPrefDictKey_CurrentSearchKey ];
-   if( currentSearchKey == nil )
-   {
-      [ [ searchField cell ] setPlaceholderString:NSLocalizedString( CSWinCtrlMainSearch_All, nil ) ];
-      currentSearchCategory = CSWinCtrlMainTag_All;
-   }
-   else
-   {
-      [ [ searchField cell ] setPlaceholderString:NSLocalizedString( currentSearchKey, nil ) ];
-      currentSearchCategory = [ searchWhatArray indexOfObject:currentSearchKey ];
-   }
-   [ [ searchCategoryMenu itemWithTag:currentSearchCategory ] setState:NSOnState ];
-
-   // Load stripe color from prefs, or the default blue if none
-   NSColor *stripeColor = [ NSUnarchiver unarchiveObjectWithData:
-                                            [ stdDefaults objectForKey:CSPrefDictKey_TableAltBackground ] ];
-   if( stripeColor == nil )
-      [ documentView setStripeColor:[ NSColor colorWithCalibratedRed:0.93
-                                                               green:0.95
-                                                                blue:1.0
-                                                               alpha:1.0 ] ];
-   else
-      [ documentView setStripeColor:stripeColor ];
-
-   [ documentView setDraggingSourceOperationMask:NSDragOperationEvery forLocal:YES ];
-   [ documentView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO ];
-
-   // Finally, listen for changes to certain prefs
-   [ stdDefaults addObserver:self forKeyPath:CSPrefDictKey_CellSpacing options:0 context:NULL ];
-   [ stdDefaults addObserver:self forKeyPath:CSPrefDictKey_TableAltBackground options:0 context:NULL ];
-   [ stdDefaults addObserver:self forKeyPath:CSPrefDictKey_IncludeDefaultCategories options:0 context:NULL ];
-
-   tableIsDragging = NO;
-}
-
-
-/*
- * Handle when certain observed items are updated
- */
-- (void)observeValueForKeyPath:(NSString *)keyPath
-                      ofObject:(id)object 
-                        change:(NSDictionary *)change
-                       context:(void *)context
-{
-   if( [ keyPath isEqualToString:CSPrefDictKey_CellSpacing ] )
-      [ self setTableViewSpacing ];
-   else if( [ keyPath isEqualToString:CSPrefDictKey_IncludeDefaultCategories ] )
-      [ self updateSetCategoryMenu ];
-   else if( [ keyPath isEqualToString:CSPrefDictKey_TableAltBackground ] )
-   {
-      NSColor *stripeColor = [ NSUnarchiver unarchiveObjectWithData:
-                                               [ [ NSUserDefaults standardUserDefaults ]
-                                                 objectForKey:CSPrefDictKey_TableAltBackground ] ];
-      [ documentView setStripeColor:stripeColor ];
-   }
-}
-
-
-/*
- * Tell the document to do whatever to allow for a new entry
- */
-- (IBAction) addEntry:(id)sender
-{
-   [ [ self document ] openAddEntryWindow ];
-}
-
-
-/*
- * Tell the document to view the certain entries
- */
-- (IBAction) viewEntry:(id)sender
-{
-   [ [ self document ] viewEntries:[ self getSelectedNames ] ];
-}
-
-
-/*
- * Tell the document to delete certain entries
- */
-- (IBAction) delete:(id)sender
-{
-   if( [ [ NSUserDefaults standardUserDefaults ] boolForKey:CSPrefDictKey_ConfirmDelete ] )
-   {
-      NSString *sheetQuestion;
-      if( [ documentView numberOfSelectedRows ] > 1 )
-         sheetQuestion = NSLocalizedString( @"Are you sure you want to delete the selected rows?", @"" );
-      else
-         sheetQuestion = NSLocalizedString( @"Are you sure you want to delete the selected row?", @"" );
-      NSBeginCriticalAlertSheet( NSLocalizedString( @"Are You Sure?", @"" ),
-                                 NSLocalizedString( @"Delete", @"" ),
-                                 NSLocalizedString( @"Cancel", @"" ),
-                                 nil,
-                                 [ self window ],
-                                 self,
-                                 @selector( deleteSheetDidEnd:returnCode:contextInfo: ),
-                                 nil,
-                                 NULL,
-                                 sheetQuestion );
-   }
-   else
-      [ [ self document ] deleteEntriesWithNamesInArray:[ self getSelectedNames ] ];
-}
-
-
-/*
- * Simple end modals
- */
-- (IBAction) newCategoryOK:(id)sender
-{
-   [ NSApp stopModal ];
-   [ newCategoryWindow orderOut:self ];
-}
-
-- (IBAction) newCategoryCancel:(id)sender
-{
-   [ NSApp abortModal ];
-   [ newCategoryWindow orderOut:self ];
-}
-
-
-/*
- * Refresh all the views in the window
- */
-- (void) refreshWindow
-{
-   [ self updateSetCategoryMenu ];
-   [ self filterView ];
-   [ documentView reloadData ];
-   [ documentView deselectAll:self ];
-   [ self updateStatusField ];
-}
-
-
-/*
- * Select which category to search
- */
-- (IBAction) limitSearch:(id)sender
-{
-   NSMenuItem *previousCategoryItem = [ [ sender menu ] itemWithTag:currentSearchCategory ];
-   [ previousCategoryItem setState:NSOffState ];
-   currentSearchCategory = [ sender tag ];
-   [ sender setState:NSOnState ];
-   NSString *searchCategoryString = [ searchWhatArray objectAtIndex:currentSearchCategory ];
-   [ [ searchField cell ] setPlaceholderString:NSLocalizedString( searchCategoryString, nil ) ];
-   [ [ NSUserDefaults standardUserDefaults ] setObject:searchCategoryString
-                                                forKey:CSPrefDictKey_CurrentSearchKey ];
-   [ self refreshWindow ];
-}
-
-
-/*
- * Cut selected rows
- */
-- (IBAction) cut:(id)sender
-{
-   [ [ self document ] copyNames:[ self getSelectedNames ] toPasteboard:[ NSPasteboard generalPasteboard ] ];
-   [ [ self document ] deleteEntriesWithNamesInArray:[ self getSelectedNames ] ];
-   [ [ [ self document ] undoManager ] setActionName:NSLocalizedString( @"Cut", @"" ) ];
-   [ [ NSApp delegate ] notePBChangeCount ];
-}
-
-
-/*
- * Copy selected rows to the general pasteboard
- */
-- (IBAction) copy:(id)sender
-{
-   [ [ self document ] copyNames:[ self getSelectedNames ] toPasteboard:[ NSPasteboard generalPasteboard ] ];
-   [ [ NSApp delegate ] notePBChangeCount ];
-}
-
-
-/*
- * Paste rows from the general pasteboard
- */
-- (IBAction) paste:(id)sender
-{
-   [ [ self document ] retrieveEntriesFromPasteboard:[ NSPasteboard generalPasteboard ]
-                                            undoName:NSLocalizedString( @"Paste", @"" ) ];
-}
-
-
-/*
- * Enable/disable certain menu items, as necessary
- */
-- (BOOL) validateMenuItem:(NSMenuItem *)menuItem
-{
-   SEL menuItemAction = [ menuItem action ];
-   if( menuItemAction == @selector( copy: ) || menuItemAction == @selector( cut: ) ||
-       menuItemAction == @selector( setCategory: ) || menuItemAction == @selector( delete: ) )
-      return ( [ documentView numberOfSelectedRows ] > 0 );
-   else if( menuItemAction == @selector( paste: ) )
-      return ( [ [ NSPasteboard generalPasteboard ] 
-                 availableTypeFromArray:[ NSArray arrayWithObject:CSDocumentPboardType ] ] != nil );
-   else if( menuItemAction == @selector( cmmCopyField: ) ||
-            menuItemAction == @selector( cmmOpenURL: ) )
-   {
-      int selectedRow = [ self rowForFilteredRow:[ documentView selectedRow ] ];
-      NSString *fieldName = nil;
-      if( menuItemAction == @selector( cmmOpenURL: ) )
-         fieldName = CSDocModelKey_URL;
-      else
-         fieldName = [ cmmCopyFields objectAtIndex:[ menuItem tag ] ];
-      NSString *fieldValue = [ [ self document ] stringForKey:fieldName atRow:selectedRow ];
-      if( fieldValue != nil && [ fieldValue length ] > 0 )
-         return YES;
-      else
-         return NO;
-   }
-
-   return YES;
-}
-
-
-/*
- * Table view methods
- */
 
 /*
  * Handle the table view
@@ -893,6 +740,67 @@ static NSArray *searchWhatArray;
 
 
 /*
+ * Select/unselect a column for display (we determine which from the sender)
+ */
+- (IBAction) cornerSelectField:(id)sender
+{
+   if( [ sender tag ] == 0 )   // Show all columns
+   {
+      unsigned int index;
+      for( index = 1; index < [ columnSelectionArray count ]; index++ )
+         [ self setDisplayOfColumnID:[ columnSelectionArray objectAtIndex:index ] enabled:YES ];
+   }
+   else
+   {
+      BOOL enabled = ( [ sender state ] != NSOnState );
+      if( [ [ documentView tableColumns ] count ] > 1 || enabled )
+         [ self setDisplayOfColumnID:[ columnSelectionArray objectAtIndex:[ sender tag ] ] enabled:enabled ];
+      else
+         NSBeginCriticalAlertSheet( NSLocalizedString( @"Need at least one column", @"" ),
+                                    nil,
+                                    nil,
+                                    nil,
+                                    [ self window ],
+                                    nil,
+                                    nil,
+                                    nil,
+                                    NULL,
+                                    NSLocalizedString( @"At least one column is needed in order to be useful",
+                                                       @"" ) );
+   }
+   [ self updateCornerMenu ];
+}
+
+
+#pragma mark -
+#pragma mark Menu Handling
+/*
+ * Update list of possible categories for the menu
+ */
+- (void) updateSetCategoryMenu
+{
+   if( [ [ self window ] isKeyWindow ] )
+   {
+      NSMenu *categoriesMenu = [ [ [ NSApp delegate ] editMenuSetCategoryMenuItem ] submenu ];
+      NSEnumerator *oldItemsEnum = [ [ categoriesMenu itemArray ] objectEnumerator ];
+      id oldItem;
+      while( ( oldItem = [ oldItemsEnum nextObject ] ) != nil )
+         [ categoriesMenu removeItem:oldItem ];
+      NSEnumerator *currentCategoriesEnum = [ [ [ self document ] categories ] objectEnumerator ];
+      id newItem;
+      while( ( newItem = [ currentCategoriesEnum nextObject ] ) != nil )
+         [ categoriesMenu addItemWithTitle:newItem
+                                    action:@selector( setCategory: )
+                             keyEquivalent:@"" ];
+      [ categoriesMenu addItem:[ NSMenuItem separatorItem ] ];
+      [ categoriesMenu addItemWithTitle:NSLocalizedString( @"New Category", @"" )
+                                 action:@selector( setCategory: )
+                          keyEquivalent:@"" ];
+   }
+}
+
+
+/*
  * Set the category on a bunch of entries
  */
 - (IBAction) setCategory:(id)sender
@@ -993,38 +901,39 @@ static NSArray *searchWhatArray;
 
 
 /*
- * Select/unselect a column for display (we determine which from the sender)
+ * Enable/disable certain menu items, as necessary
  */
-- (IBAction) cornerSelectField:(id)sender
+- (BOOL) validateMenuItem:(NSMenuItem *)menuItem
 {
-   if( [ sender tag ] == 0 )   // Show all columns
+   SEL menuItemAction = [ menuItem action ];
+   if( menuItemAction == @selector( copy: ) || menuItemAction == @selector( cut: ) ||
+       menuItemAction == @selector( setCategory: ) || menuItemAction == @selector( delete: ) )
+      return ( [ documentView numberOfSelectedRows ] > 0 );
+   else if( menuItemAction == @selector( paste: ) )
+      return ( [ [ NSPasteboard generalPasteboard ] 
+                 availableTypeFromArray:[ NSArray arrayWithObject:CSDocumentPboardType ] ] != nil );
+   else if( menuItemAction == @selector( cmmCopyField: ) ||
+            menuItemAction == @selector( cmmOpenURL: ) )
    {
-      unsigned int index;
-      for( index = 1; index < [ columnSelectionArray count ]; index++ )
-         [ self setDisplayOfColumnID:[ columnSelectionArray objectAtIndex:index ] enabled:YES ];
-   }
-   else
-   {
-      BOOL enabled = ( [ sender state ] != NSOnState );
-      if( [ [ documentView tableColumns ] count ] > 1 || enabled )
-         [ self setDisplayOfColumnID:[ columnSelectionArray objectAtIndex:[ sender tag ] ] enabled:enabled ];
+      int selectedRow = [ self rowForFilteredRow:[ documentView selectedRow ] ];
+      NSString *fieldName = nil;
+      if( menuItemAction == @selector( cmmOpenURL: ) )
+         fieldName = CSDocModelKey_URL;
       else
-         NSBeginCriticalAlertSheet( NSLocalizedString( @"Need at least one column", @"" ),
-                                    nil,
-                                    nil,
-                                    nil,
-                                    [ self window ],
-                                    nil,
-                                    nil,
-                                    nil,
-                                    NULL,
-                                    NSLocalizedString( @"At least one column is needed in order to be useful",
-                                                       @"" ) );
+         fieldName = [ cmmCopyFields objectAtIndex:[ menuItem tag ] ];
+      NSString *fieldValue = [ [ self document ] stringForKey:fieldName atRow:selectedRow ];
+      if( fieldValue != nil && [ fieldValue length ] > 0 )
+         return YES;
+      else
+         return NO;
    }
-   [ self updateCornerMenu ];
+   
+   return YES;
 }
 
 
+#pragma mark -
+#pragma mark Export Handling
 /*
  * Return the export accessory view from the NIB
  */
@@ -1065,34 +974,8 @@ static NSArray *searchWhatArray;
 }
 
 
-/*
- * When the search field value is changed; set that the field is modified if
- * it has, setup filtering, and refresh the view
- */
-- (void) controlTextDidChange:(NSNotification *)aNotification
-{
-   if( [ [ aNotification object ] isEqual:searchField ] )
-      [ self refreshWindow ];
-}
-
-
-/*
- * Only reliable way to know when we're going away and we still have a
- * reference to the document (sometimes [ self document ] works in
- * windowWillClose:, sometimes it doesn't)
- */
-- (void) setDocument:(NSDocument *)document
-{
-   if( [ self document ] != nil && document == nil && [ [ self document ] fileURL ] != nil )
-   {
-      [ self saveWindowState ];
-      [ self saveTableState ];
-      [ [ NSUserDefaults standardUserDefaults ] synchronize ];
-   }
-   [ super setDocument:document ];
-}
-
-
+#pragma mark -
+#pragma mark Window Handling
 /*
  * Update set category menu when we are key (since it now applies to us)
  */
@@ -1112,6 +995,159 @@ static NSArray *searchWhatArray;
    [ stdDefaults removeObserver:self forKeyPath:CSPrefDictKey_CellSpacing ];
    [ stdDefaults removeObserver:self forKeyPath:CSPrefDictKey_TableAltBackground ];
    [ stdDefaults removeObserver:self forKeyPath:CSPrefDictKey_IncludeDefaultCategories ];
+}
+
+
+/*
+ * Refresh all the views in the window
+ */
+- (void) refreshWindow
+{
+   [ self updateSetCategoryMenu ];
+   [ self filterView ];
+   [ documentView reloadData ];
+   [ documentView deselectAll:self ];
+   [ self updateStatusField ];
+}
+
+
+#pragma mark -
+#pragma mark Miscellaneous
+/*
+ * When the search field value is changed; set that the field is modified if
+ * it has, setup filtering, and refresh the view
+ */
+- (void) controlTextDidChange:(NSNotification *)aNotification
+{
+   if( [ [ aNotification object ] isEqual:searchField ] )
+      [ self refreshWindow ];
+}
+
+
+/*
+ * Only reliable way to know when we're going away and we still have a
+ * reference to the document (sometimes [ self document ] works in
+                              * windowWillClose:, sometimes it doesn't)
+ */
+- (void) setDocument:(NSDocument *)document
+{
+   if( [ self document ] != nil && document == nil && [ [ self document ] fileURL ] != nil )
+   {
+      [ self saveWindowState ];
+      [ self saveTableState ];
+      [ [ NSUserDefaults standardUserDefaults ] synchronize ];
+   }
+   [ super setDocument:document ];
+}
+
+
+/*
+ * Update the status field with current information
+ */
+- (void) updateStatusField
+{
+   int entryCount = [ self numberOfRowsInTableView:documentView ];
+   int selectedCount = [ documentView numberOfSelectedRows ];
+   NSString *statusString;
+   if( entryCount == 1 )
+      statusString = [ NSString stringWithFormat:NSLocalizedString( @"1 entry, %d selected", @"" ),
+         selectedCount ];
+   else
+      statusString = [ NSString stringWithFormat:NSLocalizedString( @"%d entries, %d selected", @"" ),
+         entryCount,
+         selectedCount ];
+   if( searchResultList != nil )
+      statusString = [ NSString stringWithFormat:@"%@ (%@)",
+         statusString,
+         NSLocalizedString( @"filtered", @"" ) ];
+   [ documentStatus setStringValue:statusString ];
+}
+
+
+/*
+ * Convert an index set of row numbers to an array of names
+ */
+- (NSArray *) namesFromIndexes:(NSIndexSet *)indexes
+{
+   NSMutableArray *nameArray = [ NSMutableArray arrayWithCapacity:[ indexes count ] ];
+   unsigned int rowIndex;
+   for( rowIndex = [ indexes firstIndex ];
+        rowIndex != NSNotFound;
+        rowIndex = [ indexes indexGreaterThanIndex:rowIndex ] )
+   {
+      [ nameArray addObject:[ [ self document ] stringForKey:CSDocModelKey_Name
+                                                       atRow:[ self rowForFilteredRow:rowIndex ] ] ];
+   }
+   
+   return nameArray;
+}
+
+
+/*
+ * Called when the "really delete" sheet is done
+ */
+- (void) deleteSheetDidEnd:(NSWindow *)sheet
+                returnCode:(int)returnCode
+               contextInfo:(void *)contextInfo
+{
+   if( returnCode == NSAlertDefaultReturn )   // They said delete...
+      [ [ self document ] deleteEntriesWithNamesInArray:[ self getSelectedNames ] ];
+}
+
+
+/*
+ * Setup the given column to have the correct indicator image, and remove the
+ * one from the previous column
+ */
+- (void) setSortingImageForColumn:(NSTableColumn *)tableColumn
+{
+   if( [ [ self document ] isSortAscending ] )
+      [ documentView setIndicatorImage:[ NSImage imageNamed:@"NSAscendingSortIndicator" ]
+                         inTableColumn:tableColumn ];
+   else
+      [ documentView setIndicatorImage:[ NSImage imageNamed:@"NSDescendingSortIndicator" ]
+                         inTableColumn:tableColumn ];
+   if( ![ previouslySelectedColumn isEqual:tableColumn ] )
+      [ documentView setIndicatorImage:nil inTableColumn:previouslySelectedColumn ];
+   previouslySelectedColumn = tableColumn;
+}
+
+
+/*
+ * Handle when certain observed items are updated
+ */
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object 
+                        change:(NSDictionary *)change
+                       context:(void *)context
+{
+   if( [ keyPath isEqualToString:CSPrefDictKey_CellSpacing ] )
+      [ self setTableViewSpacing ];
+   else if( [ keyPath isEqualToString:CSPrefDictKey_IncludeDefaultCategories ] )
+      [ self updateSetCategoryMenu ];
+   else if( [ keyPath isEqualToString:CSPrefDictKey_TableAltBackground ] )
+   {
+      NSColor *stripeColor = [ NSUnarchiver unarchiveObjectWithData:
+         [ [ NSUserDefaults standardUserDefaults ]
+                                                 objectForKey:CSPrefDictKey_TableAltBackground ] ];
+      [ documentView setStripeColor:stripeColor ];
+   }
+}
+
+
+/*
+ * Simple end modals
+ */
+- (IBAction) newCategoryOK:(id)sender
+{
+   [ NSApp stopModal ];
+   [ newCategoryWindow orderOut:self ];
+}
+
+- (IBAction) newCategoryCancel:(id)sender
+{
+   [ NSApp abortModal ];
+   [ newCategoryWindow orderOut:self ];
 }
 
 @end
