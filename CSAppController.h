@@ -53,8 +53,8 @@ extern NSString * const CSDocumentPboardType;
 // Returns YES when a closeAll was caused by an app timeout
 - (BOOL) closeAllFromTimeout;
 
-// Give out the Set Category menu item
-- (id <NSMenuItem>) editMenuSetCategoryMenuItem;
+// Update the Set Category menu item with the given category list
+- (void) updateSetCategoryMenuWithCategories:(NSArray *)categories action:(SEL)action;
 
 // Close all open documents
 - (IBAction) closeAll:(id)sender;

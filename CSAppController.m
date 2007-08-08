@@ -312,11 +312,23 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
 #pragma mark -
 #pragma mark Menu Item Handling
 /*
- * Give out the Set Category menu item
+ * Update the Set Category menu item with the given category list
  */
-- (id <NSMenuItem>) editMenuSetCategoryMenuItem
+- (void) updateSetCategoryMenuWithCategories:(NSArray *)categories action:(SEL)action
 {
-   return editMenuSetCategory;
+   NSMenu *categoriesMenu = [ editMenuSetCategory submenu ];
+   NSEnumerator *oldItemsEnum = [ [ categoriesMenu itemArray ] objectEnumerator ];
+   id oldItem;
+   while( ( oldItem = [ oldItemsEnum nextObject ] ) != nil )
+      [ categoriesMenu removeItem:oldItem ];
+   NSEnumerator *currentCategoriesEnum = [ categories objectEnumerator ];
+   id newItem;
+   while( ( newItem = [ currentCategoriesEnum nextObject ] ) != nil )
+      [ categoriesMenu addItemWithTitle:newItem action:action keyEquivalent:@"" ];
+   [ categoriesMenu addItem:[ NSMenuItem separatorItem ] ];
+   [ categoriesMenu addItemWithTitle:NSLocalizedString( @"New Category", @"" )
+                              action:action
+                       keyEquivalent:@"" ];
 }
 
 

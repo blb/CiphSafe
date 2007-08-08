@@ -775,48 +775,22 @@ static NSArray *searchWhatArray;
 #pragma mark -
 #pragma mark Menu Handling
 /*
- * Update list of possible categories for the menu
- */
-- (void) updateSetCategoryMenu
-{
-   if( [ [ self window ] isKeyWindow ] )
-   {
-      NSMenu *categoriesMenu = [ [ [ NSApp delegate ] editMenuSetCategoryMenuItem ] submenu ];
-      NSEnumerator *oldItemsEnum = [ [ categoriesMenu itemArray ] objectEnumerator ];
-      id oldItem;
-      while( ( oldItem = [ oldItemsEnum nextObject ] ) != nil )
-         [ categoriesMenu removeItem:oldItem ];
-      NSEnumerator *currentCategoriesEnum = [ [ [ self document ] categories ] objectEnumerator ];
-      id newItem;
-      while( ( newItem = [ currentCategoriesEnum nextObject ] ) != nil )
-         [ categoriesMenu addItemWithTitle:newItem
-                                    action:@selector( setCategory: )
-                             keyEquivalent:@"" ];
-      [ categoriesMenu addItem:[ NSMenuItem separatorItem ] ];
-      [ categoriesMenu addItemWithTitle:NSLocalizedString( @"New Category", @"" )
-                                 action:@selector( setCategory: )
-                          keyEquivalent:@"" ];
-   }
-}
-
-
-/*
  * Set the category on a bunch of entries
  */
 - (IBAction) setCategory:(id)sender
 {
-   NSMenu *categoriesMenu = [ [ [ NSApp delegate ] editMenuSetCategoryMenuItem ] submenu ];
-   // Last item is new category
+   NSArray *categories = [ [ self document ] valueForKey:@"categories" ];
    NSString *category;
-   if( [ categoriesMenu indexOfItem:sender ] == ( [ categoriesMenu numberOfItems ] - 1 ) )
+   if( [ categories containsObject:[ sender title ] ] )
+      category = [ sender title ];
+   else
    {
       if( [ NSApp runModalForWindow:newCategoryWindow ] == NSRunStoppedResponse )
          category = [ newCategory stringValue ];
       else
          category = nil;
    }
-   else
-      category = [ sender title ];
+
    if( category != nil )
    {
       NSEnumerator *selectedNamesEnumerator = [ [ self getSelectedNames ] objectEnumerator ];
@@ -981,7 +955,8 @@ static NSArray *searchWhatArray;
  */
 - (void) windowDidBecomeKey:(NSNotification *)aNotification
 {
-   [ self updateSetCategoryMenu ];
+   NSArray *categories = [ [ self document ] valueForKey:@"categories" ];
+   [ [ NSApp delegate ] updateSetCategoryMenuWithCategories:categories action:@selector( setCategory: ) ];
 }
 
 
@@ -1003,7 +978,8 @@ static NSArray *searchWhatArray;
  */
 - (void) refreshWindow
 {
-   [ self updateSetCategoryMenu ];
+   NSArray *categories = [ [ self document ] valueForKey:@"categories" ];
+   [ [ NSApp delegate ] updateSetCategoryMenuWithCategories:categories action:@selector( setCategory: ) ];
    [ self filterView ];
    [ documentView reloadData ];
    [ documentView deselectAll:self ];
@@ -1124,7 +1100,10 @@ static NSArray *searchWhatArray;
    if( [ keyPath isEqualToString:CSPrefDictKey_CellSpacing ] )
       [ self setTableViewSpacing ];
    else if( [ keyPath isEqualToString:CSPrefDictKey_IncludeDefaultCategories ] )
-      [ self updateSetCategoryMenu ];
+   {
+      NSArray *categories = [ [ self document ] valueForKey:@"categories" ];
+      [ [ NSApp delegate ] updateSetCategoryMenuWithCategories:categories action:@selector( setCategory: ) ];
+   }
    else if( [ keyPath isEqualToString:CSPrefDictKey_TableAltBackground ] )
    {
       NSColor *stripeColor = [ NSUnarchiver unarchiveObjectWithData:
