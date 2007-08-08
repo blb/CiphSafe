@@ -248,7 +248,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
             /* The error object must be set (even though this isn't a true error) or doing a cancel twice
             * will cause it to crash in the depths of NSDocumentController code
             */
-            *outError = [ NSError errorWithDomain:@"CiphSafe" code:0 userInfo:nil ];
+            *outError = [ NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil ];
          }
          break;   // User cancelled
       }
