@@ -174,15 +174,14 @@ static NSArray *searchWhatArray;
    [ [ searchCategoryMenu itemWithTag:currentSearchCategory ] setState:NSOnState ];
    
    // Load stripe color from prefs, or the default blue if none
-   NSColor *stripeColor = [ NSUnarchiver unarchiveObjectWithData:
-      [ stdDefaults objectForKey:CSPrefDictKey_TableAltBackground ] ];
-   if( stripeColor == nil )
+   id tableAltBackgroundPref = [ stdDefaults objectForKey:CSPrefDictKey_TableAltBackground ];
+   if( tableAltBackgroundPref == nil )
       [ documentView setStripeColor:[ NSColor colorWithCalibratedRed:0.93
                                                                green:0.95
                                                                 blue:1.0
                                                                alpha:1.0 ] ];
    else
-      [ documentView setStripeColor:stripeColor ];
+      [ documentView setStripeColor:[ NSUnarchiver unarchiveObjectWithData:tableAltBackgroundPref ] ];
    
    [ documentView setDraggingSourceOperationMask:NSDragOperationEvery forLocal:YES ];
    [ documentView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO ];
