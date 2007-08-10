@@ -100,6 +100,17 @@ static CSPrefsController *sharedPrefsController = nil;
    if( [ userDefaults integerForKey:CSPrefDictKey_CloseTimeout ] < 1 ||
        [ userDefaults integerForKey:CSPrefDictKey_CloseTimeout ] > 3600 )
       [ userDefaults setInteger:10 forKey:CSPrefDictKey_CloseTimeout ];
+   int cellSpacing = [ userDefaults integerForKey:CSPrefDictKey_CellSpacing ];
+   if( cellSpacing != CSPrefCellSpacingOption_Small &&
+       cellSpacing != CSPrefCellSpacingOption_Medium &&
+       cellSpacing != CSPrefCellSpacingOption_Large )
+      [ userDefaults setInteger:CSPrefCellSpacingOption_Small forKey:CSPrefDictKey_CellSpacing ];
+   int timeoutSaveOption = [ userDefaults integerForKey:CSPrefDictKey_CloseAfterTimeoutSaveOption ];
+   if( timeoutSaveOption != CSPrefCloseAfterTimeoutSaveOption_Save &&
+       timeoutSaveOption != CSPrefCloseAfterTimeoutSaveOption_Discard &&
+       timeoutSaveOption != CSPrefCloseAfterTimeoutSaveOption_Ask )
+      [ userDefaults setInteger:CSPrefCloseAfterTimeoutSaveOption_Save
+                         forKey:CSPrefDictKey_CloseAfterTimeoutSaveOption ];
 
    toolbarItemIDs = [ [ NSArray alloc ] initWithObjects:CSPrefsControllerToolbarID_General,
                                                         CSPrefsControllerToolbarID_Appearance,

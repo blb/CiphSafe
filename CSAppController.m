@@ -77,6 +77,8 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
 #if defined(DEBUG)
    NSLog( @"CiphSafe debug build" );
 #endif
+   // Force the prefs controller to load so it does its +initialize thing
+   [ CSPrefsController sharedPrefsController ];
 /*   
    // Create CoreFoundation custom allocator so we can clear memory on deallocation
    originalCFAllocator = CFAllocatorGetDefault();
