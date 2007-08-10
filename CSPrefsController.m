@@ -228,6 +228,27 @@ static CSPrefsController *sharedPrefsController = nil;
 
 
 #pragma mark -
+#pragma mark Help Display Actions
+/*
+ * Display help for the various preference panes
+ */
+- (IBAction) displayHelpAppearance:(id)sender
+{
+   [ [ NSHelpManager sharedHelpManager ] openHelpAnchor:@"appearanceprefs" inBook:@"CiphSafe Help" ]; 
+}
+
+- (IBAction) displayHelpGeneral:(id)sender
+{
+   [ [ NSHelpManager sharedHelpManager ] openHelpAnchor:@"generalprefs" inBook:@"CiphSafe Help" ]; 
+}
+
+- (IBAction) displayHelpSecurity:(id)sender
+{
+   [ [ NSHelpManager sharedHelpManager ] openHelpAnchor:@"securityprefs" inBook:@"CiphSafe Help" ]; 
+}
+
+
+#pragma mark -
 #pragma mark Miscellaneous
 /*
  * Only have a single prefs controller

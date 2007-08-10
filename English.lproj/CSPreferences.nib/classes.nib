@@ -8,7 +8,12 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {prefsAutoOpenSelectPath = id; }; 
+            ACTIONS = {
+                displayHelpAppearance = id; 
+                displayHelpGeneral = id; 
+                displayHelpSecurity = id; 
+                prefsAutoOpenSelectPath = id; 
+            }; 
             CLASS = CSPrefsController; 
             LANGUAGE = ObjC; 
             OUTLETS = {appearanceView = NSView; generalView = NSView; securityView = NSView; }; 

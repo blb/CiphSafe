@@ -82,4 +82,9 @@ extern const int CSPrefCellSpacingOption_Large;
 // Actions for the prefs window
 - (IBAction) prefsAutoOpenSelectPath:(id)sender;
 
+// Help actions
+- (IBAction) displayHelpAppearance:(id)sender;
+- (IBAction) displayHelpGeneral:(id)sender;
+- (IBAction) displayHelpSecurity:(id)sender;
+
 @end
