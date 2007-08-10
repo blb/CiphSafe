@@ -53,8 +53,8 @@
    IBOutlet NSButton *mainButton;
 }
 
-// Gererate an random password
-- (IBAction) generate:(id)sender;
+// Gererate a random password
+- (IBAction) generateRandomPassword:(id)sender;
 
 // Open the URL from the URL field
 - (IBAction) openURL:(id)sender;

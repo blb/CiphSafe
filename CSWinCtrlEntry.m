@@ -92,7 +92,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 /*
  * Generate a random password
  */
-- (IBAction) generate:(id)sender
+- (IBAction) generateRandomPassword:(id)sender
 {
    const char *genString;
    if( [ [ NSUserDefaults standardUserDefaults ] boolForKey:CSPrefDictKey_AlphanumOnly ] )

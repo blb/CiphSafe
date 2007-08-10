@@ -7,7 +7,7 @@
             SUPERCLASS = CSWinCtrlEntry; 
         }, 
         {
-            ACTIONS = {generate = id; openURL = id; }; 
+            ACTIONS = {generateRandomPassword = id; openURL = id; }; 
             CLASS = CSWinCtrlEntry; 
             LANGUAGE = ObjC; 
             OUTLETS = {
