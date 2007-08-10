@@ -1,0 +1,71 @@
+<!-- This Apple Help template put together by Andy Matuschak
+	http://www.andymatuschak.org
+	andy@andymatuschak.org
+	Version 1.0
+
+	Adapted from the Safari help book--thanks, Apple!
+	Adapted more directly from Pixen's help book.
+	Licensed under MIT. -->
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+   <title>Technical Details</title>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+   <meta name="keywords" content="technical, details, encryption, aes, openssl">
+   <meta name="description" content="Learn about the technical details" />
+   <link href="../css/topicPage.css" type="text/css" rel="stylesheet" media="all" />
+</head>
+<body>
+<div id="banner">
+   <div id="machelp">
+      <a name="technical"></a>
+      <a class="bread" href="help:anchor='access' bookID=CiphSafe Help">CiphSafe Help</a>
+   </div>
+   <div id="index">
+      <a class="leftborder" href="index.html">Index</a>
+   </div>
+</div>
+<div id="mainbox">
+   <div id="caticon">
+      <img class="icon" src="../gfx/icon32.png" alt="CiphSafe Icon" />
+   </div>
+   <div id="pagetitle">
+      <h1>Technical Details</h1>
+   </div>
+   <p>
+      CiphSafe saves each document using the
+      <a href="http://www.counterpane.com/bfsverlag.html">Blowfish</a> cipher,
+      using a 320 bit key, in cipher block chaining mode.
+   </p>
+   <p>
+      The key is created by splitting the passphrase into two halves, then calculating
+      the SHA-1 hash for each half.  Since SHA-1 generates a 160 bit result, this is
+      where the 320 bit keysize originates.
+   </p>
+   <p>
+      Both the Blowfish and SHA-1 algorithms are not actually in the application,
+      however, as CiphSafe uses the <a href="http://www.openssl.org">OpenSSL</a>
+      library (shipped with Mac OS X) to perform this work.
+   </p>
+   <p>
+      Since CiphSafe uses cipher block chaining, it requires an initialization
+      vector (IV).  The IV is simply eight random bytes, grabbed from the
+      /dev/random device.  It is then saved as the first part of the resulting file.
+   </p>
+   <p>
+      The data saved to disk is first passed to Cocoa's NSArchiver to generate a
+      bunch of bytes from all the entries in the document.  These bytes are then
+      compressed with <a href="http://www.gzip.org/zlib/">zlib</a>, and finally
+      encrypted using the key and the random IV.  This causes each save to be quite
+      different from the previous, even if no entries have been changed, as a new
+      IV is created.
+   </p>
+
+   <h2 class="seealso">See also</h2>
+   <p class="seealso">
+      <a href="backupInfo.html">Backup information</a>
+   </p>
+</div>
+</body>
+</html>

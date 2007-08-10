@@ -6,13 +6,16 @@
 	Adapted from the Safari help book--thanks, Apple!
 	Adapted more directly from Pixen's help book.
 	Licensed under MIT. -->
-
-<html>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
    <meta http-equiv="content-type" content="text/html;charset=utf-8">
    <title>Discover CiphSafe</title>
-   <meta name="robots" content="anchors">
-   <link href="../css/topicPage.css" type="text/css" rel="stylesheet" media="all">
+   <meta name="robots" content="anchors" />
+   <meta name="keywords" content="discover, ciphsafe" />
+   <meta name="description" content="Learn about Ciphsafe" />
+   <link href="../css/topicPage.css" type="text/css" rel="stylesheet" media="all" />
 </head>
 
 <body>
@@ -33,11 +36,14 @@
       <h1>Discover CiphSafe</h1>
    </div>
    <p>
-      CiphSafe provides an easy-to-use method for storing account/password
-      pairs as well as any general notes you wish to keep safe.
+      CiphSafe provides an easy-to-use method for storing account+password
+      pairs as well as any sort of notes you wish to keep safe.  The notes
+      section of each entry is basically a full-blown RTFD editor, just like
+      TextEdit.
    </p>
 
-   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
+   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0"
+          summary="Describes adding and editing entries">
       <tr>
          <td class="blue" colspan="2">
             <h3>Adding and editing entries</h3>
@@ -45,8 +51,7 @@
       </tr>
       <tr>
          <td valign="top" width="150">
-            <img src="../gfx/viewEntryScreenshot.png"
-                 alt="view entry screenshot">
+            <img src="../gfx/viewEntryScreenshot.png" alt="view entry screenshot">
          </td>
          <td valign="top">
             <p>
@@ -56,7 +61,7 @@
             </p>
             <p>
                <img src="../gfx/orngbullet.gif" alt="bullet" height="8" width="8" border="0">
-               <a href="newEntry.html">Adding an entry</a>
+               <a href="newEntry.html">Adding an entry</a><br />
                <img src="../gfx/orngbullet.gif" alt="bullet" height="8" width="8" border="0">
                <a href="genPassword.html">Generating random passwords</a>
             </p>
@@ -65,7 +70,8 @@
    </table>
    <br />
 
-   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
+   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0"
+          summary="Overview of the searching feature">
       <tr>
          <td class="blue" colspan="2">
             <h3>Searching is simple, Mac OS X-style</h3>
@@ -87,26 +93,27 @@
       </tr>
    </table>
 
-   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
+   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0"
+          summary="Describes how to use the export ability">
       <tr>
          <td class="blue" colspan="2">
-            <h3>Importing and exporting data</h3>
+            <h3>Exporting data</h3>
          </td>
       </tr>
       <tr>
          <td valign="top" width="150">
-            <img src="../gfx/feature2.png" alt="feature screenshot">
+            <img src="../gfx/exportScreenshot.png" alt="feature screenshot">
          </td>
-         <!-- These screenshots should be 150px wide or less. -->
          <td valign="top">
             <p>
-               New in version 1.3, CiphSafe can export entries to a
-               comma-separated values (CSV) or XML file.  It can also import
-               from those types of files.
+               CiphSafe now has two ways to get data to other applications: drag
+               and drop, and an export option (new in 1.3).  Drag and drop works
+               as any Mac user would expect, and use the export feature to
+               generate CSV or XML files from your data.
             </p>
             <p>
                <img src="../gfx/orngbullet.gif" alt="bullet" height="8" width="8" border="0">
-               <a href="importTask.html">Importing</a>
+               <a href="dragDrop.html">Drag and Drop</a><br />
                <img src="../gfx/orngbullet.gif" alt="bullet" height="8" width="8" border="0">
                <a href="exportTask.html">Exporting</a>
             </p>
@@ -114,51 +121,24 @@
       </tr>
    </table>
 
-   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
+   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0"
+          summary="Describes miscellaneous options">
       <tr>
          <td class="blue" colspan="2">
-            <h3>Proper Mac drag and drop support</h3>
+            <h3>Miscellaneous Options</h3>
          </td>
       </tr>
       <tr>
-         <td valign="top" width="150">
-            <img src="../gfx/dragScreenshot.png" alt="feature screenshot">
-         </td>
          <td valign="top">
-            <p>
-               CiphSafe allows entries to be dragged to other CiphSafe
-               documents and to other applications, as it should being
-               a Mac application.
-            </p>
+            <p>A few other bits you may want or need to know.</p>
             <p>
                <img src="../gfx/orngbullet.gif" alt="bullet" height="8" width="8" border="0">
-               <a href="dragDrop.html">Using drag and drop</a>
-            </p>
-         </td>
-      </tr>
-   </table>
-
-   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
-      <tr>
-         <td class="blue" colspan="2">
-            <h3>CLEVER INTRODUCTION FOR SOME OTHER FEATURE.</h3>
-         </td>
-      </tr>
-      <tr>
-         <td valign="top" width="150">
-            <img src="../gfx/feature2.png" alt="feature screenshot">
-         </td>
-         <!-- These screenshots should be 150px wide or less. -->
-         <td valign="top">
-            <p>
-               Praesent malesuada, odio a pellentesque euismod, felis mi vulputate lacus, vitae ornare lorem risus et pede. Morbi lacinia tincidunt lorem. Phasellus luctus lacus vel nulla.
-            </p>
-            <p>
+               <a href="backupInfo.html">Information for backups</a><br />
                <img src="../gfx/orngbullet.gif" alt="bullet" height="8" width="8" border="0">
-               <a href="feature2page.html">Using SOME OTHER FEATURE</a>
+               <a href="techDetails.html">Technical details</a>
             </p>
-         </td>
-      </tr>
+           </td>
+       </tr>
    </table>
 </div>
 </body>

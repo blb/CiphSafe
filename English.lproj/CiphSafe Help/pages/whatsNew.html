@@ -6,13 +6,16 @@
 	Adapted from the Safari help book--thanks, Apple!
 	Adapted more directly from Pixen's help book.
 	Licensed under MIT. -->
-
-<html>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-   <meta http-equiv="content-type" content="text/html;charset=utf-8">
    <title>What's New in CiphSafe 1.3</title>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
    <meta name="robots" content="anchors">
-   <link href="../css/topicPage.css" type="text/css" rel="stylesheet" media="all">
+   <meta name="keywords" content="new, features" />
+   <meta name="description" content="Learn what is new in CiphSafe 1.3" />
+   <link href="../css/topicPage.css" type="text/css" rel="stylesheet" media="all" />
 </head>
 
 <body>
@@ -36,26 +39,24 @@
       Several by-popular-request items have been added to CiphSafe for 1.3.
    </p>
 
-   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
+   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0"
+          summary="Describes the new export feature">
       <tr>
          <td class="blue" colspan="2">
-            <h3>Import/Export</h3>
+            <h3>Export</h3>
          </td>
       </tr>
       <tr>
          <td valign="top" width="150">
-            <img src="../gfx/feature1.png" alt="feature screenshot">
+            <img src="../gfx/exportScreenshot.png" alt="feature screenshot">
          </td>
-         <!-- These screenshots should be 150px wide or less. -->
          <td valign="top">
             <p>
-               The ability to import/export comma-separated value (CSV)
-               and XML files has been added.  Now you can get data out of
-               CiphSafe when needed as well as bring in other stuff.
+               The ability to export comma-separated value (CSV) and XML files
+               has been added.  Now you can get data out of CiphSafe whenever
+               needed.
             </p>
             <p>
-               <img src="../gfx/orngbullet.gif" alt="bullet" height="8" width="8" border="0">
-               <a href="importTask.html">Importing</a>
                <img src="../gfx/orngbullet.gif" alt="bullet" height="8" width="8" border="0">
                <a href="exportTask.html">Exporting</a>
             </p>
@@ -64,32 +65,8 @@
    </table>
    <br />
 
-   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
-      <tr>
-         <td class="blue" colspan="2">
-            <h3>New file format</h3>
-         </td>
-      </tr>
-      <tr>
-         <td valign="top">
-            <p>
-               The file format for CiphSafe has been changed.  The previous
-               format basically took the data from Cocoa's frameworks, but
-               now uses a text-based format in case Apple ever changes the
-               way Cocoa handles things.  This does have consequences if
-               you want to keep older versions of CiphSafe around.
-            </p>
-            <p>
-               <img src="../gfx/orngbullet.gif" alt="bullet" height="8" width="8" border="0">
-               <a href="feature2page.html">Information on version
-                  compatibility</a>
-            </p>
-         </td>
-      </tr>
-   </table>
-   <br />
-
-   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
+   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0"
+          summary="Describes the improved drag and drop support">
       <tr>
          <td class="blue" colspan="2">
             <h3>Drag and drop handles moving and copying</h3>
@@ -103,42 +80,60 @@
             <p>
                Prior versions only did a copy when dragging entries.  Now,
                per the Mac OS standard key combination of Command to move or
-               Option to copy, entries can be moved or copied as needed.
+               Option to copy, entries can be moved or copied as needed.  Note
+               that moving only works between CiphSafe documents, you can
+               only copy to other applications.
             </p>
             <p>
                <img src="../gfx/orngbullet.gif" alt="bullet" height="8" width="8" border="0">
-               <a href="dragDrop.html">Using drag and drop</a>
+               <a href="dragDrop.html">Drag and drop</a>
             </p>
          </td>
       </tr>
    </table>
    <br />
 
-   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
+   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0"
+          summary="Describes changes to the preferences">
       <tr>
          <td class="blue" colspan="2">
-            <h3>Preference handling</h3>
+            <h3>Preferences handling</h3>
          </td>
       </tr>
       <tr>
          <td valign="top" width="150">
-            <img src="../gfx/prefScreenshot.png" alt="preferences screenshot">
+            <img src="../gfx/prefsGeneralScreenshot.png" alt="preferences screenshot">
          </td>
          <td valign="top">
             <p>
-               The way preferences are handled has been heavily revamped;
-               from a using-CiphSafe point of view, most of this is unnoticed
-               except one bit.  The preferences window no longer has
-               Cancel/Save buttons and uses a Reset to Defaults button
-               instead as the options are otherwise set the moment one is
-               changed (like most Apple apps these days).
+               The way preferences are handled has been heavily revamped:
+               <ul>
+                  <li>
+                     The obvious change is the move to a more new-style
+                     Preferences window (ala the
+                     <a href="http://indiehig.com/wiki/Preferences_Windows">IndieHIG</a>)
+                  </li>
+                  <li>
+                     The window no longer uses Cancel/Save as it all now
+                     updates in realtime
+                  </li>
+               </ul>
+            </p>
+            <p>
+               <img src="../gfx/orngbullet.gif" alt="bullet" height="8" width="8" border="0">
+               <a href="prefsAppearance.html">Appearance Preferences</a><br />
+               <img src="../gfx/orngbullet.gif" alt="bullet" height="8" width="8" border="0">
+               <a href="prefsGeneral.html">General Preferences</a><br />
+               <img src="../gfx/orngbullet.gif" alt="bullet" height="8" width="8" border="0">
+               <a href="prefsSecurity.html">Security Preferences</a>
             </p>
          </td>
       </tr>
    </table>
    <br />
 
-   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
+   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0"
+          summary="Mention of the selectable alternate row color">
       <tr>
          <td class="blue" colspan="2">
             <h3>Alternate row color is selectable</h3>
@@ -152,40 +147,16 @@
             <p>
                The main view of entries has had the alternating color option
                for some time, but 1.3 now allows the alternate color to be
-               changed in case the standard light blue is too boring.
+               changed in case the standard light blue is too boring.  (Yes,
+               bright red is really ugly for this.)
             </p>
          </td>
       </tr>
    </table>
    <br />
 
-   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
-      <tr>
-         <td class="blue" colspan="2">
-            <h3>Alternate row color is selectable</h3>
-         </td>
-      </tr>
-      <tr>
-         <td valign="top" width="150">
-            <img src="../gfx/feature2.png" alt="feature screenshot">
-         </td>
-         <!-- These screenshots should be 150px wide or less. -->
-         <td valign="top">
-            <p>
-               The main view of entries has had the alternating color option
-               for some time, but 1.3 now allows the alternate color to be
-               changed in case the standard blue is too boring.
-            </p>
-            <p>
-               <img src="../gfx/orngbullet.gif" alt="bullet" height="8" width="8" border="0">
-               <a href="feature2page.html">Using SOME OTHER FEATURE</a>
-            </p>
-         </td>
-      </tr>
-   </table>
-   <br />
-
-   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
+   <table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0"
+          summary="Describes the smaller changes">
       <tr>
          <td class="blue" colspan="2">
             <h3>Additional new features</h3>
@@ -198,28 +169,57 @@
             </p>
             <ul>
                <li>
-                  Searching—With Mac OS X 10.3, the rounded search field became
+                  Searching&mdash;With Mac OS X 10.3, the rounded search field became
                   available to non-Apple developers; hence CiphSafe now uses
                   one instead of the uglier set of pop-up menu, rounded text
                   field, and reset button.  The option of searching all
                   fields is now also available.
                </li>
                <li>
-                  Help—CiphSafe's help has been moved to the
-                  task-based style popular with Apple's apps.  Thanks to
-                  <a href="http://www.andymatuschak.org/pages/helptoolkit">
+                  Help&mdash;CiphSafe's help has been moved to the
+                  task-based style popular with Apple's apps, as well as vastly expanded.
+                  Thanks to <a href="http://www.andymatuschak.org/pages/helptoolkit">
                   Andy Matuschak</a> for the documentation and toolkit.
                </li>
                <li>
-                  Main window—the spacebar, when the main table has
+                  Main window&mdash;the spacebar, when the main table has
                   focus, now pages down.
                </li>
                <li>
-                  Links—Point things to <a href="http://sourceforge.net">
+                  Links&mdash;Point things to <a href="http://sourceforge.net">
                   SourceForge</a> instead of withay.com.
                </li>
                <li>
-                  Code—Not something the average user will see, but a number
+                  Preferences&mdash;The "warn on short passphrase" has been
+                  removed, CiphSafe will now always warn when it's short.
+               </li>
+               <li>
+                  File Saving&mdash;Older version of CiphSafe didn't do anything
+                  with the saved file's permission, which resulted in them being
+                  readable to anyone else on the computer.  Version 1.3 now makes sure
+                  they are saved as readable only to the owner.
+               </li>
+               <li>
+                  File Opening&mdash;Previously, if you had an auto-open document
+                  selected and started CiphSafe by either double-clicking or dragging
+                  a document, CiphSafe would open that as well as the auto-open
+                  document.  Now, the auto-open is not opened when another document is requested.
+               </li>
+               <li>
+                  Entry Contextual Menu&mdash;The contextual menu (via right- or Ctrl-clicking)
+                  for entries now disables any options for fields which are not present in the
+                  given entry.
+               </li>
+               <li>
+                  Quitting&mdash;An issue where having changes in a change window then quitting
+                  CiphSafe would not warn about unsaved changes has been fixed.
+               </li>
+               <li>
+                  Performance&mdash;Performance for really large documents containing complicated
+                  notes fields has been improved.
+               </li>
+               <li>
+                  Code&mdash;Not something the average user will see, but a number
                   of changes at the source level have been made to improve
                   things.
                </li>
@@ -227,7 +227,6 @@
          </td>
       </tr>
    </table>
-
 </div>
 </body>
 </html>
