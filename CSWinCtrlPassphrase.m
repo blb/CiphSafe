@@ -52,7 +52,7 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
 
 @interface CSWinCtrlPassphrase (InternalMethods)
 - (BOOL) doPassphrasesMatch;
-- (NSMutableData *) genKeyForConfirm:(BOOL)useConfirmTab;
+- (NSMutableData *) generateKeyUsingConfirmationTab:(BOOL)useConfirmTab;
 @end
 
 
@@ -114,7 +114,8 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
                                                @"use it anyway?", @"" ) );
       }
       else   // All is well, send the key
-         [ modalDelegate performSelector:sheetEndSelector withObject:[ self genKeyForConfirm:YES ] ];
+         [ modalDelegate performSelector:sheetEndSelector
+                              withObject:[ self generateKeyUsingConfirmationTab:YES ] ];
    }
 }
 
@@ -130,7 +131,7 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
    {
       [ NSApp endSheet:[ self window ] ];
       [ [ self window ] orderOut:self ];
-      [ [ self genKeyForConfirm:YES ] clearOutData ];
+      [ [ self generateKeyUsingConfirmationTab:YES ] clearOutData ];
       [ modalDelegate performSelector:sheetEndSelector withObject:nil ];
    }
 }
@@ -153,7 +154,7 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
               contextInfo:NULL ];
    else   // Cancel all together
    {
-      [ [ self genKeyForConfirm:YES ] clearOutData ];
+      [ [ self generateKeyUsingConfirmationTab:YES ] clearOutData ];
       [ modalDelegate performSelector:sheetEndSelector withObject:nil ];
    }
 }
@@ -167,7 +168,8 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
                     contextInfo:(void *)contextInfo
 {
    if( returnCode == NSAlertDefaultReturn )   // Use it
-      [ modalDelegate performSelector:sheetEndSelector withObject:[ self genKeyForConfirm:YES ] ];
+      [ modalDelegate performSelector:sheetEndSelector
+                           withObject:[ self generateKeyUsingConfirmationTab:YES ] ];
    else   // Bring back the original sheet
       [ NSApp beginSheet:[ self window ]
               modalForWindow:parentWindow
@@ -209,7 +211,7 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
  * Generate the key from the passphrase in the window; this does not verify
  * passphrases match on the confirm tab
  */
-- (NSMutableData *) genKeyForConfirm:(BOOL)useConfirmTab
+- (NSMutableData *) generateKeyUsingConfirmationTab:(BOOL)useConfirmTab
 {
    NSString *passphrase;
    if( useConfirmTab )
@@ -290,7 +292,7 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
    parentWindow = nil;
    int windowReturn = [ NSApp runModalForWindow:[ self window ] ];
    [ [ self window ] orderOut:self ];
-   NSMutableData *keyData = [ self genKeyForConfirm:NO ];
+   NSMutableData *keyData = [ self generateKeyUsingConfirmationTab:NO ];
    if( windowReturn == NSRunAbortedResponse )
    {
       [ keyData clearOutData ];
