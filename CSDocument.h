@@ -61,7 +61,7 @@
 - (void) viewEntries:(NSArray *)namesArray;
 
 // Copy/paste support (and drag/drop)
-- (BOOL) copyNames:(NSArray *)names toPasteboard:(NSPasteboard *)pboard;
+- (BOOL) copyRows:(NSIndexSet *)rows toPasteboard:(NSPasteboard *)pboard;
 - (BOOL) retrieveEntriesFromPasteboard:(NSPasteboard *)pboard
                               undoName:(NSString *)undoName;
 

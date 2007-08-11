@@ -459,7 +459,7 @@ static NSArray *searchWhatArray;
  */
 - (IBAction) cut:(id)sender
 {
-   [ [ self document ] copyNames:[ self getSelectedNames ] toPasteboard:[ NSPasteboard generalPasteboard ] ];
+   [ [ self document ] copyRows:[ self selectedRowIndexes ] toPasteboard:[ NSPasteboard generalPasteboard ] ];
    [ [ self document ] deleteEntriesWithNamesInArray:[ self getSelectedNames ] ];
    [ [ [ self document ] undoManager ] setActionName:NSLocalizedString( @"Cut", @"" ) ];
    [ [ NSApp delegate ] notePBChangeCount ];
@@ -471,7 +471,7 @@ static NSArray *searchWhatArray;
  */
 - (IBAction) copy:(id)sender
 {
-   [ [ self document ] copyNames:[ self getSelectedNames ] toPasteboard:[ NSPasteboard generalPasteboard ] ];
+   [ [ self document ] copyRows:[ self selectedRowIndexes ] toPasteboard:[ NSPasteboard generalPasteboard ] ];
    [ [ NSApp delegate ] notePBChangeCount ];
 }
 
@@ -646,7 +646,7 @@ static NSArray *searchWhatArray;
 {
    tableIsDragging = YES;
    dragNamesArray = [ [ self namesFromIndexes:rowIndexes ] retain ];
-   return [ [ self document ] copyNames:dragNamesArray toPasteboard:pboard ];
+   return [ [ self document ] copyRows:rowIndexes toPasteboard:pboard ];
 }
 
 

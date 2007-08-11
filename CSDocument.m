@@ -547,14 +547,13 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 #pragma mark -
 #pragma mark Copy/Paste
 /*
- * Copy the given rows to the given pasteboard (rows must be an array of
- * entry names)
+ * Copy the given rows to the given pasteboard
  *
  * XXX Since these entries are being copied to a pasteboard (for drag/drop or
  * copy/paste), there's really no point in worrying about clearing out any
  * data, since it will become accessible to the system
  */
-- (BOOL) copyNames:(NSArray *)names toPasteboard:(NSPasteboard *)pboard
+- (BOOL) copyRows:(NSIndexSet *)rows toPasteboard:(NSPasteboard *)pboard
 {
    /*
     * This generates several pasteboard types:
@@ -564,52 +563,57 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
     *    NSTabularTextPboardType - simple string, each entry tab-delimited
     *    NSStringPboardType - same as NSTabularTextPboardType
     */
-   NSMutableArray *docArray = [ NSMutableArray arrayWithCapacity:[ names count ] ];
+   NSMutableArray *docArray = [ NSMutableArray arrayWithCapacity:[ rows count ] ];
    NSAttributedString *attrEOL = [ [ NSAttributedString alloc ] initWithString:@"\n" ];
    NSMutableAttributedString *rtfdStringRows = [ [ NSMutableAttributedString alloc ] initWithString:@"" ];
-   NSEnumerator *nameEnumerator = [ names objectEnumerator ];
-   id nextName;
-   while( ( nextName = [ nameEnumerator nextObject ] ) != nil )
+   int row;
+   for( row = [ rows firstIndex ]; row != NSNotFound; row = [ rows indexGreaterThanIndex:row ] )
    {
-      /*
-       * Here we generate an array of dictionaries for the CSDocumentPboardType
-       * and an attributed string to generate the RTFD/RTF/string types
-       */
-      int row = [ self rowForName:nextName ];
+      NSString *nameString = [ self stringForKey:CSDocModelKey_Name atRow:row ];
       NSString *acctString = [ self stringForKey:CSDocModelKey_Acct atRow:row ];
       NSString *urlString = [ self stringForKey:CSDocModelKey_URL atRow:row ];
       NSString *categoryString = [ self stringForKey:CSDocModelKey_Category atRow:row ];
       NSString *passwdString = [ self stringForKey:CSDocModelKey_Passwd atRow:row ];
+      NSData *notesData = [ self RTFDNotesAtRow:row ];
       [ docArray addObject:[ NSDictionary dictionaryWithObjectsAndKeys:
-                                             nextName, CSDocModelKey_Name,
+                                             nameString, CSDocModelKey_Name,
                                              acctString, CSDocModelKey_Acct,
                                              passwdString, CSDocModelKey_Passwd,
                                              urlString, CSDocModelKey_URL,
                                              categoryString, CSDocModelKey_Category,
-                                             [ self RTFDNotesAtRow:row ], CSDocModelKey_Notes,
+                                             notesData, CSDocModelKey_Notes,
                                              nil ] ];
       NSAttributedString *attrString;
       if( [ [ NSUserDefaults standardUserDefaults ] boolForKey:CSPrefDictKey_IncludePasswd ] )
          attrString = [ [ NSAttributedString alloc ] initWithString:
-                           [ NSString stringWithFormat:@"%@\t%@\t%@\t%@\t%@\t",
-                              nextName, acctString, passwdString, urlString,
-                              categoryString ] ];
+            [ NSString stringWithFormat:@"%@\t%@\t%@\t%@\t%@\t",
+                          nameString,
+                          acctString,
+                          passwdString,
+                          urlString,
+                          categoryString ] ];
       else
          attrString = [ [ NSAttributedString alloc ] initWithString:
-                           [ NSString stringWithFormat:@"%@\t%@\t%@\t%@\t",
-                              nextName, acctString, urlString, categoryString ] ];
+            [ NSString stringWithFormat:@"%@\t%@\t%@\t%@\t",
+                          nameString,
+                          acctString,
+                          urlString,
+                          categoryString ] ];
       [ rtfdStringRows appendAttributedString:attrString ];
       [ attrString release ];
-      [ rtfdStringRows appendAttributedString:[ self RTFDStringNotesAtRow:row ] ];
+      NSAttributedString *notesAttrString = [ [ NSAttributedString alloc ] initWithRTFD:notesData
+                                                                     documentAttributes:NULL ];
+      [ rtfdStringRows appendAttributedString:notesAttrString ];
+      [ notesAttrString release ];
       [ rtfdStringRows appendAttributedString:attrEOL ];
    }
 
    [ pboard declareTypes:[ NSArray arrayWithObjects:CSDocumentPboardType,
-                                                    NSRTFDPboardType,
-                                                    NSRTFPboardType,
-                                                    NSTabularTextPboardType,
-                                                    NSStringPboardType,
-                                                    nil ]
+                                      NSRTFDPboardType,
+                                      NSRTFPboardType,
+                                      NSTabularTextPboardType,
+                                      NSStringPboardType,
+                                      nil ]
                    owner:nil ];
    [ pboard setData:[ NSArchiver archivedDataWithRootObject:docArray ] forType:CSDocumentPboardType ];
    [ pboard setData:[ rtfdStringRows RTFDWithDocumentAttributes:NULL ] forType:NSRTFDPboardType ];
