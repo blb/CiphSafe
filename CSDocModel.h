@@ -53,9 +53,9 @@ extern NSString * const CSDocModelDidRemoveEntryNotification;
 
 /*
  * Keys to the dictionaries contained in the userInfo of notifications
- * the _DeletedNames' value is an NSArray
+ * the ...Names' values are NSArray
  */
-extern NSString * const CSDocModelNotificationInfoKey_AddedName;
+extern NSString * const CSDocModelNotificationInfoKey_AddedNames;
 extern NSString * const CSDocModelNotificationInfoKey_ChangedNameFrom;
 extern NSString * const CSDocModelNotificationInfoKey_ChangedNameTo;
 extern NSString * const CSDocModelNotificationInfoKey_DeletedNames;
@@ -65,6 +65,7 @@ extern NSString * const CSDocModelNotificationInfoKey_DeletedNames;
    NSMutableArray *allEntries;     // Of NSMutableDictionary's
    // Cache attributed strings from allEntries
    NSMutableDictionary *entryASCache;
+   NSMutableDictionary *nameRowCache;
    NSString *sortKey;
    BOOL sortAscending;
    NSUndoManager *undoManager;
@@ -87,6 +88,7 @@ extern NSString * const CSDocModelNotificationInfoKey_DeletedNames;
 - (void) setSortAscending:(BOOL)sortAsc;
 - (BOOL) isSortAscending;
 - (void) setSortKey:(NSString *)newSortKey ascending:(BOOL)sortAsc;
+- (void) sortEntries;
 
 // Entry access
 - (int) entryCount;
@@ -103,6 +105,13 @@ extern NSString * const CSDocModelNotificationInfoKey_DeletedNames;
                       URL:(NSString *)url
                  category:(NSString *)category
                 notesRTFD:(NSData *)notes;
+- (BOOL) addBulkEntryWithName:(NSString *)name
+                      account:(NSString *)account
+                     password:(NSString *)password
+                          URL:(NSString *)url
+                     category:(NSString *)category
+                    notesRTFD:(NSData *)notes;
+- (void) registerAddForNamesInArray:(NSArray *)nameArray;
 - (BOOL) changeEntryWithName:(NSString *)name
                      newName:(NSString *)newName
                      account:(NSString *)account

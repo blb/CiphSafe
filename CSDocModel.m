@@ -52,7 +52,7 @@ NSString * const CSDocModelDidAddEntryNotification = @"CSDocModelDidAddEntryNoti
 NSString * const CSDocModelDidChangeEntryNotification = @"CSDocModelDidChangeEntryNotification";
 NSString * const CSDocModelDidRemoveEntryNotification = @"CSDocModelDidRemoveEntryNotification";
 
-NSString * const CSDocModelNotificationInfoKey_AddedName = @"CSDocModelNotificationInfoKey_AddedName";
+NSString * const CSDocModelNotificationInfoKey_AddedNames = @"CSDocModelNotificationInfoKey_AddedNames";
 NSString * const CSDocModelNotificationInfoKey_ChangedNameFrom =
    @"CSDocModelNotificationInfoKey_ChangedNameFrom";
 NSString * const CSDocModelNotificationInfoKey_ChangedNameTo = @"CSDocModelNotificationInfoKey_ChangedNameTo";
@@ -109,6 +109,7 @@ static NSArray *keyArray;
    {
       allEntries = [ [ NSMutableArray alloc ] initWithCapacity:25 ];
       entryASCache = [ [ NSMutableDictionary alloc ] initWithCapacity:25 ];
+      nameRowCache = [ [ NSMutableDictionary alloc ] initWithCapacity:25 ];
       [ self setupSelf ];
    }
    
@@ -153,8 +154,9 @@ static NSArray *keyArray;
             {
                [ allEntries retain ];
                entryASCache = [ [ NSMutableDictionary alloc ] initWithCapacity:[ allEntries count ] ];
+               nameRowCache = [ [ NSMutableDictionary alloc ] initWithCapacity:[ allEntries count ] ];
                [ self setupSelf ];
-               [ allEntries sortUsingFunction:sortEntries context:self ];
+               [ self sortEntries ];
             }
 #if defined(DEBUG)
             else
@@ -188,13 +190,11 @@ static NSArray *keyArray;
  */
 - (NSMutableDictionary *) findEntryWithName:(NSString *)name
 {
-   NSEnumerator *enumerator = [ allEntries objectEnumerator ];
-   id oneEntry;
-   while( ( ( oneEntry = [ enumerator nextObject ] ) != nil ) &&
-          ![ [ oneEntry objectForKey:CSDocModelKey_Name ] isEqualToString:name ] )
-      ;   // Just loop through...
-   
-   return oneEntry;
+   int row = [ self rowForName:name ];
+   if( row != -1 )
+      return [ allEntries objectAtIndex:row ];
+   else
+      return nil;
 }
 
 
@@ -324,15 +324,11 @@ static NSArray *keyArray;
  */
 - (int) rowForName:(NSString *)name
 {
-   int rowNum = -1;
-   int index;
-   for( index = 0; index < [ self entryCount ] && rowNum == -1; index++ )
-   {
-      if( [ [ self stringForKey:CSDocModelKey_Name atRow:index ] isEqualToString:name ] )
-         rowNum = index;
-   }
-   
-   return rowNum;
+   NSNumber *rowNumber = [ nameRowCache objectForKey:name ];
+   if( rowNumber != nil )
+      return [ rowNumber intValue ];
+   else
+      return -1;
 }
 
 
@@ -461,9 +457,9 @@ static NSArray *keyArray;
     */
    sortKey = newSortKey;
    sortAscending = sortAsc;
-   [ allEntries sortUsingFunction:sortEntries context:self ];
    [ [ NSNotificationCenter defaultCenter ] postNotificationName:CSDocModelDidChangeSortNotification
                                                           object:self ];
+   [ self sortEntries ];
 }
 
 
@@ -483,33 +479,83 @@ static NSArray *keyArray;
                  category:(NSString *)category
                 notesRTFD:(NSData *)notes
 {
+   BOOL result = [ self addBulkEntryWithName:name
+                                     account:account
+                                    password:password
+                                         URL:url
+                                    category:category
+                                   notesRTFD:notes ];
+   if( result )
+   {
+      if( undoManager != nil )
+      {
+         [ undoManager registerUndoWithTarget:self selector:@selector( deleteEntryWithName: ) object:name ];
+         if( ![ undoManager isUndoing ] && ![ undoManager isRedoing ] )
+            [ undoManager setActionName:NSLocalizedString( @"Add", @"" ) ];
+      }
+
+      NSDictionary *userInfo = [ NSDictionary dictionaryWithObject:[ NSArray arrayWithObject:name ]
+                                                            forKey:CSDocModelNotificationInfoKey_AddedNames ];
+      [ [ NSNotificationCenter defaultCenter ] postNotificationName:CSDocModelDidAddEntryNotification
+                                                             object:self
+                                                           userInfo:userInfo ];
+      [ self sortEntries ];
+   }
+      
+   return result;
+}
+
+
+/*
+ * Add a new entry with the given data, skipping certain post-processing for cases when a number of
+ * entries will be added at once; returns YES if all went okay, NO if an entry with that name already
+ * exists.  Use registerAddForNamesInArray: to finalize the bulk add.
+ */
+- (BOOL) addBulkEntryWithName:(NSString *)name
+                      account:(NSString *)account
+                     password:(NSString *)password
+                          URL:(NSString *)url
+                     category:(NSString *)category
+                    notesRTFD:(NSData *)notes
+{
    // If it already exists, we're outta here
    if( [ self rowForName:name ] != -1 )
       return NO;
-
+   
    [ allEntries addObject:[ NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                                    name, CSDocModelKey_Name,
-                                                    account, CSDocModelKey_Acct,
-                                                    password, CSDocModelKey_Passwd,
-                                                    url, CSDocModelKey_URL,
-                                                    category, CSDocModelKey_Category,
-                                                    notes, CSDocModelKey_Notes,
-                                                    nil ] ];
+                                                   name, CSDocModelKey_Name,
+                                                   account, CSDocModelKey_Acct,
+                                                   password, CSDocModelKey_Passwd,
+                                                   url, CSDocModelKey_URL,
+                                                   category, CSDocModelKey_Category,
+                                                   notes, CSDocModelKey_Notes,
+                                                   nil ] ];
+
+   return YES;
+}
+
+
+/*
+ * Register a bulk add of names, as given by nameArray, with the undo manager and notification center;
+ * also resort the array
+ */
+- (void) registerAddForNamesInArray:(NSArray *)nameArray
+{
    if( undoManager != nil )
    {
-      [ undoManager registerUndoWithTarget:self selector:@selector( deleteEntryWithName: ) object:name ];
+      [ undoManager registerUndoWithTarget:self
+                                  selector:@selector( deleteEntriesWithNamesInArray: )
+                                    object:nameArray ];
       if( ![ undoManager isUndoing ] && ![ undoManager isRedoing ] )
          [ undoManager setActionName:NSLocalizedString( @"Add", @"" ) ];
    }
 
-   [ allEntries sortUsingFunction:sortEntries context:self ];
-   NSDictionary *userInfo = [ NSDictionary dictionaryWithObject:name
-                                                         forKey:CSDocModelNotificationInfoKey_AddedName ];
+   NSDictionary *userInfo = [ NSDictionary dictionaryWithObject:nameArray
+                                                         forKey:CSDocModelNotificationInfoKey_AddedNames ];
    [ [ NSNotificationCenter defaultCenter ] postNotificationName:CSDocModelDidAddEntryNotification
                                                           object:self
                                                         userInfo:userInfo ];
-
-   return YES;
+   [ self sortEntries ];
 }
 
 
@@ -568,7 +614,6 @@ static NSArray *keyArray;
    if( notes != nil )
       [ theEntry setObject:notes forKey:CSDocModelKey_Notes ];
 
-   [ allEntries sortUsingFunction:sortEntries context:self ];
    NSDictionary *userInfo = [ NSDictionary dictionaryWithObjectsAndKeys:
                                               name, CSDocModelNotificationInfoKey_ChangedNameFrom,
                                               realNewName, CSDocModelNotificationInfoKey_ChangedNameTo,
@@ -576,6 +621,7 @@ static NSArray *keyArray;
    [ [ NSNotificationCenter defaultCenter ] postNotificationName:CSDocModelDidChangeEntryNotification
                                                           object:self
                                                         userInfo:userInfo ];
+   [ self sortEntries ];
 
    return YES;
 }
@@ -591,42 +637,53 @@ static NSArray *keyArray;
 - (unsigned) deleteEntriesWithNamesInArray:(NSArray *)nameArray
 {
    unsigned int numDeleted = 0;
+
+   /*
+    * Build a list, do this in advance since they will be deleted soon, causing the entry array to be
+    * modified during this operation
+    */
    NSEnumerator *nameEnumerator = [ nameArray objectEnumerator ];
    id nameToDelete;
+   NSMutableArray *entriesToDelete = [ NSMutableArray arrayWithCapacity:[ nameArray count ] ];
    while( ( nameToDelete = [ nameEnumerator nextObject ] ) != nil )
    {
       NSMutableDictionary *theEntry = [ self findEntryWithName:nameToDelete ];
       if( theEntry != nil )
+         [ entriesToDelete addObject:theEntry ];
+   }
+
+   NSEnumerator *entryEnumerator = [ entriesToDelete objectEnumerator ];
+   id entryToDelete;
+   while( ( entryToDelete = [ entryEnumerator nextObject ] ) != nil )
+   {
+      numDeleted++;
+      [ entryASCache removeObjectForKey:[ entryToDelete objectForKey:CSDocModelKey_Name ] ];
+      // removeObject: is going to release it, so we hold it for a bit here
+      [ entryToDelete retain ];
+      [ allEntries removeObject:entryToDelete ];
+      if( undoManager != nil )
       {
-         numDeleted++;
-         [ entryASCache removeObjectForKey:nameToDelete ];
-         // removeObject: is going to release it, so we hold it for a bit here
-         [ theEntry retain ];
-         [ allEntries removeObject:theEntry ];
-         if( undoManager != nil )
-         {
-            id undoInvocation = [ undoManager prepareWithInvocationTarget:self ];
-            [ undoInvocation addEntryWithName:[ theEntry objectForKey:CSDocModelKey_Name ]
-                                      account:[ theEntry objectForKey:CSDocModelKey_Acct ]
-                                     password:[ theEntry objectForKey:CSDocModelKey_Passwd ]
-                                          URL:[ theEntry objectForKey:CSDocModelKey_URL ]
-                                     category:[ theEntry objectForKey:CSDocModelKey_Category ]
-                                    notesRTFD:[ theEntry objectForKey:CSDocModelKey_Notes ] ];
-            if( ![ undoManager isUndoing ] && ![ undoManager isRedoing ] )
-               [ undoManager setActionName:NSLocalizedString( @"Delete", @"" ) ];
-         }
-         [ theEntry release ];
+         id undoInvocation = [ undoManager prepareWithInvocationTarget:self ];
+         [ undoInvocation addEntryWithName:[ entryToDelete objectForKey:CSDocModelKey_Name ]
+                                   account:[ entryToDelete objectForKey:CSDocModelKey_Acct ]
+                                  password:[ entryToDelete objectForKey:CSDocModelKey_Passwd ]
+                                       URL:[ entryToDelete objectForKey:CSDocModelKey_URL ]
+                                  category:[ entryToDelete objectForKey:CSDocModelKey_Category ]
+                                 notesRTFD:[ entryToDelete objectForKey:CSDocModelKey_Notes ] ];
+         if( ![ undoManager isUndoing ] && ![ undoManager isRedoing ] )
+            [ undoManager setActionName:NSLocalizedString( @"Delete", @"" ) ];
       }
+      [ entryToDelete release ];
    }
 
    if( numDeleted > 0 )
    {
-      [ allEntries sortUsingFunction:sortEntries context:self ];
       NSDictionary *userInfo = [ NSDictionary dictionaryWithObject:nameArray
                                                             forKey:CSDocModelNotificationInfoKey_DeletedNames ];
       [ [ NSNotificationCenter defaultCenter ] postNotificationName:CSDocModelDidRemoveEntryNotification
                                                              object:self
                                                            userInfo:userInfo ];
+      [ self sortEntries ];
    }
 
    return numDeleted;
@@ -645,6 +702,21 @@ static NSArray *keyArray;
 
 #pragma mark -
 #pragma mark Miscellaneous
+/*
+ * Force the model to perform a sort of the entries
+ */
+- (void) sortEntries
+{
+   [ allEntries sortUsingFunction:sortEntries context:self ];
+   [ nameRowCache removeAllObjects ];
+   int row;
+   int entryCount = [ self entryCount ];
+   for( row = 0; row < entryCount; row++ )
+      [ nameRowCache setObject:[ NSNumber numberWithInt:row ]
+                        forKey:[ self stringForKey:CSDocModelKey_Name atRow:row ] ];
+}
+
+
 /*
  * Return a valid string (empty, @"", if necessary)
  */

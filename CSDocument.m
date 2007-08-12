@@ -601,10 +601,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
                           categoryString ] ];
       [ rtfdStringRows appendAttributedString:attrString ];
       [ attrString release ];
-      NSAttributedString *notesAttrString = [ [ NSAttributedString alloc ] initWithRTFD:notesData
-                                                                     documentAttributes:NULL ];
-      [ rtfdStringRows appendAttributedString:notesAttrString ];
-      [ notesAttrString release ];
+      [ rtfdStringRows appendAttributedString:[ self RTFDStringNotesAtRow:row ] ];
       [ rtfdStringRows appendAttributedString:attrEOL ];
    }
 
@@ -637,17 +634,21 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
    NSArray *entryArray = [ NSUnarchiver unarchiveObjectWithData:[ pboard dataForType:CSDocumentPboardType ] ];
    if( entryArray != nil && [ entryArray count ] > 0 )
    {
+      NSMutableArray *nameArray = [ NSMutableArray arrayWithCapacity:[ entryArray count ] ];
       NSEnumerator *entryEnumerator = [ entryArray objectEnumerator ];
       id entryDictionary;
       while( ( entryDictionary = [ entryEnumerator nextObject ] ) != nil )
       {
-         [ self addEntryWithName:[ self uniqueNameForName:[ entryDictionary objectForKey:CSDocModelKey_Name ] ]
-                   account:[ entryDictionary objectForKey:CSDocModelKey_Acct ]
-                   password:[ entryDictionary objectForKey:CSDocModelKey_Passwd ]
-                   URL:[ entryDictionary objectForKey:CSDocModelKey_URL ]
-                   category:[ entryDictionary objectForKey:CSDocModelKey_Category ]
-                   notesRTFD:[ entryDictionary objectForKey:CSDocModelKey_Notes ] ];
+         NSString *uniqueName = [ self uniqueNameForName:[ entryDictionary objectForKey:CSDocModelKey_Name ] ];
+         [ nameArray addObject:uniqueName ];
+         [ [ self model ] addBulkEntryWithName:uniqueName
+                                       account:[ entryDictionary objectForKey:CSDocModelKey_Acct ]
+                                      password:[ entryDictionary objectForKey:CSDocModelKey_Passwd ]
+                                           URL:[ entryDictionary objectForKey:CSDocModelKey_URL ]
+                                      category:[ entryDictionary objectForKey:CSDocModelKey_Category ]
+                                     notesRTFD:[ entryDictionary objectForKey:CSDocModelKey_Notes ] ];
       }
+      [ [ self model ] registerAddForNamesInArray:nameArray ];
       [ [ self undoManager ] setActionName:undoName ];
       retval = YES;
    }
