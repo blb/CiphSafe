@@ -9,8 +9,6 @@
    <false/>
    <key>CSPrefDictKey_CloseEdit</key>
    <false/>
-   <key>CSPrefDictKey_ConfirmDelete</key>
-   <true/>
    <key>CSPrefDictKey_ClearClipboard</key>
    <true/>
    <key>CSPrefDictKey_CreateNew</key>

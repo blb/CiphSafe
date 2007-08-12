@@ -39,7 +39,6 @@
 extern NSString * const CSPrefDictKey_SaveBackup;
 extern NSString * const CSPrefDictKey_CloseAdd;
 extern NSString * const CSPrefDictKey_CloseEdit;
-extern NSString * const CSPrefDictKey_ConfirmDelete;
 extern NSString * const CSPrefDictKey_ClearClipboard;
 extern NSString * const CSPrefDictKey_CreateNew;
 extern NSString * const CSPrefDictKey_GenSize;

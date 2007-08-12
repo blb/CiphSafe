@@ -429,26 +429,7 @@ static NSArray *searchWhatArray;
  */
 - (IBAction) delete:(id)sender
 {
-   if( [ [ NSUserDefaults standardUserDefaults ] boolForKey:CSPrefDictKey_ConfirmDelete ] )
-   {
-      NSString *sheetQuestion;
-      if( [ documentView numberOfSelectedRows ] > 1 )
-         sheetQuestion = NSLocalizedString( @"Are you sure you want to delete the selected rows?", @"" );
-      else
-         sheetQuestion = NSLocalizedString( @"Are you sure you want to delete the selected row?", @"" );
-      NSBeginCriticalAlertSheet( NSLocalizedString( @"Are You Sure?", @"" ),
-                                 NSLocalizedString( @"Delete", @"" ),
-                                 NSLocalizedString( @"Cancel", @"" ),
-                                 nil,
-                                 [ self window ],
-                                 self,
-                                 @selector( deleteSheetDidEnd:returnCode:contextInfo: ),
-                                 nil,
-                                 NULL,
-                                 sheetQuestion );
-   }
-   else
-      [ [ self document ] deleteEntriesWithNamesInArray:[ self getSelectedNames ] ];
+   [ [ self document ] deleteEntriesWithNamesInArray:[ self getSelectedNames ] ];
 }
 
 
@@ -1055,18 +1036,6 @@ static NSArray *searchWhatArray;
    }
    
    return nameArray;
-}
-
-
-/*
- * Called when the "really delete" sheet is done
- */
-- (void) deleteSheetDidEnd:(NSWindow *)sheet
-                returnCode:(int)returnCode
-               contextInfo:(void *)contextInfo
-{
-   if( returnCode == NSAlertDefaultReturn )   // They said delete...
-      [ [ self document ] deleteEntriesWithNamesInArray:[ self getSelectedNames ] ];
 }
 
 

@@ -7,11 +7,11 @@
 	<key>IBEditorPositions</key>
 	<dict>
 		<key>868</key>
-		<string>437 484 405 402 0 0 1280 1002 </string>
+		<string>449 374 405 380 0 0 1280 1002 </string>
 		<key>923</key>
-		<string>437 582 405 205 0 0 1280 1002 </string>
+		<string>476 634 405 205 0 0 1280 1002 </string>
 		<key>942</key>
-		<string>437 471 405 427 0 0 1280 1002 </string>
+		<string>276 486 405 427 0 0 1280 1002 </string>
 	</dict>
 	<key>IBFramework Version</key>
 	<string>443.0</string>
@@ -19,8 +19,8 @@
 	<array>
 		<integer>868</integer>
 		<integer>1003</integer>
-		<integer>942</integer>
 		<integer>923</integer>
+		<integer>942</integer>
 	</array>
 	<key>IBSystem Version</key>
 	<string>8L127</string>
