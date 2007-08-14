@@ -953,18 +953,25 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 /*
  * Enable certain menu items only when it makes sense
  */
-- (BOOL) validateMenuItem:(NSMenuItem *)menuItem
+- (BOOL) validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem
 {
-   SEL menuItemAction = [ menuItem action ];
+   SEL itemAction = [ anItem action ];
    
-   if( menuItemAction == @selector( changePassphrase: ) )
+   if( itemAction == @selector( changePassphrase: ) )
       return ( bfKey != nil );
-   else if( menuItemAction == @selector( revertDocumentToSaved: ) )
-      return [ self isDocumentEdited ];
-   else if( menuItemAction == @selector( exportSelectedItems: ) )
+   else if( itemAction == @selector( revertDocumentToSaved: ) )
+   {
+      if( [ self isDocumentEdited ] )
+         return [ super validateUserInterfaceItem:anItem ];
+      else
+         return NO;
+   }
+   else if( itemAction == @selector( exportSelectedItems: ) )
       return ( [ [ [ self mainWindowController ] selectedRowIndexes ] count ] > 0 );
+   else if( itemAction == @selector( exportDocument: ) )
+      return ( [ self entryCount ] > 0 );
    else
-      return [ super validateMenuItem:menuItem ];
+      return [ super validateUserInterfaceItem:anItem ];
 }
 
 
