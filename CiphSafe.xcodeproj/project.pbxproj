@@ -11,6 +11,7 @@
 		6419C7040C5D5172006D9A6E /* lightswitch.png in Resources */ = {isa = PBXBuildFile; fileRef = 6419C7010C5D5172006D9A6E /* lightswitch.png */; };
 		6419C7050C5D5172006D9A6E /* mini window ciphsafe.png in Resources */ = {isa = PBXBuildFile; fileRef = 6419C7020C5D5172006D9A6E /* mini window ciphsafe.png */; };
 		6419C7060C5D5172006D9A6E /* padlock caution behind.png in Resources */ = {isa = PBXBuildFile; fileRef = 6419C7030C5D5172006D9A6E /* padlock caution behind.png */; };
+		645821920C6EEA1B00F29A6F /* Source ReadMe.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 645821910C6EEA1B00F29A6F /* Source ReadMe.rtf */; };
 		6478D27D09F2EF020023B67B /* DefaultCategories.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6478D27C09F2EF020023B67B /* DefaultCategories.plist */; };
 		649B03D00C5C16CE00B599AC /* CSPrefsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 649B03CF0C5C16CE00B599AC /* CSPrefsController.m */; };
 		649B04220C5C288F00B599AC /* CSPreferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = 649B04200C5C288F00B599AC /* CSPreferences.nib */; };
@@ -74,6 +75,7 @@
 		6419C7010C5D5172006D9A6E /* lightswitch.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = lightswitch.png; sourceTree = "<group>"; };
 		6419C7020C5D5172006D9A6E /* mini window ciphsafe.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mini window ciphsafe.png"; sourceTree = "<group>"; };
 		6419C7030C5D5172006D9A6E /* padlock caution behind.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "padlock caution behind.png"; sourceTree = "<group>"; };
+		645821910C6EEA1B00F29A6F /* Source ReadMe.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = "Source ReadMe.rtf"; sourceTree = "<group>"; };
 		6478D23A09F2D1890023B67B /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = English; path = English.lproj/DefaultCategories.plist; sourceTree = "<group>"; };
 		649B03CE0C5C16CE00B599AC /* CSPrefsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CSPrefsController.h; sourceTree = "<group>"; };
 		649B03CF0C5C16CE00B599AC /* CSPrefsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CSPrefsController.m; sourceTree = "<group>"; };
@@ -119,7 +121,7 @@
 		64FCAE1E09E8732200F59756 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
 		64FCAE2009E8734200F59756 /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = /usr/lib/libssl.dylib; sourceTree = "<absolute>"; };
 		8D15AC360486D014006FF6A4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		8D15AC370486D014006FF6A4 /* CiphSafe.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CiphSafe.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D15AC370486D014006FF6A4 /* CiphSafe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiphSafe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -220,6 +222,7 @@
 				64FCAE0209E8725700F59756 /* Localizable.strings */,
 				2A37F4B6FDCFA73011CA2CEA /* MainMenu.nib */,
 				64FCADBB09E870ED00F59756 /* ReadMe.rtf */,
+				645821910C6EEA1B00F29A6F /* Source ReadMe.rtf */,
 				6478D27C09F2EF020023B67B /* DefaultCategories.plist */,
 				6412E63509F3619000F421C0 /* DefaultPrefs.plist */,
 				649B04200C5C288F00B599AC /* CSPreferences.nib */,
@@ -349,6 +352,7 @@
 				6419C7040C5D5172006D9A6E /* lightswitch.png in Resources */,
 				6419C7050C5D5172006D9A6E /* mini window ciphsafe.png in Resources */,
 				6419C7060C5D5172006D9A6E /* padlock caution behind.png in Resources */,
+				645821920C6EEA1B00F29A6F /* Source ReadMe.rtf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -494,7 +498,7 @@
 				PRODUCT_NAME = CiphSafe;
 				WARNING_CFLAGS = "-Wall";
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = YES;
+				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
