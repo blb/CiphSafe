@@ -115,7 +115,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
     */
    [ randomString deleteCharactersInRange:NSMakeRange( 0, [ randomString length ] ) ];
 
-   [ [ self window ] setDocumentEdited:YES ];
+   [ self updateDocumentEditedStatus ];
 }
 
 
