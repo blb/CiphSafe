@@ -479,10 +479,8 @@ static NSArray *searchWhatArray;
 - (void) setTableViewSpacing
 {
    int cellSpacing = [ [ NSUserDefaults standardUserDefaults ] integerForKey:CSPrefDictKey_CellSpacing ];
-   NSSize newSpacing;
-   if( cellSpacing == CSPrefCellSpacingOption_Small )
-      newSpacing = NSMakeSize( 3.0, 2.0 );
-   else if( cellSpacing == CSPrefCellSpacingOption_Medium )
+   NSSize newSpacing = NSMakeSize( 3.0, 2.0 );   // The default is small
+   if( cellSpacing == CSPrefCellSpacingOption_Medium )
       newSpacing = NSMakeSize( 5.0, 2.0 );
    else if( cellSpacing == CSPrefCellSpacingOption_Large )
       newSpacing = NSMakeSize( 7.0, 3.0 );
