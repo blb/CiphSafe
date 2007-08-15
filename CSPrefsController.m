@@ -278,15 +278,19 @@ static CSPrefsController *sharedPrefsController = nil;
 - (void) setWindowContentToView:(NSView *)newView
 {
    NSWindow *window = [ self window ];
-   NSView *currentView = [ window contentView ];
-   if( ![ currentView isEqual:newView ] )
+   NSView *contentView = [ window contentView ];
+   NSView *currentSubview = nil;
+   if( [ [ contentView subviews ] count ] > 0 )
+      currentSubview = [ [ contentView subviews ] objectAtIndex:0 ];
+   if( ![ currentSubview isEqual:newView ] )
    {
       NSRect windowFrame = [ window frame ];
       NSRect newFrame = [ window frameRectForContentRect:[ newView frame ] ];
       newFrame.origin = windowFrame.origin;
       newFrame.origin.y -= NSHeight( newFrame ) - NSHeight( windowFrame );
-      [ [ self window ] setContentView:newView ];   
+      [ currentSubview removeFromSuperview ];
       [ window setFrame:newFrame display:YES animate:YES ];
+      [ contentView addSubview:newView ];
    }
 }
 
