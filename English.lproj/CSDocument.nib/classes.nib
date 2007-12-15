@@ -3,7 +3,7 @@
         {CLASS = BLBTableView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }, 
         {CLASS = BLBTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
         {
-            ACTIONS = {doGenerate = id; doOpenURL = id; }; 
+            ACTIONS = {generate = id; openURL = id; }; 
             CLASS = CSWinCtrlEntry; 
             LANGUAGE = ObjC; 
             OUTLETS = {
@@ -19,30 +19,34 @@
         }, 
         {
             ACTIONS = {
+                addEntry = id; 
                 cmmCopyField = id; 
                 cmmOpenURL = id; 
                 cornerSelectField = id; 
-                doAddEntry = id; 
-                doDeleteEntry = id; 
-                doResetSearch = id; 
-                doSetCategory = id; 
-                doViewEntry = id; 
+                delete = id; 
+                exportTypeChanged = id; 
+                limitSearch = id; 
                 newCategoryCancel = id; 
                 newCategoryOK = id; 
+                setCategory = id; 
+                viewEntry = id; 
             }; 
             CLASS = CSWinCtrlMain; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                "_cmmTableHeader" = NSMenu; 
-                "_contextualMenu" = NSMenu; 
-                "_documentDeleteButton" = NSButton; 
-                "_documentSearch" = BLBTextField; 
-                "_documentStatus" = NSTextField; 
-                "_documentView" = BLBTableView; 
-                "_documentViewButton" = NSButton; 
-                "_newCategory" = NSTextField; 
-                "_newCategoryWindow" = NSPanel; 
-                "_searchWhat" = NSPopUpButton; 
+                cmmTableHeader = NSMenu; 
+                contextualMenu = NSMenu; 
+                documentDeleteButton = NSButton; 
+                documentStatus = NSTextField; 
+                documentView = BLBTableView; 
+                documentViewButton = NSButton; 
+                exportAccessoryView = NSView; 
+                exportCSVHeader = NSButton; 
+                exportType = NSPopUpButton; 
+                newCategory = NSTextField; 
+                newCategoryWindow = NSPanel; 
+                searchCategoryMenu = NSMenu; 
+                searchField = NSSearchField; 
             }; 
             SUPERCLASS = NSWindowController; 
         }, 

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>csd</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>CiphSafe</string>
+			<key>CFBundleTypeName</key>
+			<string>CiphSafe Document</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>****</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.withay.ciphsafe.doc</string>
+			</array>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>CSDocument</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>${EXECUTABLE_NAME}</string>
+	<key>CFBundleGetInfoString</key>
+	<string>© Bryan L Blackburn, 2003,2006-2007</string>
+	<key>CFBundleHelpBookFolder</key>
+	<string>CiphSafe Help</string>
+	<key>CFBundleHelpBookName</key>
+	<string>CiphSafe Help</string>
+	<key>CFBundleIconFile</key>
+	<string>CiphSafe</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.withay.ciphsafe</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>${PRODUCT_NAME}</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>${CIPHSAFE_VERSION}</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>${CIPHSAFE_BUNDLE_VERSION}</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.4.0</string>
+	<key>NSMainNibFile</key>
+	<string>MainMenu</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>CiphSafe Document</string>
+			<key>UTTypeIconFile</key>
+			<string>CiphSafe.icns</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.withay.ciphsafe.doc</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>csd</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
+</dict>
+</plist>

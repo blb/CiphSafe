@@ -1,0 +1,526 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		646925CB0CE9589D005B14AC /* BLBTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 646925CA0CE9589D005B14AC /* BLBTableView.m */; };
+		646925CD0CE95F41005B14AC /* CiphSafe.icns in Resources */ = {isa = PBXBuildFile; fileRef = 646925CC0CE95F41005B14AC /* CiphSafe.icns */; };
+		646925D00CE95F52005B14AC /* CSAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 646925CF0CE95F52005B14AC /* CSAppController.m */; };
+		646925D50CE95F61005B14AC /* CSDocModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 646925D20CE95F61005B14AC /* CSDocModel.m */; };
+		646925D60CE95F61005B14AC /* CSDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 646925D40CE95F61005B14AC /* CSDocument.m */; };
+		646925E30CE95F7F005B14AC /* CSPrefsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 646925D80CE95F7F005B14AC /* CSPrefsController.m */; };
+		646925E40CE95F7F005B14AC /* CSWinCtrlAdd.m in Sources */ = {isa = PBXBuildFile; fileRef = 646925DA0CE95F7F005B14AC /* CSWinCtrlAdd.m */; };
+		646925E50CE95F7F005B14AC /* CSWinCtrlChange.m in Sources */ = {isa = PBXBuildFile; fileRef = 646925DC0CE95F7F005B14AC /* CSWinCtrlChange.m */; };
+		646925E60CE95F7F005B14AC /* CSWinCtrlEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 646925DE0CE95F7F005B14AC /* CSWinCtrlEntry.m */; };
+		646925E70CE95F7F005B14AC /* CSWinCtrlMain.m in Sources */ = {isa = PBXBuildFile; fileRef = 646925E00CE95F7F005B14AC /* CSWinCtrlMain.m */; };
+		646925E80CE95F7F005B14AC /* CSWinCtrlPassphrase.m in Sources */ = {isa = PBXBuildFile; fileRef = 646925E20CE95F7F005B14AC /* CSWinCtrlPassphrase.m */; };
+		646925ED0CE95F9B005B14AC /* DefaultPrefs.plist in Resources */ = {isa = PBXBuildFile; fileRef = 646925EC0CE95F9B005B14AC /* DefaultPrefs.plist */; };
+		646926400CE95FD7005B14AC /* CSDocument.nib in Resources */ = {isa = PBXBuildFile; fileRef = 646926120CE95FD7005B14AC /* CSDocument.nib */; };
+		646926410CE95FD7005B14AC /* CSDocumentAdd.nib in Resources */ = {isa = PBXBuildFile; fileRef = 646926140CE95FD7005B14AC /* CSDocumentAdd.nib */; };
+		646926420CE95FD7005B14AC /* CSDocumentChange.nib in Resources */ = {isa = PBXBuildFile; fileRef = 646926160CE95FD7005B14AC /* CSDocumentChange.nib */; };
+		646926430CE95FD7005B14AC /* CSPassphrase.nib in Resources */ = {isa = PBXBuildFile; fileRef = 646926180CE95FD7005B14AC /* CSPassphrase.nib */; };
+		646926440CE95FD7005B14AC /* CSPreferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = 6469261A0CE95FD7005B14AC /* CSPreferences.nib */; };
+		646926450CE95FD7005B14AC /* DefaultCategories.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6469261C0CE95FD7005B14AC /* DefaultCategories.plist */; };
+		646926460CE95FD7005B14AC /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6469261E0CE95FD7005B14AC /* Localizable.strings */; };
+		646926490CE95FF1005B14AC /* lightswitch.png in Resources */ = {isa = PBXBuildFile; fileRef = 646926470CE95FF1005B14AC /* lightswitch.png */; };
+		6469264A0CE95FF1005B14AC /* mini window ciphsafe.png in Resources */ = {isa = PBXBuildFile; fileRef = 646926480CE95FF1005B14AC /* mini window ciphsafe.png */; };
+		646926550CE96008005B14AC /* NSArray_FOOC.m in Sources */ = {isa = PBXBuildFile; fileRef = 6469264C0CE96008005B14AC /* NSArray_FOOC.m */; };
+		646926560CE96008005B14AC /* NSAttributedString_RWDA.m in Sources */ = {isa = PBXBuildFile; fileRef = 6469264E0CE96008005B14AC /* NSAttributedString_RWDA.m */; };
+		646926570CE96008005B14AC /* NSData_clear.m in Sources */ = {isa = PBXBuildFile; fileRef = 646926500CE96008005B14AC /* NSData_clear.m */; };
+		646926580CE96008005B14AC /* NSData_compress.m in Sources */ = {isa = PBXBuildFile; fileRef = 646926520CE96008005B14AC /* NSData_compress.m */; };
+		646926590CE96008005B14AC /* NSData_crypto.m in Sources */ = {isa = PBXBuildFile; fileRef = 646926540CE96008005B14AC /* NSData_crypto.m */; };
+		6469265D0CE9601D005B14AC /* padlock caution behind.png in Resources */ = {isa = PBXBuildFile; fileRef = 6469265A0CE9601D005B14AC /* padlock caution behind.png */; };
+		6469265E0CE9601D005B14AC /* ReadMe.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 6469265B0CE9601D005B14AC /* ReadMe.rtf */; };
+		6469265F0CE9601D005B14AC /* Source ReadMe.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 6469265C0CE9601D005B14AC /* Source ReadMe.rtf */; };
+		646926890CE960BE005B14AC /* CiphSafe Help in Resources */ = {isa = PBXBuildFile; fileRef = 646926600CE960BE005B14AC /* CiphSafe Help */; };
+		646926910CE96212005B14AC /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6469268F0CE96212005B14AC /* libcrypto.dylib */; };
+		646926920CE96212005B14AC /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 646926900CE96212005B14AC /* libssl.dylib */; };
+		646926970CE9622F005B14AC /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 646926960CE9622F005B14AC /* libz.dylib */; };
+		8D15AC2D0486D014006FF6A4 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B6FDCFA73011CA2CEA /* MainMenu.nib */; };
+		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
+		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
+		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		089C1660FE840EACC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		2A37F4B0FDCFA73011CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = src/main.m; sourceTree = "<group>"; };
+		2A37F4B7FDCFA73011CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		32DBCF750370BD2300C91783 /* CiphSafe_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CiphSafe_Prefix.pch; sourceTree = "<group>"; };
+		642C1CE40D13604100664139 /* versions.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = versions.xcconfig; sourceTree = "<group>"; };
+		642C1D000D13613B00664139 /* target_ciphsafe.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = target_ciphsafe.xcconfig; sourceTree = "<group>"; };
+		646925C90CE9589D005B14AC /* BLBTableView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BLBTableView.h; path = src/BLBTableView.h; sourceTree = "<group>"; };
+		646925CA0CE9589D005B14AC /* BLBTableView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = BLBTableView.m; path = src/BLBTableView.m; sourceTree = "<group>"; };
+		646925CC0CE95F41005B14AC /* CiphSafe.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = CiphSafe.icns; path = images/CiphSafe.icns; sourceTree = "<group>"; };
+		646925CE0CE95F52005B14AC /* CSAppController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CSAppController.h; path = src/CSAppController.h; sourceTree = "<group>"; };
+		646925CF0CE95F52005B14AC /* CSAppController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = CSAppController.m; path = src/CSAppController.m; sourceTree = "<group>"; };
+		646925D10CE95F61005B14AC /* CSDocModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CSDocModel.h; path = src/CSDocModel.h; sourceTree = "<group>"; };
+		646925D20CE95F61005B14AC /* CSDocModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = CSDocModel.m; path = src/CSDocModel.m; sourceTree = "<group>"; };
+		646925D30CE95F61005B14AC /* CSDocument.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CSDocument.h; path = src/CSDocument.h; sourceTree = "<group>"; };
+		646925D40CE95F61005B14AC /* CSDocument.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = CSDocument.m; path = src/CSDocument.m; sourceTree = "<group>"; };
+		646925D70CE95F7F005B14AC /* CSPrefsController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CSPrefsController.h; path = src/CSPrefsController.h; sourceTree = "<group>"; };
+		646925D80CE95F7F005B14AC /* CSPrefsController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = CSPrefsController.m; path = src/CSPrefsController.m; sourceTree = "<group>"; };
+		646925D90CE95F7F005B14AC /* CSWinCtrlAdd.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CSWinCtrlAdd.h; path = src/CSWinCtrlAdd.h; sourceTree = "<group>"; };
+		646925DA0CE95F7F005B14AC /* CSWinCtrlAdd.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = CSWinCtrlAdd.m; path = src/CSWinCtrlAdd.m; sourceTree = "<group>"; };
+		646925DB0CE95F7F005B14AC /* CSWinCtrlChange.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CSWinCtrlChange.h; path = src/CSWinCtrlChange.h; sourceTree = "<group>"; };
+		646925DC0CE95F7F005B14AC /* CSWinCtrlChange.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = CSWinCtrlChange.m; path = src/CSWinCtrlChange.m; sourceTree = "<group>"; };
+		646925DD0CE95F7F005B14AC /* CSWinCtrlEntry.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CSWinCtrlEntry.h; path = src/CSWinCtrlEntry.h; sourceTree = "<group>"; };
+		646925DE0CE95F7F005B14AC /* CSWinCtrlEntry.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = CSWinCtrlEntry.m; path = src/CSWinCtrlEntry.m; sourceTree = "<group>"; };
+		646925DF0CE95F7F005B14AC /* CSWinCtrlMain.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CSWinCtrlMain.h; path = src/CSWinCtrlMain.h; sourceTree = "<group>"; };
+		646925E00CE95F7F005B14AC /* CSWinCtrlMain.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = CSWinCtrlMain.m; path = src/CSWinCtrlMain.m; sourceTree = "<group>"; };
+		646925E10CE95F7F005B14AC /* CSWinCtrlPassphrase.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CSWinCtrlPassphrase.h; path = src/CSWinCtrlPassphrase.h; sourceTree = "<group>"; };
+		646925E20CE95F7F005B14AC /* CSWinCtrlPassphrase.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = CSWinCtrlPassphrase.m; path = src/CSWinCtrlPassphrase.m; sourceTree = "<group>"; };
+		646925EC0CE95F9B005B14AC /* DefaultPrefs.plist */ = {isa = PBXFileReference; explicitFileType = text.plist; fileEncoding = 30; path = DefaultPrefs.plist; sourceTree = "<group>"; };
+		646926130CE95FD7005B14AC /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/CSDocument.nib; sourceTree = "<group>"; };
+		646926150CE95FD7005B14AC /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/CSDocumentAdd.nib; sourceTree = "<group>"; };
+		646926170CE95FD7005B14AC /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/CSDocumentChange.nib; sourceTree = "<group>"; };
+		646926190CE95FD7005B14AC /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/CSPassphrase.nib; sourceTree = "<group>"; };
+		6469261B0CE95FD7005B14AC /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/CSPreferences.nib; sourceTree = "<group>"; };
+		6469261D0CE95FD7005B14AC /* English */ = {isa = PBXFileReference; explicitFileType = text.plist; fileEncoding = 30; name = English; path = English.lproj/DefaultCategories.plist; sourceTree = "<group>"; };
+		6469261F0CE95FD7005B14AC /* English */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
+		646926470CE95FF1005B14AC /* lightswitch.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = lightswitch.png; path = images/lightswitch.png; sourceTree = "<group>"; };
+		646926480CE95FF1005B14AC /* mini window ciphsafe.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "mini window ciphsafe.png"; path = "images/mini window ciphsafe.png"; sourceTree = "<group>"; };
+		6469264B0CE96008005B14AC /* NSArray_FOOC.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSArray_FOOC.h; path = src/NSArray_FOOC.h; sourceTree = "<group>"; };
+		6469264C0CE96008005B14AC /* NSArray_FOOC.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NSArray_FOOC.m; path = src/NSArray_FOOC.m; sourceTree = "<group>"; };
+		6469264D0CE96008005B14AC /* NSAttributedString_RWDA.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSAttributedString_RWDA.h; path = src/NSAttributedString_RWDA.h; sourceTree = "<group>"; };
+		6469264E0CE96008005B14AC /* NSAttributedString_RWDA.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NSAttributedString_RWDA.m; path = src/NSAttributedString_RWDA.m; sourceTree = "<group>"; };
+		6469264F0CE96008005B14AC /* NSData_clear.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSData_clear.h; path = src/NSData_clear.h; sourceTree = "<group>"; };
+		646926500CE96008005B14AC /* NSData_clear.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NSData_clear.m; path = src/NSData_clear.m; sourceTree = "<group>"; };
+		646926510CE96008005B14AC /* NSData_compress.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSData_compress.h; path = src/NSData_compress.h; sourceTree = "<group>"; };
+		646926520CE96008005B14AC /* NSData_compress.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NSData_compress.m; path = src/NSData_compress.m; sourceTree = "<group>"; };
+		646926530CE96008005B14AC /* NSData_crypto.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSData_crypto.h; path = src/NSData_crypto.h; sourceTree = "<group>"; };
+		646926540CE96008005B14AC /* NSData_crypto.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NSData_crypto.m; path = src/NSData_crypto.m; sourceTree = "<group>"; };
+		6469265A0CE9601D005B14AC /* padlock caution behind.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "padlock caution behind.png"; path = "images/padlock caution behind.png"; sourceTree = "<group>"; };
+		6469265B0CE9601D005B14AC /* ReadMe.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = ReadMe.rtf; sourceTree = "<group>"; };
+		6469265C0CE9601D005B14AC /* Source ReadMe.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = "Source ReadMe.rtf"; sourceTree = "<group>"; };
+		646926610CE960BE005B14AC /* English */ = {isa = PBXFileReference; lastKnownFileType = folder; name = English; path = "English.lproj/CiphSafe Help"; sourceTree = "<group>"; };
+		6469268F0CE96212005B14AC /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
+		646926900CE96212005B14AC /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = /usr/lib/libssl.dylib; sourceTree = "<absolute>"; };
+		646926960CE9622F005B14AC /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
+		8D15AC360486D014006FF6A4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		8D15AC370486D014006FF6A4 /* CiphSafe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiphSafe.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8D15AC330486D014006FF6A4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
+				646926910CE96212005B14AC /* libcrypto.dylib in Frameworks */,
+				646926920CE96212005B14AC /* libssl.dylib in Frameworks */,
+				646926970CE9622F005B14AC /* libz.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				646926960CE9622F005B14AC /* libz.dylib */,
+				6469268F0CE96212005B14AC /* libcrypto.dylib */,
+				646926900CE96212005B14AC /* libssl.dylib */,
+				1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */,
+			);
+			name = "Linked Frameworks";
+			sourceTree = "<group>";
+		};
+		1058C7A8FEA54F5311CA2CBB /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */,
+				13E42FBA07B3F13500E4EEF1 /* CoreData.framework */,
+				2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		19C28FB0FE9D524F11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8D15AC370486D014006FF6A4 /* CiphSafe.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2A37F4AAFDCFA73011CA2CEA /* CiphSafe */ = {
+			isa = PBXGroup;
+			children = (
+				2A37F4ABFDCFA73011CA2CEA /* Classes */,
+				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
+				2A37F4B8FDCFA73011CA2CEA /* Resources */,
+				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
+				19C28FB0FE9D524F11CA2CBB /* Products */,
+			);
+			name = CiphSafe;
+			sourceTree = "<group>";
+		};
+		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				646925C90CE9589D005B14AC /* BLBTableView.h */,
+				646925CA0CE9589D005B14AC /* BLBTableView.m */,
+				646925CE0CE95F52005B14AC /* CSAppController.h */,
+				646925CF0CE95F52005B14AC /* CSAppController.m */,
+				646925C20CE95837005B14AC /* Document */,
+				646925C80CE95845005B14AC /* Window Controllers */,
+				646925BF0CE9582E005B14AC /* Categories */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		2A37F4AFFDCFA73011CA2CEA /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				32DBCF750370BD2300C91783 /* CiphSafe_Prefix.pch */,
+				2A37F4B0FDCFA73011CA2CEA /* main.m */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				642C1CE40D13604100664139 /* versions.xcconfig */,
+				642C1D000D13613B00664139 /* target_ciphsafe.xcconfig */,
+				646926600CE960BE005B14AC /* CiphSafe Help */,
+				6469265B0CE9601D005B14AC /* ReadMe.rtf */,
+				6469265C0CE9601D005B14AC /* Source ReadMe.rtf */,
+				6469265A0CE9601D005B14AC /* padlock caution behind.png */,
+				646926470CE95FF1005B14AC /* lightswitch.png */,
+				646926480CE95FF1005B14AC /* mini window ciphsafe.png */,
+				646926120CE95FD7005B14AC /* CSDocument.nib */,
+				646926140CE95FD7005B14AC /* CSDocumentAdd.nib */,
+				646926160CE95FD7005B14AC /* CSDocumentChange.nib */,
+				646926180CE95FD7005B14AC /* CSPassphrase.nib */,
+				6469261A0CE95FD7005B14AC /* CSPreferences.nib */,
+				6469261C0CE95FD7005B14AC /* DefaultCategories.plist */,
+				6469261E0CE95FD7005B14AC /* Localizable.strings */,
+				646925EC0CE95F9B005B14AC /* DefaultPrefs.plist */,
+				646925CC0CE95F41005B14AC /* CiphSafe.icns */,
+				2A37F4B6FDCFA73011CA2CEA /* MainMenu.nib */,
+				8D15AC360486D014006FF6A4 /* Info.plist */,
+				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */,
+				1058C7A8FEA54F5311CA2CBB /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		646925BF0CE9582E005B14AC /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				6469264B0CE96008005B14AC /* NSArray_FOOC.h */,
+				6469264C0CE96008005B14AC /* NSArray_FOOC.m */,
+				6469264D0CE96008005B14AC /* NSAttributedString_RWDA.h */,
+				6469264E0CE96008005B14AC /* NSAttributedString_RWDA.m */,
+				6469264F0CE96008005B14AC /* NSData_clear.h */,
+				646926500CE96008005B14AC /* NSData_clear.m */,
+				646926510CE96008005B14AC /* NSData_compress.h */,
+				646926520CE96008005B14AC /* NSData_compress.m */,
+				646926530CE96008005B14AC /* NSData_crypto.h */,
+				646926540CE96008005B14AC /* NSData_crypto.m */,
+			);
+			name = Categories;
+			sourceTree = "<group>";
+		};
+		646925C20CE95837005B14AC /* Document */ = {
+			isa = PBXGroup;
+			children = (
+				646925D10CE95F61005B14AC /* CSDocModel.h */,
+				646925D20CE95F61005B14AC /* CSDocModel.m */,
+				646925D30CE95F61005B14AC /* CSDocument.h */,
+				646925D40CE95F61005B14AC /* CSDocument.m */,
+			);
+			name = Document;
+			sourceTree = "<group>";
+		};
+		646925C80CE95845005B14AC /* Window Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				646925D70CE95F7F005B14AC /* CSPrefsController.h */,
+				646925D80CE95F7F005B14AC /* CSPrefsController.m */,
+				646925D90CE95F7F005B14AC /* CSWinCtrlAdd.h */,
+				646925DA0CE95F7F005B14AC /* CSWinCtrlAdd.m */,
+				646925DB0CE95F7F005B14AC /* CSWinCtrlChange.h */,
+				646925DC0CE95F7F005B14AC /* CSWinCtrlChange.m */,
+				646925DD0CE95F7F005B14AC /* CSWinCtrlEntry.h */,
+				646925DE0CE95F7F005B14AC /* CSWinCtrlEntry.m */,
+				646925DF0CE95F7F005B14AC /* CSWinCtrlMain.h */,
+				646925E00CE95F7F005B14AC /* CSWinCtrlMain.m */,
+				646925E10CE95F7F005B14AC /* CSWinCtrlPassphrase.h */,
+				646925E20CE95F7F005B14AC /* CSWinCtrlPassphrase.m */,
+			);
+			name = "Window Controllers";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8D15AC270486D014006FF6A4 /* CiphSafe */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "CiphSafe" */;
+			buildPhases = (
+				8D15AC2B0486D014006FF6A4 /* Resources */,
+				8D15AC300486D014006FF6A4 /* Sources */,
+				8D15AC330486D014006FF6A4 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CiphSafe;
+			productInstallPath = "$(HOME)/Applications";
+			productName = CiphSafe;
+			productReference = 8D15AC370486D014006FF6A4 /* CiphSafe.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "CiphSafe" */;
+			hasScannedForEncodings = 1;
+			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* CiphSafe */;
+			projectDirPath = "";
+			targets = (
+				8D15AC270486D014006FF6A4 /* CiphSafe */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8D15AC2B0486D014006FF6A4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D15AC2D0486D014006FF6A4 /* MainMenu.nib in Resources */,
+				8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */,
+				646925CD0CE95F41005B14AC /* CiphSafe.icns in Resources */,
+				646925ED0CE95F9B005B14AC /* DefaultPrefs.plist in Resources */,
+				646926400CE95FD7005B14AC /* CSDocument.nib in Resources */,
+				646926410CE95FD7005B14AC /* CSDocumentAdd.nib in Resources */,
+				646926420CE95FD7005B14AC /* CSDocumentChange.nib in Resources */,
+				646926430CE95FD7005B14AC /* CSPassphrase.nib in Resources */,
+				646926440CE95FD7005B14AC /* CSPreferences.nib in Resources */,
+				646926450CE95FD7005B14AC /* DefaultCategories.plist in Resources */,
+				646926460CE95FD7005B14AC /* Localizable.strings in Resources */,
+				646926490CE95FF1005B14AC /* lightswitch.png in Resources */,
+				6469264A0CE95FF1005B14AC /* mini window ciphsafe.png in Resources */,
+				6469265D0CE9601D005B14AC /* padlock caution behind.png in Resources */,
+				6469265E0CE9601D005B14AC /* ReadMe.rtf in Resources */,
+				6469265F0CE9601D005B14AC /* Source ReadMe.rtf in Resources */,
+				646926890CE960BE005B14AC /* CiphSafe Help in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8D15AC300486D014006FF6A4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D15AC320486D014006FF6A4 /* main.m in Sources */,
+				646925CB0CE9589D005B14AC /* BLBTableView.m in Sources */,
+				646925D00CE95F52005B14AC /* CSAppController.m in Sources */,
+				646925D50CE95F61005B14AC /* CSDocModel.m in Sources */,
+				646925D60CE95F61005B14AC /* CSDocument.m in Sources */,
+				646925E30CE95F7F005B14AC /* CSPrefsController.m in Sources */,
+				646925E40CE95F7F005B14AC /* CSWinCtrlAdd.m in Sources */,
+				646925E50CE95F7F005B14AC /* CSWinCtrlChange.m in Sources */,
+				646925E60CE95F7F005B14AC /* CSWinCtrlEntry.m in Sources */,
+				646925E70CE95F7F005B14AC /* CSWinCtrlMain.m in Sources */,
+				646925E80CE95F7F005B14AC /* CSWinCtrlPassphrase.m in Sources */,
+				646926550CE96008005B14AC /* NSArray_FOOC.m in Sources */,
+				646926560CE96008005B14AC /* NSAttributedString_RWDA.m in Sources */,
+				646926570CE96008005B14AC /* NSData_clear.m in Sources */,
+				646926580CE96008005B14AC /* NSData_compress.m in Sources */,
+				646926590CE96008005B14AC /* NSData_crypto.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		089C165FFE840EACC02AAC07 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				089C1660FE840EACC02AAC07 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		2A37F4B6FDCFA73011CA2CEA /* MainMenu.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2A37F4B7FDCFA73011CA2CEA /* English */,
+			);
+			name = MainMenu.nib;
+			sourceTree = "<group>";
+		};
+		646926120CE95FD7005B14AC /* CSDocument.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				646926130CE95FD7005B14AC /* English */,
+			);
+			name = CSDocument.nib;
+			sourceTree = "<group>";
+		};
+		646926140CE95FD7005B14AC /* CSDocumentAdd.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				646926150CE95FD7005B14AC /* English */,
+			);
+			name = CSDocumentAdd.nib;
+			sourceTree = "<group>";
+		};
+		646926160CE95FD7005B14AC /* CSDocumentChange.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				646926170CE95FD7005B14AC /* English */,
+			);
+			name = CSDocumentChange.nib;
+			sourceTree = "<group>";
+		};
+		646926180CE95FD7005B14AC /* CSPassphrase.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				646926190CE95FD7005B14AC /* English */,
+			);
+			name = CSPassphrase.nib;
+			sourceTree = "<group>";
+		};
+		6469261A0CE95FD7005B14AC /* CSPreferences.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6469261B0CE95FD7005B14AC /* English */,
+			);
+			name = CSPreferences.nib;
+			sourceTree = "<group>";
+		};
+		6469261C0CE95FD7005B14AC /* DefaultCategories.plist */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6469261D0CE95FD7005B14AC /* English */,
+			);
+			name = DefaultCategories.plist;
+			sourceTree = "<group>";
+		};
+		6469261E0CE95FD7005B14AC /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6469261F0CE95FD7005B14AC /* English */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		646926600CE960BE005B14AC /* CiphSafe Help */ = {
+			isa = PBXVariantGroup;
+			children = (
+				646926610CE960BE005B14AC /* English */,
+			);
+			name = "CiphSafe Help";
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		C05733C808A9546B00998B17 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 642C1D000D13613B00664139 /* target_ciphsafe.xcconfig */;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = CiphSafe;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		C05733C908A9546B00998B17 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 642C1D000D13613B00664139 /* target_ciphsafe.xcconfig */;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = CiphSafe;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		C05733CC08A9546B00998B17 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_DEBUGGING_SYMBOLS = full;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = DEBUG;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Debug;
+		};
+		C05733CD08A9546B00998B17 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "CiphSafe" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C05733C808A9546B00998B17 /* Debug */,
+				C05733C908A9546B00998B17 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "CiphSafe" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C05733CC08A9546B00998B17 /* Debug */,
+				C05733CD08A9546B00998B17 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
+}

@@ -1,0 +1,37 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {closeAll = id; prefsAutoOpenSelectPath = id; }; 
+            CLASS = CSAppController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {editMenuSetCategory = NSMenuItem; prefsWindow = NSWindow; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                displayHelpAppearance = id; 
+                displayHelpGeneral = id; 
+                displayHelpSecurity = id; 
+                prefsAutoOpenSelectPath = id; 
+            }; 
+            CLASS = CSPrefsController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {appearanceView = NSView; generalView = NSView; securityView = NSView; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {
+                addEntry = id; 
+                changePassphrase = id; 
+                deselectAll = id; 
+                exportDocument = id; 
+                exportSelectedItems = id; 
+                setCategory = id; 
+            }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

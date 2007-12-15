@@ -5,14 +5,14 @@
             CLASS = CSWinCtrlPassphrase; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                "_confirmView" = NSView; 
-                "_modalDelegate" = id; 
-                "_nonConfirmView" = NSView; 
-                "_passphraseNote1" = NSTextField; 
-                "_passphraseNote2" = NSTextField; 
-                "_passphrasePhrase1" = NSTextField; 
-                "_passphrasePhrase2" = NSTextField; 
-                "_passphrasePhraseConfirm" = NSTextField; 
+                confirmView = NSView; 
+                modalDelegate = id; 
+                nonConfirmView = NSView; 
+                passphraseNote1 = NSTextField; 
+                passphraseNote2 = NSTextField; 
+                passphrasePhrase1 = NSTextField; 
+                passphrasePhrase2 = NSTextField; 
+                passphrasePhraseConfirm = NSTextField; 
             }; 
             SUPERCLASS = NSWindowController; 
         }, 

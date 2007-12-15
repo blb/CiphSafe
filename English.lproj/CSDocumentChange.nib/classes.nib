@@ -1,23 +1,23 @@
 {
     IBClasses = (
         {
-            ACTIONS = {doChange = id; }; 
+            ACTIONS = {change = id; }; 
             CLASS = CSWinCtrlChange; 
             LANGUAGE = ObjC; 
             SUPERCLASS = CSWinCtrlEntry; 
         }, 
         {
-            ACTIONS = {doGenerate = id; doOpenURL = id; }; 
+            ACTIONS = {generateRandomPassword = id; openURL = id; }; 
             CLASS = CSWinCtrlEntry; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                "_accountText" = NSTextField; 
-                "_category" = NSComboBox; 
-                "_mainButton" = NSButton; 
-                "_nameText" = NSTextField; 
-                "_notes" = NSTextView; 
-                "_passwordText" = NSTextField; 
-                "_urlText" = NSTextField; 
+                accountText = NSTextField; 
+                category = NSComboBox; 
+                mainButton = NSButton; 
+                nameText = NSTextField; 
+                notes = NSTextView; 
+                passwordText = NSTextField; 
+                urlText = NSTextField; 
             }; 
             SUPERCLASS = NSWindowController; 
         }, 

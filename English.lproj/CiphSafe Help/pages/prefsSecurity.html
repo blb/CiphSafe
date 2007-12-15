@@ -1,0 +1,94 @@
+<!-- This Apple Help template put together by Andy Matuschak
+	http://www.andymatuschak.org
+	andy@andymatuschak.org
+	Version 1.0
+
+	Adapted from the Safari help book--thanks, Apple!
+	Adapted more directly from Pixen's help book.
+	Licensed under MIT. -->
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+   <title>Setting Security Preferences in CiphSafe</title>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+   <meta name="keywords" content="preferences, options, configuration, security" />
+   <meta name="description"
+         content="The security preferences control how to secure the application" />
+   <link href="../css/topicPage.css" type="text/css" rel="stylesheet" media="all" />
+</head>
+<body>
+<div id="banner">
+   <div id="machelp">
+      <a name="preferences"></a>
+      <a name="securityprefs"></a>
+      <a class="bread" href="help:anchor='access' bookID=CiphSafe Help">CiphSafe Help</a>
+   </div>
+   <div id="index">
+      <a class="leftborder" href="index.html">Index</a>
+   </div>
+</div>
+<div id="mainbox">
+   <div id="caticon">
+      <img class="icon" src="../gfx/icon32.png" alt="CiphSafe Icon" />
+   </div>
+   <div id="pagetitle">
+      <h1>Setting Security Preferences in CiphSafe</h1>
+   </div>
+   <p>The Security preferences pane controls several security-specific options.</p>
+   <ul>
+      <li>
+         The "Include password on copy/drag to other apps" option lets you select
+         whether the password of any entries copied or dragged to applications other
+         than CiphSafe is included.  The password is always included if the copy or
+         drag target is another document in CiphSafe.
+      </li>
+      <li>
+         The "Close all after ... minutes of inactivty" options allows you to have
+         CiphSafe automatically close all open documents if it is left as a background
+         application for the given number of minutes.  The accompanying selections for
+         "Autosave changes on close", "Discard changes on close", and "Ask what to do"
+         control what CiphSafe does when a document has been modified but not yet
+         saved:
+         <ul>
+            <li>Autosave just saves, then closes the document</li>
+            <li>Discard causes any updates to be lost (so be careful with this)</li>
+            <li>
+               Ask will bring up a sheet asking what to do, which does defeat the purpose
+               of closing a bit, but is safer from data loss.
+            </li>
+         </ul>
+      </li>
+      <li>
+         The "Generated password length" option lets you set how many characters to use
+         when a password is generated.  The longer the better, but pay attention to what
+         some web sites say for password restrictions, as some have short maximum lengths.
+      </li>
+      <li>
+         The "Use only alphanumerics for generated passwords" option allows you to select
+         whether or not you want a generated password to include special characters.  Some
+         web sites don't like anything other than alphanumeric, hence this option.  When
+         disabled (use special characters as well), this includes a number of other characters,
+         from parenthesis to plus and minus, and so on.  If you're really curious, see the
+         variable genAll in CSWinCtrlEntry.m.
+      </li>
+      <li>
+         The "Clear clipboard on Quit" option tells CiphSafe that, if the last item placed
+         on the clipboard came from CiphSafe, to clear it out when quitting.  This causes
+         the clipboard to be empty when you quit CiphSafe.
+      </li>
+   </ul>
+
+   <p style="text-align: center;">
+      <img src="../gfx/prefsSecurityScreenshot.png" alt="Security preferences" />
+   </p>
+
+   <h2 class="seealso">See also</h2>
+   <p class="seealso">
+      <a href="prefsAppearance.html">Appearance Preferences</a><br />
+      <a href="prefsGeneral.html">General Preferences</a><br />
+      <a href="whatsNew.html">What's New</a>
+   </p>
+</div>
+</body>
+</html>

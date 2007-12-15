@@ -1,46 +1,26 @@
 {
     IBClasses = (
         {
-            ACTIONS = {
-                closeAll = id; 
-                openPrefs = id; 
-                prefsAutoOpenClicked = id; 
-                prefsAutoOpenSelectPath = id; 
-                prefsCancel = id; 
-                prefsCloseAfterTimeoutClicked = id; 
-                prefsSave = id; 
-            }; 
+            ACTIONS = {closeAll = id; openPreferences = id; }; 
             CLASS = CSAppController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {
-                "_editMenuSetCategory" = NSMenuItem; 
-                "_prefsAlphanumOnly" = NSButton; 
-                "_prefsAutoOpen" = NSButton; 
-                "_prefsAutoOpenName" = NSTextField; 
-                "_prefsAutoOpenSelect" = NSButton; 
-                "_prefsCellSpacing" = NSPopUpButton; 
-                "_prefsClearClipboard" = NSButton; 
-                "_prefsCloseAdd" = NSButton; 
-                "_prefsCloseAfterTimeout" = NSButton; 
-                "_prefsCloseEdit" = NSButton; 
-                "_prefsConfirmDelete" = NSButton; 
-                "_prefsCreateNew" = NSButton; 
-                "_prefsGenSize" = NSTextField; 
-                "_prefsIncludeDefaultCategories" = NSButton; 
-                "_prefsIncludePasswd" = NSButton; 
-                "_prefsKeepBackup" = NSButton; 
-                "_prefsTimeout" = NSTextField; 
-                "_prefsWarnShort" = NSButton; 
-                "_prefsWindow" = NSWindow; 
-            }; 
+            OUTLETS = {editMenuSetCategory = NSMenuItem; }; 
             SUPERCLASS = NSObject; 
         }, 
         {
             ACTIONS = {
+                addEntry = id; 
+                changePassphrase = id; 
                 deselectAll = id; 
-                doAddEntry = id; 
-                doChangePassphrase = id; 
-                doSetCategory = id; 
+                exportDocument = id; 
+                exportSelectedItems = id; 
+                miniaturizeAll = id; 
+                orderFrontLinkPanel = id; 
+                orderFrontListPanel = id; 
+                orderFrontSpacingPanel = id; 
+                orderFrontTablePanel = id; 
+                setCategory = id; 
+                toggleBaseWritingDirection = id; 
             }; 
             CLASS = FirstResponder; 
             LANGUAGE = ObjC; 
