@@ -55,6 +55,8 @@
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		32DBCF750370BD2300C91783 /* CiphSafe_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CiphSafe_Prefix.pch; sourceTree = "<group>"; };
+		642C1CE40D13604100664139 /* versions.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = versions.xcconfig; sourceTree = "<group>"; };
+		642C1D000D13613B00664139 /* target_ciphsafe.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = target_ciphsafe.xcconfig; sourceTree = "<group>"; };
 		646925C90CE9589D005B14AC /* BLBTableView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BLBTableView.h; path = src/BLBTableView.h; sourceTree = "<group>"; };
 		646925CA0CE9589D005B14AC /* BLBTableView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = BLBTableView.m; path = src/BLBTableView.m; sourceTree = "<group>"; };
 		646925CC0CE95F41005B14AC /* CiphSafe.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = CiphSafe.icns; path = images/CiphSafe.icns; sourceTree = "<group>"; };
@@ -189,6 +191,8 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				642C1CE40D13604100664139 /* versions.xcconfig */,
+				642C1D000D13613B00664139 /* target_ciphsafe.xcconfig */,
 				646926600CE960BE005B14AC /* CiphSafe Help */,
 				6469265B0CE9601D005B14AC /* ReadMe.rtf */,
 				6469265C0CE9601D005B14AC /* Source ReadMe.rtf */,
@@ -442,6 +446,7 @@
 /* Begin XCBuildConfiguration section */
 		C05733C808A9546B00998B17 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 642C1D000D13613B00664139 /* target_ciphsafe.xcconfig */;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -452,12 +457,12 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = CiphSafe;
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = YES;
 			};
 			name = Debug;
 		};
 		C05733C908A9546B00998B17 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 642C1D000D13613B00664139 /* target_ciphsafe.xcconfig */;
 			buildSettings = {
 				ARCHS = (
 					ppc,
@@ -481,7 +486,6 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
-				WARNING_CFLAGS = "-Wall";
 			};
 			name = Debug;
 		};
@@ -492,7 +496,6 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
-				WARNING_CFLAGS = "-Wall";
 			};
 			name = Release;
 		};

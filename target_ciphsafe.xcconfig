@@ -1,0 +1,4 @@
+#include "versions"
+
+WARNING_CFLAGS = -Wall
+ZERO_LINK = NO

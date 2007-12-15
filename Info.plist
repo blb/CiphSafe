@@ -52,11 +52,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.3beta6</string>
+	<string>${CIPHSAFE_VERSION}</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>@@SVN_REVISION@@</string>
+	<string>${CIPHSAFE_BUNDLE_VERSION}</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.4.0</string>
 	<key>NSMainNibFile</key>

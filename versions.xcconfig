@@ -1,0 +1,4 @@
+// Finder-visible version
+CIPHSAFE_VERSION = 1.3
+// Build version
+CIPHSAFE_BUNDLE_VERSION = 1000
