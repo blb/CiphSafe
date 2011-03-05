@@ -36,7 +36,6 @@
 #import "CSWinCtrlPassphrase.h"
 #import "CSPrefsController.h"
 #import "NSData_crypto.h"
-#import "NSData_clear.h"
 
 
 NSString * const CSPassphraseNote_Save = @"Passphrase hint";

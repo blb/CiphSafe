@@ -37,7 +37,6 @@
 #import "NSAttributedString_RWDA.h"
 #import "NSData_compress.h"
 #import "NSData_crypto.h"
-#import "NSData_clear.h"
 
 // Make identifiers in IB's config match these for easy use
 NSString * const CSDocModelKey_Name = @"name";

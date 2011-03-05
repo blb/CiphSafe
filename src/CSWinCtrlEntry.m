@@ -40,7 +40,6 @@
 #import "CSDocument.h"
 #import "CSPrefsController.h"
 #import "NSData_crypto.h"
-#import "NSData_clear.h"
 
 
 @implementation CSWinCtrlEntry

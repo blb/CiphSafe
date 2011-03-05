@@ -43,7 +43,6 @@
 #import "CSWinCtrlPassphrase.h"
 #import "NSArray_FOOC.h"
 #import "NSAttributedString_RWDA.h"
-#import "NSData_clear.h"
 
 
 NSString * const CSDocument_Name = @"CiphSafe Document";
