@@ -401,7 +401,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
                                                          NSLocalizedString(CSDocModelKey_Category, @""),
                                                          NSLocalizedString(CSDocModelKey_Notes, @"")]
                            dataUsingEncoding:NSUTF8StringEncoding]];
-   unsigned int rowIndex;
+   NSUInteger rowIndex;
    for(rowIndex = [indexes firstIndex];
        rowIndex != NSNotFound;
        rowIndex = [indexes indexGreaterThanIndex:rowIndex])
@@ -439,7 +439,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
    NSArray *keyArray = [NSArray arrayWithObjects:CSDocModelKey_Name, CSDocModelKey_Acct,
                                                  CSDocModelKey_Passwd, CSDocModelKey_URL,
                                                  CSDocModelKey_Category, CSDocModelKey_Notes, nil];
-   unsigned int rowIndex;
+   NSUInteger rowIndex;
    for(rowIndex = [indexes firstIndex];
        rowIndex != NSNotFound;
        rowIndex = [indexes indexGreaterThanIndex:rowIndex])
@@ -568,7 +568,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
    NSMutableArray *docArray = [NSMutableArray arrayWithCapacity:[rows count]];
    NSAttributedString *attrEOL = [[NSAttributedString alloc] initWithString:@"\n"];
    NSMutableAttributedString *rtfdStringRows = [[NSMutableAttributedString alloc] initWithString:@""];
-   int row;
+   NSInteger row;
    for(row = [rows firstIndex]; row != NSNotFound; row = [rows indexGreaterThanIndex:row])
    {
       NSString *nameString = [self stringForKey:CSDocModelKey_Name atRow:row];

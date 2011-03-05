@@ -60,7 +60,7 @@ NSString * const CSDocModelNotificationInfoKey_DeletedNames = @"CSDocModelNotifi
 
 
 // Used to sort the array
-int sortEntries(id dict1, id dict2, void *context);
+NSInteger sortEntries(id dict1, id dict2, void *context);
 
 @interface CSDocModel (InternalMethods)
 - (NSString *) nonNilStringFrom:(NSDictionary *)dict forKey:(NSString *)key;
@@ -767,7 +767,7 @@ static NSArray *keyArray;
  * is the CSDocModel's self, the two ids are each an NSMutableDictionary
  * (one entry)
  */
-int sortEntries(id dict1, id dict2, void *context)
+NSInteger sortEntries(id dict1, id dict2, void *context)
 {
    CSDocModel *objSelf = (CSDocModel *) context;
    NSString *sortKey = [objSelf sortKey];

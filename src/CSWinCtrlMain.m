@@ -560,7 +560,7 @@ static NSArray *searchWhatArray;
 /*
  * Handle the table view
  */
-- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)aTableView
 {
    if(searchResultList != nil)
       return [searchResultList count];
@@ -574,7 +574,7 @@ static NSArray *searchWhatArray;
  */
 - (id) tableView:(NSTableView *)aTableView
        objectValueForTableColumn:(NSTableColumn *)aTableColumn
-       row:(int)rowIndex
+       row:(NSInteger)rowIndex
 {
    NSString *colID = [aTableColumn identifier];
    if([colID isEqualToString:CSDocModelKey_Notes])
@@ -653,7 +653,7 @@ static NSArray *searchWhatArray;
  */
 - (NSDragOperation) tableView:(NSTableView*)tv
                     validateDrop:(id <NSDraggingInfo>)info
-                    proposedRow:(int)row
+                    proposedRow:(NSInteger)row
                     proposedDropOperation:(NSTableViewDropOperation)op
 {
    if(tableIsDragging)
@@ -670,7 +670,7 @@ static NSArray *searchWhatArray;
  */
 - (BOOL) tableView:(NSTableView*)tv
          acceptDrop:(id <NSDraggingInfo>)info
-         row:(int)row
+         row:(NSInteger)row
          dropOperation:(NSTableViewDropOperation)op
 {
    return [[self document] retrieveEntriesFromPasteboard:[info draggingPasteboard]
@@ -1023,7 +1023,7 @@ static NSArray *searchWhatArray;
 - (NSArray *) namesFromIndexes:(NSIndexSet *)indexes
 {
    NSMutableArray *nameArray = [NSMutableArray arrayWithCapacity:[indexes count]];
-   unsigned int rowIndex;
+   NSUInteger rowIndex;
    for(rowIndex = [indexes firstIndex];
        rowIndex != NSNotFound;
        rowIndex = [indexes indexGreaterThanIndex:rowIndex])
