@@ -327,8 +327,8 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
    CSAppController *appController = (CSAppController *) [NSApp delegate];
    if([appController closeAllFromTimeout])
    {
-      int saveOption = [[NSUserDefaults standardUserDefaults]
-                        integerForKey:CSPrefDictKey_CloseAfterTimeoutSaveOption];
+      NSInteger saveOption = [[NSUserDefaults standardUserDefaults]
+                              integerForKey:CSPrefDictKey_CloseAfterTimeoutSaveOption];
       if(saveOption == CSPrefCloseAfterTimeoutSaveOption_Save)
          [self saveDocument:self];
       else if(saveOption == CSPrefCloseAfterTimeoutSaveOption_Discard)
@@ -374,7 +374,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
    }
    else
       categories = [NSMutableArray arrayWithCapacity:10];
-   int index;
+   NSInteger index;
    for(index = 0; index < [self entryCount]; index++)
    {
       NSString *category = [self stringForKey:CSDocModelKey_Category atRow:index];
@@ -485,7 +485,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  * Handle the actual export
  */
 - (void) exportPanelDidEnd:(NSSavePanel *)sheet
-                returnCode:(int)returnCode
+                returnCode:(NSInteger)returnCode
                contextInfo:(void *)contextInfo
 {
    if(returnCode == NSOKButton)
@@ -669,7 +669,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 /*
  * Number of rows/entries
  */
-- (int) entryCount
+- (NSInteger) entryCount
 {
    return [[self model] entryCount];
 }
@@ -723,7 +723,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 /*
  * Get the string value for some key at the given row
  */
-- (NSString *) stringForKey:(NSString *)key atRow:(int)row
+- (NSString *) stringForKey:(NSString *)key atRow:(NSInteger)row
 {
    return [[self model] stringForKey:key atRow:row];
 }
@@ -732,7 +732,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 /*
  * Get the notes value for the given row
  */
-- (NSData *) RTFDNotesAtRow:(int)row
+- (NSData *) RTFDNotesAtRow:(NSInteger)row
 {
    return [[self model] RTFDNotesAtRow:row];
 }
@@ -741,7 +741,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 /*
  * Get the notes value (RTF version) for the given row
  */
-- (NSData *) RTFNotesAtRow:(int)row
+- (NSData *) RTFNotesAtRow:(NSInteger)row
 {
    return [[self model] RTFNotesAtRow:row];
 }
@@ -750,7 +750,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 /*
  * Get the RTFD attributed string version of the notes
  */
-- (NSAttributedString *) RTFDStringNotesAtRow:(int)row
+- (NSAttributedString *) RTFDStringNotesAtRow:(NSInteger)row
 {
    return [[self model] RTFDStringNotesAtRow:row];
 }
@@ -759,7 +759,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 /*
  * Get the RTF attributed string version of the notes
  */
-- (NSAttributedString *) RTFStringNotesAtRow:(int)row
+- (NSAttributedString *) RTFStringNotesAtRow:(NSInteger)row
 {
    return [[self model] RTFStringNotesAtRow:row];
 }
@@ -768,7 +768,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 /*
  * Find the row for a given name
  */
-- (int) rowForName:(NSString *)name
+- (NSInteger) rowForName:(NSString *)name
 {
    return [[self model] rowForName:name];
 }
@@ -826,7 +826,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 /*
  * Delete all entries with the given names
  */
-- (unsigned) deleteEntriesWithNamesInArray:(NSArray *)nameArray
+- (NSUInteger) deleteEntriesWithNamesInArray:(NSArray *)nameArray
 {
    return [[self model] deleteEntriesWithNamesInArray:nameArray];
 }
@@ -1003,12 +1003,14 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 - (NSString *) uniqueNameForName:(NSString *)name
 {
    NSString *uniqueName = name;
-   int index;
+   NSInteger index;
    for(index = 0; [self rowForName:uniqueName] != -1; index++)
    {
       if(index)
+#warning 64BIT: Check formatting arguments
          uniqueName = [NSString stringWithFormat:NSLocalizedString(@"%@ copy %d", @""), name, index];
       else
+#warning 64BIT: Check formatting arguments
          uniqueName = [NSString stringWithFormat:NSLocalizedString(@"%@ copy", @""), name];
    }
    

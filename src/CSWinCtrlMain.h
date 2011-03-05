@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007,2011, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -39,15 +39,15 @@
 /*
  * Tag values for the selection in the export accessory view type selector
  */
-extern const int CSWinCtrlMainExportType_CSV;
-extern const int CSWinCtrlMainExportType_XML;
+extern const NSInteger CSWinCtrlMainExportType_CSV;
+extern const NSInteger CSWinCtrlMainExportType_XML;
 
 
 @interface CSWinCtrlMain : NSWindowController
 {
    NSTableColumn *previouslySelectedColumn;
    NSArray *searchResultList;
-   int currentSearchCategory;
+   NSInteger currentSearchCategory;
    NSArray *dragNamesArray;
    BOOL tableIsDragging;
 
@@ -106,7 +106,7 @@ extern const int CSWinCtrlMainExportType_XML;
 
 // Provide access to the export accessory view
 - (NSView *) exportAccessoryView;
-- (int) exportType;
+- (NSInteger) exportType;
 - (BOOL) exportCSVHeader;
 - (IBAction) exportTypeChanged:(id)sender;
 

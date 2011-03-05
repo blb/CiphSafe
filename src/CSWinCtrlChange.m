@@ -80,7 +80,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 + (NSNumber *) numberForDocument:(NSDocument *)document
 {
-   return [NSNumber numberWithUnsignedInt:[document hash]];
+   return [NSNumber numberWithUnsignedInteger:[document hash]];
 }
 
 
@@ -219,6 +219,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
          [[self window] performClose:self];
    }
    else
+#warning 64BIT: Check formatting arguments
       NSBeginInformationalAlertSheet(CSWINCTRLENTRY_LOC_ENTRYEXISTS,
                                      nil,
                                      nil,
@@ -264,6 +265,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 - (void) synchronizeWindowTitleWithDocumentName
 {
+#warning 64BIT: Check formatting arguments
    [[self window] setTitle:[NSString stringWithFormat:NSLocalizedString(@"View/Change %@ in %@", @""),
                                                       myEntryName,
                                                       [[self document] displayName]]];
@@ -278,7 +280,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 - (BOOL) doesField:(NSTextField *)field matchStringWithKey:(NSString *)key
 {
-   int row = [[self document] rowForName:myEntryName];
+   NSInteger row = [[self document] rowForName:myEntryName];
    
    return [[field stringValue] isEqualToString:[[self document] stringForKey:key atRow:row]];
 }
@@ -291,7 +293,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 {
    // XXX If it were possible, we'd clear out controls here
    [nameText setStringValue:myEntryName];
-   int myEntryRowNum = [[self document] rowForName:myEntryName];
+   NSInteger myEntryRowNum = [[self document] rowForName:myEntryName];
    if(myEntryRowNum >= 0)
    {
       [mainButton setEnabled:YES];
@@ -349,7 +351,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 
 - (BOOL) notesChanged
 {
-   int row = [[self document] rowForName:myEntryName];
+   NSInteger row = [[self document] rowForName:myEntryName];
 
    return ![[notes textStorage] isEqualToAttributedString:[[self document] RTFDStringNotesAtRow:row]];
 }

@@ -98,12 +98,12 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
       genString = genAlphanum;
    else
       genString = genAll;
-   int genStringLength = strlen(genString);
-   int genSize = [[NSUserDefaults standardUserDefaults] integerForKey:CSPrefDictKey_GenSize];
+   NSInteger genStringLength = strlen(genString);
+   NSInteger genSize = [[NSUserDefaults standardUserDefaults] integerForKey:CSPrefDictKey_GenSize];
    NSMutableString *randomString = [NSMutableString stringWithCapacity:genSize];
    NSMutableData *randomData = [NSData randomDataOfLength:genSize];
    unsigned char *randomBytes = [randomData mutableBytes];
-   int index;
+   NSInteger index;
    for(index = 0; index < genSize; index++)
       [randomString appendFormat:@"%c", genString[randomBytes[index] % genStringLength]];
    [passwordText setStringValue:randomString];
@@ -125,6 +125,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 {
    NSURL *theURL = [NSURL URLWithString:[urlText stringValue]];
    if(theURL == nil || ![[NSWorkspace sharedWorkspace] openURL:theURL])
+#warning 64BIT: Check formatting arguments
       NSBeginInformationalAlertSheet(NSLocalizedString(@"Invalid URL", @""),
                                      nil,
                                      nil,
@@ -200,6 +201,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 {
    if([[self window] isDocumentEdited])
    {
+#warning 64BIT: Check formatting arguments
       id alertPanel = NSGetCriticalAlertPanel(
                          NSLocalizedString(@"Entry Not Saved", @""),
                          NSLocalizedString(@"The entry has not been saved, close anyway?", @""),
@@ -258,14 +260,14 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 /*
  * Provide information to combo boxes for categories
  */
-- (int) numberOfItemsInComboBox:(NSComboBox *)aComboBox
+- (NSInteger) numberOfItemsInComboBox:(NSComboBox *)aComboBox
 {
    if([aComboBox isEqual:category])
       return [[[self document] categories] count];
    return 0;
 }
 
-- (id) comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(int)index
+- (id) comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index
 {
    if(index == -1)   // Apparently, it'll ask for object at -1, so make sure to tell it it's being stupid
       return nil;
@@ -274,7 +276,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
    return nil;
 }
 
-- (unsigned int) comboBox:(NSComboBox *)aComboBox indexOfItemWithStringValue:(NSString *)aString
+- (NSUInteger) comboBox:(NSComboBox *)aComboBox indexOfItemWithStringValue:(NSString *)aString
 {
    if([aComboBox isEqual:category])
       return [[[self document] categories] indexOfObject:aString];
@@ -298,7 +300,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
  * Handle the "should close" sheet
  */
 - (void) closeSheetDidEnd:(NSWindow *)sheet
-               returnCode:(int)returnCode
+               returnCode:(NSInteger)returnCode
               contextInfo:(void *)contextInfo
 {
    if(returnCode == NSAlertDefaultReturn)

@@ -40,17 +40,17 @@
 
 
 // Accessory view export type tags, make sure the match tag values as set in IB
-const int CSWinCtrlMainExportType_CSV = 0;
-const int CSWinCtrlMainExportType_XML = 1;
+const NSInteger CSWinCtrlMainExportType_CSV = 0;
+const NSInteger CSWinCtrlMainExportType_XML = 1;
 
 // Menu tag mappings
-const int CSWinCtrlMainTag_All = 0;
-const int CSWinCtrlMainTag_Name = 1;
-const int CSWinCtrlMainTag_Acct = 2;
-const int CSWinCtrlMainTag_Passwd = 3;
-const int CSWinCtrlMainTag_URL = 4;
-const int CSWinCtrlMainTag_Category = 5;
-const int CSWinCtrlMainTag_Notes = 6;
+const NSInteger CSWinCtrlMainTag_All = 0;
+const NSInteger CSWinCtrlMainTag_Name = 1;
+const NSInteger CSWinCtrlMainTag_Acct = 2;
+const NSInteger CSWinCtrlMainTag_Passwd = 3;
+const NSInteger CSWinCtrlMainTag_URL = 4;
+const NSInteger CSWinCtrlMainTag_Category = 5;
+const NSInteger CSWinCtrlMainTag_Notes = 6;
 
 
 NSString *CSWinCtrlMainSearch_All = @"all";
@@ -247,15 +247,15 @@ static NSArray *searchWhatArray;
    if(tableInfoString != nil && [tableInfoString length] > 0)
    {
       NSArray *partsArray = [tableInfoString componentsSeparatedByString:@" "];
-      unsigned int index;
+      NSUInteger index;
       for(index = 0; index < [partsArray count]; index += 2)
       {
          NSString *colName = [partsArray objectAtIndex:index];
          [self addTableColumnWithID:colName];
-         int currentColIndex = [documentView columnWithIdentifier:colName];
+         NSInteger currentColIndex = [documentView columnWithIdentifier:colName];
          [documentView moveColumn:currentColIndex toColumn:(index / 2)];
          NSTableColumn *tableColumn = [documentView tableColumnWithIdentifier:colName];
-         [tableColumn setWidth:[[partsArray objectAtIndex:(index + 1)] floatValue]];
+         [tableColumn setWidth:[[partsArray objectAtIndex:(index + 1)] doubleValue]];
       }
       return YES;
    }
@@ -271,13 +271,15 @@ static NSArray *searchWhatArray;
 {
    NSArray *tableColumns = [documentView tableColumns];
    NSMutableString *infoString = [NSMutableString stringWithCapacity:70];
-   unsigned int index;
+   NSUInteger index;
    for(index = 0; index < [tableColumns count]; index++)
    {
       NSTableColumn *tableColumn = [tableColumns objectAtIndex:index];
       if(index == 0)
+#warning 64BIT: Check formatting arguments
          [infoString appendFormat:@"%@ %f", [tableColumn identifier], [tableColumn width]];
       else
+#warning 64BIT: Check formatting arguments
          [infoString appendFormat:@" %@ %f", [tableColumn identifier], [tableColumn width]];
    }
    [[NSUserDefaults standardUserDefaults] setObject:infoString
@@ -323,10 +325,10 @@ static NSArray *searchWhatArray;
 /*
  * Return the search-list row number for a given basic row number
  */
-- (int) rowForFilteredRow:(int)row
+- (NSInteger) rowForFilteredRow:(NSInteger)row
 {
    if(searchResultList != nil)
-      return [[searchResultList objectAtIndex:row] intValue];
+      return [[searchResultList objectAtIndex:row] integerValue];
    else
       return row;
 }
@@ -335,14 +337,14 @@ static NSArray *searchWhatArray;
 /*
  * Return the original row number for a filtered row number
  */
-- (int) filteredRowForRow:(int)row
+- (NSInteger) filteredRowForRow:(NSInteger)row
 {
    if(searchResultList != nil)
    {
-      unsigned int index;
+      NSUInteger index;
       for(index = 0; index < [searchResultList count]; index++)
       {
-         if([[searchResultList objectAtIndex:index] intValue] == row)
+         if([[searchResultList objectAtIndex:index] integerValue] == row)
             return index;
       }
       return -1;
@@ -477,7 +479,7 @@ static NSArray *searchWhatArray;
  */
 - (void) setTableViewSpacing
 {
-   int cellSpacing = [[NSUserDefaults standardUserDefaults] integerForKey:CSPrefDictKey_CellSpacing];
+   NSInteger cellSpacing = [[NSUserDefaults standardUserDefaults] integerForKey:CSPrefDictKey_CellSpacing];
    NSSize newSpacing = NSMakeSize(3.0, 2.0);   // The default is small
    if(cellSpacing == CSPrefCellSpacingOption_Medium)
       newSpacing = NSMakeSize(5.0, 2.0);
@@ -546,7 +548,7 @@ static NSArray *searchWhatArray;
  */
 - (void) updateCornerMenu
 {
-   unsigned int index;
+   NSUInteger index;
    for(index = 1; index < [columnSelectionArray count]; index++)
    {
       if([documentView columnWithIdentifier:[columnSelectionArray objectAtIndex:index]] >= 0)
@@ -688,7 +690,7 @@ static NSArray *searchWhatArray;
    if([[theEvent characters] characterAtIndex:0] == ' ')
    {
       NSSize contentViewSize = [[tableView enclosingScrollView] contentSize];
-      float amtToKeepVisible = [[tableView enclosingScrollView] verticalPageScroll];
+      CGFloat amtToKeepVisible = [[tableView enclosingScrollView] verticalPageScroll];
       [tableView scrollRectToVisible:NSOffsetRect([tableView visibleRect],
                                                   0,
                                                   contentViewSize.height - amtToKeepVisible)];
@@ -701,7 +703,7 @@ static NSArray *searchWhatArray;
                                                                   forKey:CSDocModelKey_Name];
       if(rowForKey != nil)
       {
-         int filteredRow = [self filteredRowForRow:[rowForKey intValue]];
+         NSInteger filteredRow = [self filteredRowForRow:[rowForKey intValue]];
          if(filteredRow >= 0)
          {
             [tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:filteredRow]
@@ -723,7 +725,7 @@ static NSArray *searchWhatArray;
 {
    if([sender tag] == 0)   // Show all columns
    {
-      unsigned int index;
+      NSUInteger index;
       for(index = 1; index < [columnSelectionArray count]; index++)
          [self setDisplayOfColumnID:[columnSelectionArray objectAtIndex:index] enabled:YES];
    }
@@ -733,6 +735,7 @@ static NSArray *searchWhatArray;
       if([[documentView tableColumns] count] > 1 || enabled)
          [self setDisplayOfColumnID:[columnSelectionArray objectAtIndex:[sender tag]] enabled:enabled];
       else
+#warning 64BIT: Check formatting arguments
          NSBeginCriticalAlertSheet(
             NSLocalizedString(@"Need at least one column", @""),
             nil,
@@ -794,8 +797,8 @@ static NSArray *searchWhatArray;
  * visual feedback
  */
 - (NSMenu *) contextualMenuForBLBTableView:(BLBTableView *)tableView
-                                       row:(int)row
-                                    column:(int)column
+                                       row:(NSInteger)row
+                                    column:(NSInteger)column
 {
    [tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 
@@ -811,7 +814,7 @@ static NSArray *searchWhatArray;
 {
    NSString *fieldName = [cmmCopyFields objectAtIndex:[sender tag]];
    NSPasteboard *generalPB = [NSPasteboard generalPasteboard];
-   int selectedRow = [self rowForFilteredRow:[documentView selectedRow]];
+   NSInteger selectedRow = [self rowForFilteredRow:[documentView selectedRow]];
    if([fieldName isEqual:CSDocModelKey_Notes])
    {
       [generalPB declareTypes:[NSArray arrayWithObjects:NSRTFDPboardType, NSRTFPboardType, nil]
@@ -834,10 +837,11 @@ static NSArray *searchWhatArray;
  */
 - (IBAction) cmmOpenURL:(id)sender
 {
-   int selectedRow = [self rowForFilteredRow:[documentView selectedRow]];
+   NSInteger selectedRow = [self rowForFilteredRow:[documentView selectedRow]];
    NSURL *theURL = [NSURL URLWithString:[[self document] stringForKey:CSDocModelKey_URL
                                                                 atRow:selectedRow]];
    if(theURL == nil || ![[NSWorkspace sharedWorkspace] openURL:theURL])
+#warning 64BIT: Check formatting arguments
       NSBeginInformationalAlertSheet(NSLocalizedString(@"Invalid URL", @""),
                                      nil,
                                      nil,
@@ -866,7 +870,7 @@ static NSArray *searchWhatArray;
    else if(menuItemAction == @selector(cmmCopyField:)
            || menuItemAction == @selector(cmmOpenURL:))
    {
-      int selectedRow = [self rowForFilteredRow:[documentView selectedRow]];
+      NSInteger selectedRow = [self rowForFilteredRow:[documentView selectedRow]];
       NSString *fieldName = nil;
       if(menuItemAction == @selector(cmmOpenURL:))
          fieldName = CSDocModelKey_URL;
@@ -898,7 +902,7 @@ static NSArray *searchWhatArray;
  * Return the export accessory view's popup button's selection (see the CSWinCtrlMainExportType_*
  * constants)
  */
-- (int) exportType
+- (NSInteger) exportType
 {
    return [exportType selectedTag];
 }
@@ -999,13 +1003,15 @@ static NSArray *searchWhatArray;
  */
 - (void) updateStatusField
 {
-   int entryCount = [self numberOfRowsInTableView:documentView];
-   int selectedCount = [documentView numberOfSelectedRows];
+   NSInteger entryCount = [self numberOfRowsInTableView:documentView];
+   NSInteger selectedCount = [documentView numberOfSelectedRows];
    NSString *statusString;
    if(entryCount == 1)
+#warning 64BIT: Check formatting arguments
       statusString = [NSString stringWithFormat:NSLocalizedString(@"1 entry, %d selected", @""),
                                                 selectedCount];
    else
+#warning 64BIT: Check formatting arguments
       statusString = [NSString stringWithFormat:NSLocalizedString(@"%d entries, %d selected", @""),
                                                 entryCount,
                                                 selectedCount];

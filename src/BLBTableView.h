@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007,2011, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -54,7 +54,9 @@
  */
 @interface NSObject (BLBTableViewDelegate)
 
-- (NSMenu *) contextualMenuForBLBTableView:(BLBTableView *)tableView row:(int)row column:(int)column;
+- (NSMenu *) contextualMenuForBLBTableView:(BLBTableView *)tableView
+                                       row:(NSInteger)row
+                                    column:(NSInteger)column;
 - (BOOL) blbTableView:(BLBTableView *)tableView didReceiveKeyDownEvent:(NSEvent *)theEvent;
 - (void) blbTableView:(BLBTableView *)tableView
  completedDragAtPoint:(NSPoint)aPoint

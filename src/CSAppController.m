@@ -295,12 +295,12 @@ void ciphSafeCFDeallocate(void *ptr, void *info)
           * from that, we can get the parent window.  The newly-added menu item
           * goes after that window's menu item.
           */
-         int parentItemIndex = [windowMenu indexOfItemWithTarget:[[[[[menuItem target]
-                                                                     windowController]
-                                                                    document]
-                                                                   mainWindowController]
-                                                                  window]
-                                                       andAction:@selector(makeKeyAndOrderFront:)];
+         NSInteger parentItemIndex = [windowMenu indexOfItemWithTarget:[[[[[menuItem target]
+                                                                           windowController]
+                                                                          document]
+                                                                         mainWindowController]
+                                                                        window]
+                                                             andAction:@selector(makeKeyAndOrderFront:)];
          NSAssert(parentItemIndex >= 0, @"No parent window menu item");
          if(parentItemIndex == [windowMenu numberOfItems] - 1)
             [windowMenu addItem:menuItem];

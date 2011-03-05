@@ -108,6 +108,7 @@
          [[self window] performClose:self];
    }
    else
+#warning 64BIT: Check formatting arguments
       NSBeginInformationalAlertSheet(CSWINCTRLENTRY_LOC_ENTRYEXISTS,
                                      nil,
                                      nil,
@@ -128,6 +129,7 @@
  */
 - (void) synchronizeWindowTitleWithDocumentName
 {
+#warning 64BIT: Check formatting arguments
    [[self window] setTitle:[NSString stringWithFormat:NSLocalizedString(@"Add to %@", @""),
                                                       [[self document] displayName]]];
 }

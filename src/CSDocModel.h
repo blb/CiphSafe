@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007,2011, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -91,14 +91,14 @@ extern NSString * const CSDocModelNotificationInfoKey_DeletedNames;
 - (void) sortEntries;
 
 // Entry access
-- (int) entryCount;
-- (NSString *) stringForKey:(NSString *)key atRow:(int)row;
-- (NSArray *) stringArrayForEntryAtRow:(int)row;
-- (NSData *) RTFDNotesAtRow:(int)row;
-- (NSData *) RTFNotesAtRow:(int)row;
-- (NSAttributedString *) RTFDStringNotesAtRow:(int)row;
-- (NSAttributedString *) RTFStringNotesAtRow:(int)row;
-- (int) rowForName:(NSString *)name;
+- (NSInteger) entryCount;
+- (NSString *) stringForKey:(NSString *)key atRow:(NSInteger)row;
+- (NSArray *) stringArrayForEntryAtRow:(NSInteger)row;
+- (NSData *) RTFDNotesAtRow:(NSInteger)row;
+- (NSData *) RTFNotesAtRow:(NSInteger)row;
+- (NSAttributedString *) RTFDStringNotesAtRow:(NSInteger)row;
+- (NSAttributedString *) RTFStringNotesAtRow:(NSInteger)row;
+- (NSInteger) rowForName:(NSString *)name;
 - (BOOL) addEntryWithName:(NSString *)name
                   account:(NSString *)account
                  password:(NSString *)password
@@ -119,7 +119,7 @@ extern NSString * const CSDocModelNotificationInfoKey_DeletedNames;
                          URL:(NSString *)url
                     category:(NSString *)category
                    notesRTFD:(NSData *)notes;
-- (unsigned) deleteEntriesWithNamesInArray:(NSArray *)nameArray;
+- (NSUInteger) deleteEntriesWithNamesInArray:(NSArray *)nameArray;
 - (BOOL) deleteEntryWithName:(NSString *)name;
 
 

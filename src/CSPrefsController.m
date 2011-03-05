@@ -54,12 +54,12 @@ NSString * const CSPrefDictKey_CurrentSearchKey = @"CSPrefDictKey_CurrentSearchK
 NSString * const CSPrefDictKey_CloseAfterTimeoutSaveOption = @"CSPrefDictKey_CloseAfterTimeoutSaveOption";
 
 // Values should match the tag values in IB
-const int CSPrefCloseAfterTimeoutSaveOption_Save = 0;
-const int CSPrefCloseAfterTimeoutSaveOption_Discard = 1;
-const int CSPrefCloseAfterTimeoutSaveOption_Ask = 2;
-const int CSPrefCellSpacingOption_Small = 0;
-const int CSPrefCellSpacingOption_Medium = 1;
-const int CSPrefCellSpacingOption_Large = 2;
+const NSInteger CSPrefCloseAfterTimeoutSaveOption_Save = 0;
+const NSInteger CSPrefCloseAfterTimeoutSaveOption_Discard = 1;
+const NSInteger CSPrefCloseAfterTimeoutSaveOption_Ask = 2;
+const NSInteger CSPrefCellSpacingOption_Small = 0;
+const NSInteger CSPrefCellSpacingOption_Medium = 1;
+const NSInteger CSPrefCellSpacingOption_Large = 2;
 
 
 NSString * const CSPrefsControllerToolbarID_General = @"General";
@@ -99,12 +99,12 @@ static CSPrefsController *sharedPrefsController = nil;
    if([userDefaults integerForKey:CSPrefDictKey_CloseTimeout] < 1
       || [userDefaults integerForKey:CSPrefDictKey_CloseTimeout] > 3600)
       [userDefaults setInteger:10 forKey:CSPrefDictKey_CloseTimeout];
-   int cellSpacing = [userDefaults integerForKey:CSPrefDictKey_CellSpacing];
+   NSInteger cellSpacing = [userDefaults integerForKey:CSPrefDictKey_CellSpacing];
    if(cellSpacing != CSPrefCellSpacingOption_Small
       && cellSpacing != CSPrefCellSpacingOption_Medium
       && cellSpacing != CSPrefCellSpacingOption_Large)
       [userDefaults setInteger:CSPrefCellSpacingOption_Small forKey:CSPrefDictKey_CellSpacing];
-   int timeoutSaveOption = [userDefaults integerForKey:CSPrefDictKey_CloseAfterTimeoutSaveOption];
+   NSInteger timeoutSaveOption = [userDefaults integerForKey:CSPrefDictKey_CloseAfterTimeoutSaveOption];
    if(timeoutSaveOption != CSPrefCloseAfterTimeoutSaveOption_Save
       && timeoutSaveOption != CSPrefCloseAfterTimeoutSaveOption_Discard
       && timeoutSaveOption != CSPrefCloseAfterTimeoutSaveOption_Ask)
@@ -355,7 +355,7 @@ static CSPrefsController *sharedPrefsController = nil;
  * Open panel to select an autoopen file ended
  */
 - (void) selectPathSheetDidEnd:(NSOpenPanel *)sheet
-                    returnCode:(int)returnCode
+                    returnCode:(NSInteger)returnCode
                    contextInfo:(void *)contextInfo
 {
    if(returnCode == NSOKButton)

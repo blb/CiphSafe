@@ -1,5 +1,5 @@
 /*
- * Copyright © 2007, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2007,2011 Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -55,14 +55,14 @@ extern NSString * const CSPrefDictKey_CurrentSearchKey;
 extern NSString * const CSPrefDictKey_CloseAfterTimeoutSaveOption;
 
 // Possible values for CloseAfterTimeoutSaveOption preference
-extern const int CSPrefCloseAfterTimeoutSaveOption_Save;
-extern const int CSPrefCloseAfterTimeoutSaveOption_Discard;
-extern const int CSPrefCloseAfterTimeoutSaveOption_Ask;
+extern const NSInteger CSPrefCloseAfterTimeoutSaveOption_Save;
+extern const NSInteger CSPrefCloseAfterTimeoutSaveOption_Discard;
+extern const NSInteger CSPrefCloseAfterTimeoutSaveOption_Ask;
 
 // Possible values for CellSpacing preference
-extern const int CSPrefCellSpacingOption_Small;
-extern const int CSPrefCellSpacingOption_Medium;
-extern const int CSPrefCellSpacingOption_Large;
+extern const NSInteger CSPrefCellSpacingOption_Small;
+extern const NSInteger CSPrefCellSpacingOption_Medium;
+extern const NSInteger CSPrefCellSpacingOption_Large;
 
 
 @interface CSPrefsController : NSWindowController

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007,2011, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -69,18 +69,18 @@
 - (NSArray *) categories;
 
 // Methods to add/change/delete/find entries
-- (int) entryCount;
+- (NSInteger) entryCount;
 - (void) setSortKey:(NSString *)newSortKey;
 - (NSString *) sortKey;
 - (void) setSortAscending:(BOOL)sortAsc;
 - (BOOL) isSortAscending;
 - (void) setSortKey:(NSString *)newSortKey ascending:(BOOL)sortAsc;
-- (NSString *) stringForKey:(NSString *)key atRow:(int)row;
-- (NSData *) RTFDNotesAtRow:(int)row;
-- (NSData *) RTFNotesAtRow:(int)row;
-- (NSAttributedString *) RTFDStringNotesAtRow:(int)row;
-- (NSAttributedString *) RTFStringNotesAtRow:(int)row;
-- (int) rowForName:(NSString *)name;
+- (NSString *) stringForKey:(NSString *)key atRow:(NSInteger)row;
+- (NSData *) RTFDNotesAtRow:(NSInteger)row;
+- (NSData *) RTFNotesAtRow:(NSInteger)row;
+- (NSAttributedString *) RTFDStringNotesAtRow:(NSInteger)row;
+- (NSAttributedString *) RTFStringNotesAtRow:(NSInteger)row;
+- (NSInteger) rowForName:(NSString *)name;
 - (BOOL) addEntryWithName:(NSString *)name
                   account:(NSString *)account
                  password:(NSString *)password
@@ -94,7 +94,7 @@
                          URL:(NSString *)url
                     category:(NSString *)category
                    notesRTFD:(NSData *)notes;
-- (unsigned) deleteEntriesWithNamesInArray:(NSArray *)nameArray;
+- (NSUInteger) deleteEntriesWithNamesInArray:(NSArray *)nameArray;
 - (NSNumber *) firstRowBeginningWithString:(NSString *)findMe
                                 ignoreCase:(BOOL)ignoreCase
                                     forKey:(NSString *)key;

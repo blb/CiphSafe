@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006,2011, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -41,17 +41,17 @@
 
 #import <Foundation/Foundation.h>
 
-extern const int NSDataCompressionLevelNone;
-extern const int NSDataCompressionLevelDefault;
-extern const int NSDataCompressionLevelLow;
-extern const int NSDataCompressionLevelMedium;
-extern const int NSDataCompressionLevelHigh;
+extern const NSInteger NSDataCompressionLevelNone;
+extern const NSInteger NSDataCompressionLevelDefault;
+extern const NSInteger NSDataCompressionLevelLow;
+extern const NSInteger NSDataCompressionLevelMedium;
+extern const NSInteger NSDataCompressionLevelHigh;
 
 @interface NSData (withay_compress)
 
 + (void) setCompressLogging:(BOOL)logEnabled;
 - (NSMutableData *) compressedData;
-- (NSMutableData *) compressedDataAtLevel:(int)level;
+- (NSMutableData *) compressedDataAtLevel:(NSInteger)level;
 - (NSMutableData *) uncompressedData;
 - (BOOL) isCompressedFormat;
 

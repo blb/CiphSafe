@@ -63,10 +63,10 @@
 - (void) updateDocumentEditedStatus;
 
 // Methods to make it a data source for category combo boxes
-- (int) numberOfItemsInComboBox:(NSComboBox *)aComboBox;
-- (id) comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(int)index;
-- (unsigned int) comboBox:(NSComboBox *)aComboBox
-                 indexOfItemWithStringValue:(NSString *)aString;
+- (NSInteger) numberOfItemsInComboBox:(NSComboBox *)aComboBox;
+- (id) comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index;
+- (NSUInteger) comboBox:(NSComboBox *)aComboBox
+               indexOfItemWithStringValue:(NSString *)aString;
 
 /*
  * Used by updateDocumentEditedStatus to determine if data is dirty; overridden

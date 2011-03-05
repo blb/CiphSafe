@@ -43,7 +43,7 @@ NSString * const CSPassphraseNote_Load = @"Passphrase for file";
 NSString * const CSPassphraseNote_Change = @"New passphrase";
 
 // What's considered short
-static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
+static const NSInteger CSWinCtrlPassphrase_ShortPassPhrase = 8;
 
 // Defines for localized strings
 #define CSWINCTRLPASSPHRASE_LOC_ENTERAGAIN NSLocalizedString(@"Enter Again", @"")
@@ -85,6 +85,7 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
       if(![self doPassphrasesMatch])
       {
          // Ask for direction if the passphrases don't match
+#warning 64BIT: Check formatting arguments
          NSBeginAlertSheet(NSLocalizedString(@"Passphrases Don't Match", @""),
                            CSWINCTRLPASSPHRASE_LOC_ENTERAGAIN,
                            NSLocalizedString(@"Cancel", @""),
@@ -100,6 +101,7 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
       else if(([[passphrasePhrase2 stringValue] length] < CSWinCtrlPassphrase_ShortPassPhrase))
       {
          // Warn if it is short
+#warning 64BIT: Check formatting arguments
          NSBeginAlertSheet(NSLocalizedString(@"Short Passphrase", @""),
                            NSLocalizedString(@"Use It", @""),
                            CSWINCTRLPASSPHRASE_LOC_ENTERAGAIN,
@@ -143,7 +145,7 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
  * End of the "passphrases don't match" sheet
  */
 - (void) noMatchSheetDidDismiss:(NSWindow *)sheet
-                     returnCode:(int)returnCode
+                     returnCode:(NSInteger)returnCode
                     contextInfo:(void *)contextInfo
 {
    if(returnCode == NSAlertDefaultReturn)   // Enter again
@@ -165,7 +167,7 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
  * End of the "short passphrase" warning sheet
  */
 - (void) shortPPSheetDidDismiss:(NSWindow *)sheet
-                     returnCode:(int)returnCode
+                     returnCode:(NSInteger)returnCode
                     contextInfo:(void *)contextInfo
 {
    if(returnCode == NSAlertDefaultReturn)   // Use it
@@ -242,7 +244,7 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
    {
       NSMutableData *newData = [NSMutableData dataWithLength:[passphraseData length]];
       unsigned char *newBytes = [newData mutableBytes];
-      unsigned int position;
+      NSUInteger position;
       for(position = 0; position < [passphraseData length]; position += 2)
       {
          newBytes[position] = dataBytes[position + 1];
@@ -251,7 +253,7 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
       // XXX - old passphraseData should be cleared here
       passphraseData = newData;
    }
-   int pdLen = [passphraseData length];
+   NSInteger pdLen = [passphraseData length];
    NSData *dataFirst = [passphraseData subdataWithRange:NSMakeRange(0, pdLen / 2)];
    NSData *dataSecond = [passphraseData subdataWithRange:NSMakeRange(pdLen / 2, pdLen - pdLen / 2)];
    /*
@@ -279,6 +281,7 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
 - (NSMutableData *) getEncryptionKeyWithNote:(NSString *)noteType
                             forDocumentNamed:(NSString *)docName
 {
+#warning 64BIT: Check formatting arguments
    [[self window] setTitle:[NSString stringWithFormat:NSLocalizedString(@"Enter passphrase for %@", @""),
                                                       docName]];
    [passphraseNote1 setStringValue:NSLocalizedString(noteType, nil)];
@@ -290,7 +293,7 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
                                          order:9999
                                          modes:runModeArray];
    parentWindow = nil;
-   int windowReturn = [NSApp runModalForWindow:[self window]];
+   NSInteger windowReturn = [NSApp runModalForWindow:[self window]];
    [[self window] orderOut:self];
    NSMutableData *keyData = [self generateKeyUsingConfirmationTab:NO];
    if(windowReturn == NSRunAbortedResponse)

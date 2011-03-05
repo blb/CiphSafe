@@ -189,7 +189,7 @@ static NSArray *keyArray;
  */
 - (NSMutableDictionary *) findEntryWithName:(NSString *)name
 {
-   int row = [self rowForName:name];
+   NSInteger row = [self rowForName:name];
    if(row != -1)
       return [allEntries objectAtIndex:row];
    else
@@ -219,7 +219,7 @@ static NSArray *keyArray;
 /*
  * Return total number of entries
  */
-- (int) entryCount
+- (NSInteger) entryCount
 {
    return [allEntries count];
 }
@@ -228,7 +228,7 @@ static NSArray *keyArray;
 /*
  * Return the value for the given key on the given row
  */
-- (NSString *) stringForKey:(NSString *)key atRow:(int)row
+- (NSString *) stringForKey:(NSString *)key atRow:(NSInteger)row
 {
    NSString *result;
    if([key isEqualToString:CSDocModelKey_Notes])
@@ -245,7 +245,7 @@ static NSArray *keyArray;
 /*
  * Return an array of strings for the entry at the given row
  */
-- (NSArray *) stringArrayForEntryAtRow:(int)row
+- (NSArray *) stringArrayForEntryAtRow:(NSInteger)row
 {
    NSMutableArray *stringArray = [NSMutableArray arrayWithCapacity:6];
    NSEnumerator *keyEnumerator = [keyArray objectEnumerator];
@@ -260,7 +260,7 @@ static NSArray *keyArray;
 /*
  * Return the RTFD for the notes on the given row
  */
-- (NSData *) RTFDNotesAtRow:(int)row
+- (NSData *) RTFDNotesAtRow:(NSInteger)row
 {
    return [[allEntries objectAtIndex:row] objectForKey:CSDocModelKey_Notes];
 }
@@ -272,7 +272,7 @@ static NSArray *keyArray;
  * XXX Note this returns an autoreleased NSData with possibly sensitive
  * information
  */
-- (NSData *) RTFNotesAtRow:(int)row
+- (NSData *) RTFNotesAtRow:(NSInteger)row
 {
    return [[self RTFDStringNotesAtRow:row] RTFWithDocumentAttributes:NULL];
 }
@@ -285,7 +285,7 @@ static NSArray *keyArray;
  * XXX Note this returns an autoreleased NSString with possibly sensitive
  * information
  */
-- (NSAttributedString *) RTFDStringNotesAtRow:(int)row
+- (NSAttributedString *) RTFDStringNotesAtRow:(NSInteger)row
 {
    NSString *cacheKey = [self stringForKey:CSDocModelKey_Name atRow:row];
    NSAttributedString *rtfdString = [entryASCache objectForKey:cacheKey];
@@ -310,7 +310,7 @@ static NSArray *keyArray;
  * XXX Note this returns an autoreleased NSString with possibly sensitive
  * information
  */
-- (NSAttributedString *) RTFStringNotesAtRow:(int)row
+- (NSAttributedString *) RTFStringNotesAtRow:(NSInteger)row
 {
    return [[[NSAttributedString alloc]
             initWithRTF:[self RTFNotesAtRow:row] documentAttributes:NULL]
@@ -321,11 +321,11 @@ static NSArray *keyArray;
 /*
  * Return the row number for the given name, -1 if not found
  */
-- (int) rowForName:(NSString *)name
+- (NSInteger) rowForName:(NSString *)name
 {
    NSNumber *rowNumber = [nameRowCache objectForKey:name];
    if(rowNumber != nil)
-      return [rowNumber intValue];
+      return [rowNumber integerValue];
    else
       return -1;
 }
@@ -339,17 +339,17 @@ static NSArray *keyArray;
                                     forKey:(NSString *)key
 {
    NSRange searchRange = NSMakeRange(0, [findString length]);
-   unsigned int compareOptions = 0;
+   NSUInteger compareOptions = 0;
    if(ignoreCase)
       compareOptions = NSCaseInsensitiveSearch;
    NSNumber *retval = nil;
-   int index;
+   NSInteger index;
    for(index = 0; index < [self entryCount] && retval == nil; index++)
    {
       if([[self stringForKey:key atRow:index] compare:findString
                                               options:compareOptions
                                                 range:searchRange] == NSOrderedSame)
-         retval = [NSNumber numberWithInt:index];
+         retval = [NSNumber numberWithInteger:index];
    }
    
    return retval;
@@ -365,10 +365,10 @@ static NSArray *keyArray;
                           forKey:(NSString *)key
 {
    NSMutableArray *retval = [NSMutableArray arrayWithCapacity:10];
-   unsigned compareOptions = 0;
+   NSUInteger compareOptions = 0;
    if(ignoreCase)
       compareOptions = NSCaseInsensitiveSearch;
-   int index;
+   NSInteger index;
    for(index = 0; index < [self entryCount]; index++)
    {
       NSString *stringToSearch;
@@ -378,7 +378,7 @@ static NSArray *keyArray;
          stringToSearch = [self stringForKey:key atRow:index];
       NSRange searchResult = [stringToSearch rangeOfString:findString options:compareOptions];
       if(searchResult.location != NSNotFound)
-         [retval addObject:[NSNumber numberWithInt:index]];
+         [retval addObject:[NSNumber numberWithInteger:index]];
    }
    
    return retval;
@@ -633,9 +633,9 @@ static NSArray *keyArray;
  * XXX Note that the deleted entries will live on in the undo manager
  * and the names are also given to the notification center
  */
-- (unsigned) deleteEntriesWithNamesInArray:(NSArray *)nameArray
+- (NSUInteger) deleteEntriesWithNamesInArray:(NSArray *)nameArray
 {
-   unsigned int numDeleted = 0;
+   NSUInteger numDeleted = 0;
 
    /*
     * Build a list, do this in advance since they will be deleted soon, causing the entry array to be
@@ -708,10 +708,10 @@ static NSArray *keyArray;
 {
    [allEntries sortUsingFunction:sortEntries context:self];
    [nameRowCache removeAllObjects];
-   int row;
-   int entryCount = [self entryCount];
+   NSInteger row;
+   NSInteger entryCount = [self entryCount];
    for(row = 0; row < entryCount; row++)
-      [nameRowCache setObject:[NSNumber numberWithInt:row]
+      [nameRowCache setObject:[NSNumber numberWithInteger:row]
                        forKey:[self stringForKey:CSDocModelKey_Name atRow:row]];
 }
 
@@ -784,7 +784,7 @@ NSInteger sortEntries(id dict1, id dict2, void *context)
    NSString *value1, *value2;
    if([sortKey isEqualToString:CSDocModelKey_Notes])
    {
-      unsigned int row = [objSelf rowForName:[dictFirst objectForKey:CSDocModelKey_Name]];
+      NSUInteger row = [objSelf rowForName:[dictFirst objectForKey:CSDocModelKey_Name]];
       value1 = [[objSelf RTFDStringNotesAtRow:row] string];
       row = [objSelf rowForName:[dictSecond objectForKey:CSDocModelKey_Name]];
       value2 = [[objSelf RTFDStringNotesAtRow:row] string];

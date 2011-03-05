@@ -60,9 +60,9 @@
  */
 - (void) drawStripesInRect:(NSRect)clipRect
 {
-   float fullRowHeight = [self rowHeight] + [self intercellSpacing].height;
-   float clipBottom = NSMaxY(clipRect);
-   int firstStripe = clipRect.origin.y / fullRowHeight;
+   CGFloat fullRowHeight = [self rowHeight] + [self intercellSpacing].height;
+   CGFloat clipBottom = NSMaxY(clipRect);
+   NSInteger firstStripe = clipRect.origin.y / fullRowHeight;
    if(firstStripe % 2 == 1)
       firstStripe++;   // We're only interested in drawing the stripes
    
@@ -129,8 +129,8 @@
    if([[self delegate] respondsToSelector:@selector(contextualMenuForBLBTableView:row:column:)])
    {
       NSPoint clickPoint = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-      int clickColumn = [self columnAtPoint:clickPoint];
-      int clickRow = [self rowAtPoint:clickPoint];
+      NSInteger clickColumn = [self columnAtPoint:clickPoint];
+      NSInteger clickRow = [self rowAtPoint:clickPoint];
 
       if(clickColumn >= 0 && clickRow >= 0)
          return [[self delegate] contextualMenuForBLBTableView:self

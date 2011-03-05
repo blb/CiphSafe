@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006,2011, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -43,7 +43,7 @@
 @interface NSData (withay_crypto)
 
 + (void) setCryptoLogging:(BOOL)logEnabled;
-+ (NSMutableData *) randomDataOfLength:(int)len;
++ (NSMutableData *) randomDataOfLength:(NSInteger)len;
 - (NSMutableData *) blowfishEncryptedDataWithKey:(NSData *)key iv:(NSData *)iv;
 - (NSMutableData *) blowfishDecryptedDataWithKey:(NSData *)key iv:(NSData *)iv;
 - (NSMutableData *) SHA1Hash;
