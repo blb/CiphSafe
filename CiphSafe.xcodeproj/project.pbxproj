@@ -30,7 +30,6 @@
 		6469264A0CE95FF1005B14AC /* mini window ciphsafe.png in Resources */ = {isa = PBXBuildFile; fileRef = 646926480CE95FF1005B14AC /* mini window ciphsafe.png */; };
 		646926550CE96008005B14AC /* NSArray_FOOC.m in Sources */ = {isa = PBXBuildFile; fileRef = 6469264C0CE96008005B14AC /* NSArray_FOOC.m */; };
 		646926560CE96008005B14AC /* NSAttributedString_RWDA.m in Sources */ = {isa = PBXBuildFile; fileRef = 6469264E0CE96008005B14AC /* NSAttributedString_RWDA.m */; };
-		646926570CE96008005B14AC /* NSData_clear.m in Sources */ = {isa = PBXBuildFile; fileRef = 646926500CE96008005B14AC /* NSData_clear.m */; };
 		646926580CE96008005B14AC /* NSData_compress.m in Sources */ = {isa = PBXBuildFile; fileRef = 646926520CE96008005B14AC /* NSData_compress.m */; };
 		646926590CE96008005B14AC /* NSData_crypto.m in Sources */ = {isa = PBXBuildFile; fileRef = 646926540CE96008005B14AC /* NSData_crypto.m */; };
 		6469265D0CE9601D005B14AC /* padlock caution behind.png in Resources */ = {isa = PBXBuildFile; fileRef = 6469265A0CE9601D005B14AC /* padlock caution behind.png */; };
@@ -92,8 +91,6 @@
 		6469264C0CE96008005B14AC /* NSArray_FOOC.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NSArray_FOOC.m; path = src/NSArray_FOOC.m; sourceTree = "<group>"; };
 		6469264D0CE96008005B14AC /* NSAttributedString_RWDA.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSAttributedString_RWDA.h; path = src/NSAttributedString_RWDA.h; sourceTree = "<group>"; };
 		6469264E0CE96008005B14AC /* NSAttributedString_RWDA.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NSAttributedString_RWDA.m; path = src/NSAttributedString_RWDA.m; sourceTree = "<group>"; };
-		6469264F0CE96008005B14AC /* NSData_clear.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSData_clear.h; path = src/NSData_clear.h; sourceTree = "<group>"; };
-		646926500CE96008005B14AC /* NSData_clear.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NSData_clear.m; path = src/NSData_clear.m; sourceTree = "<group>"; };
 		646926510CE96008005B14AC /* NSData_compress.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSData_compress.h; path = src/NSData_compress.h; sourceTree = "<group>"; };
 		646926520CE96008005B14AC /* NSData_compress.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NSData_compress.m; path = src/NSData_compress.m; sourceTree = "<group>"; };
 		646926530CE96008005B14AC /* NSData_crypto.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSData_crypto.h; path = src/NSData_crypto.h; sourceTree = "<group>"; };
@@ -231,8 +228,6 @@
 				6469264C0CE96008005B14AC /* NSArray_FOOC.m */,
 				6469264D0CE96008005B14AC /* NSAttributedString_RWDA.h */,
 				6469264E0CE96008005B14AC /* NSAttributedString_RWDA.m */,
-				6469264F0CE96008005B14AC /* NSData_clear.h */,
-				646926500CE96008005B14AC /* NSData_clear.m */,
 				646926510CE96008005B14AC /* NSData_compress.h */,
 				646926520CE96008005B14AC /* NSData_compress.m */,
 				646926530CE96008005B14AC /* NSData_crypto.h */,
@@ -297,10 +292,22 @@
 /* Begin PBXProject section */
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				ORGANIZATIONNAME = "Bryan L Blackburn";
+			};
 			buildConfigurationList = C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "CiphSafe" */;
+			compatibilityVersion = "Xcode 2.4";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* CiphSafe */;
 			projectDirPath = "";
+			projectRoot = "";
 			targets = (
 				8D15AC270486D014006FF6A4 /* CiphSafe */,
 			);
@@ -352,7 +359,6 @@
 				646925E80CE95F7F005B14AC /* CSWinCtrlPassphrase.m in Sources */,
 				646926550CE96008005B14AC /* NSArray_FOOC.m in Sources */,
 				646926560CE96008005B14AC /* NSAttributedString_RWDA.m in Sources */,
-				646926570CE96008005B14AC /* NSData_clear.m in Sources */,
 				646926580CE96008005B14AC /* NSData_compress.m in Sources */,
 				646926590CE96008005B14AC /* NSData_crypto.m in Sources */,
 			);
@@ -448,14 +454,14 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 642C1D000D13613B00664139 /* target_ciphsafe.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = CiphSafe;
+				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -464,15 +470,13 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 642C1D000D13613B00664139 /* target_ciphsafe.xcconfig */;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = CiphSafe;
+				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -485,7 +489,6 @@
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = DEBUG;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 			};
 			name = Debug;
 		};
@@ -495,7 +498,6 @@
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 			};
 			name = Release;
 		};

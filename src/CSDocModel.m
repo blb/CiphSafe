@@ -145,11 +145,11 @@ static NSArray *keyArray;
       if(decryptedData != nil)
       {
          NSMutableData *uncompressedData = [decryptedData uncompressedData];
-         [decryptedData clearOutData];
+         // XXX - decryptedData can be zeroed
          if(uncompressedData != nil)
          {
             allEntries = [NSUnarchiver unarchiveObjectWithData:uncompressedData];
-            [uncompressedData clearOutData];
+            // XXX - uncompressedData can be zeroed
             if(allEntries != nil)
             {
                [allEntries retain];
@@ -206,9 +206,9 @@ static NSArray *keyArray;
    NSData *iv = [NSData randomDataOfLength:8];
    NSData *archivedData = [NSArchiver archivedDataWithRootObject:allEntries];
    NSMutableData *compressedData = [archivedData compressedData];
-   [archivedData clearOutData];
+   // XXX - archivedData can be zeroed
    NSData *ceData = [compressedData blowfishEncryptedDataWithKey:bfKey iv:iv];
-   [compressedData clearOutData];
+   // XXX - compressedData can be zeroed
    NSMutableData *ivAndData = [NSMutableData dataWithCapacity:[iv length] + [ceData length]];
    [ivAndData appendData:iv];
    [ivAndData appendData:ceData];

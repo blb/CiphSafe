@@ -287,7 +287,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
    if(![newKey isEqual:bfKey])
    {
       [newKey retain];
-      [bfKey clearOutData];
+      // XXX - bfKey can be zeroed
       [bfKey release];
       bfKey = newKey;
    }

@@ -131,7 +131,8 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
    {
       [NSApp endSheet:[self window]];
       [[self window] orderOut:self];
-      [[self generateKeyUsingConfirmationTab:YES] clearOutData];
+      // XXX - data from generateKeyUsingConfirmationTab should be cleared
+      [self generateKeyUsingConfirmationTab:YES];  // Called for the side-effects (clearing fields)
       [modalDelegate performSelector:sheetEndSelector withObject:nil];
    }
 }
@@ -154,7 +155,8 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
             contextInfo:NULL];
    else   // Cancel all together
    {
-      [[self generateKeyUsingConfirmationTab:YES] clearOutData];
+      // XXX - data from generateKeyUsingConfirmationTab should be cleared
+      [self generateKeyUsingConfirmationTab:YES];   // Called for the side-effects
       [modalDelegate performSelector:sheetEndSelector withObject:nil];
    }
 }
@@ -247,26 +249,25 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
          newBytes[position] = dataBytes[position + 1];
          newBytes[position + 1] = dataBytes[position];
       }
-      [passphraseData clearOutData];
+      // XXX - old passphraseData should be cleared here
       passphraseData = newData;
    }
    int pdLen = [passphraseData length];
    NSData *dataFirst = [passphraseData subdataWithRange:NSMakeRange(0, pdLen / 2)];
    NSData *dataSecond = [passphraseData subdataWithRange:NSMakeRange(pdLen / 2, pdLen - pdLen / 2)];
-   [passphraseData clearOutData];
    /*
-    * XXX At this point, passphrase should be cleared, however, there is no way,
-    * that I've yet found, to do that...here's hoping it gets released and the
-    * memory reused soon...
+    * XXX At this point, passphrase and passphraseData should be cleared, however,
+    * there is no way, that I've yet found, to do that...here's hoping it gets released
+    * and the memory reused soon...
     */
    passphrase = nil;
    
    NSMutableData *keyData = [dataFirst SHA1Hash];
-   [dataFirst clearOutData];
+   // XXX - dataFirst should now be cleared...
    NSMutableData *tmpData = [dataSecond SHA1Hash];
-   [dataSecond clearOutData];
+   // XXX - dataSecond should now be cleared...
    [keyData appendData:tmpData];
-   [tmpData clearOutData];
+   // XXX - tmpData should now be cleared...
    
    return keyData;
 }
@@ -295,7 +296,7 @@ static const int CSWinCtrlPassphrase_ShortPassPhrase = 8;
    NSMutableData *keyData = [self generateKeyUsingConfirmationTab:NO];
    if(windowReturn == NSRunAbortedResponse)
    {
-      [keyData clearOutData];
+      // XXX - keyData should be sanitized here
       keyData = nil;
    }
    

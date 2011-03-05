@@ -108,7 +108,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
    for(index = 0; index < genSize; index++)
       [randomString appendFormat:@"%c", genString[randomBytes[index] % genStringLength]];
    [passwordText setStringValue:randomString];
-   [randomData clearOutData];
+   // XXX - randomData can be zeroed here
    /*
     * XXX deleteCharactersInRange: probably just changes its length; strings are
     * a pain in the ass in Cocoa from a security point of view
