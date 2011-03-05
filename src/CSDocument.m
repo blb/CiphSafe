@@ -47,6 +47,7 @@
 
 
 NSString * const CSDocument_Name = @"CiphSafe Document";
+NSString * const CSDocument_NameUTI = @"com.withay.ciphsafe.doc";
 NSString * const CSDocumentXML_RootNode = @"document";
 NSString * const CSDocumentXML_EntryNode = @"entry";
 
@@ -206,7 +207,8 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (NSData *) dataOfType:(NSString *)typeName error:(NSError **)outError
 {
-   NSAssert([typeName isEqualToString:CSDocument_Name], @"Unknown file type");
+   NSAssert(([typeName isEqualToString:CSDocument_Name] || [typeName isEqualToString:CSDocument_NameUTI]),
+            ([NSString stringWithFormat:@"Unknown file type %@", typeName]));
    NSAssert(bfKey != nil, @"key is nil");
 
    return [[self model] encryptedDataWithKey:bfKey];
@@ -218,7 +220,8 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (BOOL) readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError
 {
-   NSAssert([typeName isEqualToString:CSDocument_Name], @"Unknown file type");
+   NSAssert(([typeName isEqualToString:CSDocument_Name] || [typeName isEqualToString:CSDocument_NameUTI]),
+            ([NSString stringWithFormat:@"Unknown file type %@", typeName]));
 
    if(docModel != nil)   // This'll happen on revert
    {
