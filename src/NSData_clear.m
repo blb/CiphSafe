@@ -50,6 +50,8 @@
          isMutable = NO;
       char *someData = NULL;
       int index;
+      // This first method only works with Objective-C pre-2
+#if 0
       for(index = 0; index < isa->ivars->ivar_count; index++)
       {
          Ivar ivar = &isa->ivars->ivar_list[index];
@@ -60,6 +62,16 @@
             else
                someData = ((char *) self + ivar->ivar_offset);
          }
+      }
+#endif
+      Ivar ivar = object_getInstanceVariable(self, "_bytes", NULL);
+      if( ivar != NULL)
+      {
+         ptrdiff_t ivarOffset = ivar_getOffset(ivar);
+         if(isMutable)
+            someData = *((char **) ((char *) self + ivarOffset));
+         else
+            someData = ((char *) self + ivarOffset);
       }
       if(someData != NULL)   // We found _bytes
       {
