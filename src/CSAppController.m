@@ -337,7 +337,7 @@ void ciphSafeCFDeallocate(void *ptr, void *info)
 /*
  * Enable only valid menu items
  */
-- (BOOL) validateMenuItem:(id <NSMenuItem>)menuItem
+- (BOOL) validateMenuItem:(NSMenuItem *)menuItem
 {
    SEL menuItemAction = [menuItem action];
    if(menuItemAction == @selector(closeAll:))
