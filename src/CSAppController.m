@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007,2011, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -51,18 +51,18 @@ static CFAllocatorRef originalCFAllocator;
 
 
 // These are the custom CoreFoundation allocator functions
-void *ciphSafeCFReallocate( void *ptr, CFIndex newsize, CFOptionFlags hint, void *info )
+void *ciphSafeCFReallocate(void *ptr, CFIndex newsize, CFOptionFlags hint, void *info)
 {
-//   return realloc( ptr, newsize );
-   return CFAllocatorReallocate( originalCFAllocator, ptr, newsize, hint );
+//   return realloc(ptr, newsize);
+   return CFAllocatorReallocate(originalCFAllocator, ptr, newsize, hint);
 }
 
 
-void ciphSafeCFDeallocate( void *ptr, void *info )
+void ciphSafeCFDeallocate(void *ptr, void *info)
 {
-//   free( ptr );
+//   free(ptr);
 //   return;
-   CFAllocatorDeallocate( originalCFAllocator, ptr );
+   CFAllocatorDeallocate(originalCFAllocator, ptr);
 }
 */
 
@@ -75,31 +75,31 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
 + (void) initialize
 {
 #if defined(DEBUG)
-   NSLog( @"CiphSafe debug build" );
+   NSLog(@"CiphSafe debug build");
 #endif
    // Force the prefs controller to load so it does its +initialize thing
-   [ CSPrefsController sharedPrefsController ];
+   [CSPrefsController sharedPrefsController];
 /*   
    // Create CoreFoundation custom allocator so we can clear memory on deallocation
    originalCFAllocator = CFAllocatorGetDefault();
-   CFRetain( originalCFAllocator );
+   CFRetain(originalCFAllocator);
    CFAllocatorContext originalContext;
-   CFAllocatorGetContext( originalCFAllocator, &originalContext );
+   CFAllocatorGetContext(originalCFAllocator, &originalContext);
    
    CFAllocatorContext allocContext;
-   memcpy( &allocContext, &originalContext, sizeof( CFAllocatorContext ) );
+   memcpy(&allocContext, &originalContext, sizeof(CFAllocatorContext));
    allocContext.reallocate = ciphSafeCFReallocate;
    allocContext.deallocate = ciphSafeCFDeallocate;
-   ciphSafeCFAllocator = CFAllocatorCreate( NULL, &allocContext );
-   CFAllocatorSetDefault( ciphSafeCFAllocator );
+   ciphSafeCFAllocator = CFAllocatorCreate(NULL, &allocContext);
+   CFAllocatorSetDefault(ciphSafeCFAllocator);
    */
 }
 
 
 - (id) init
 {
-   self = [ super init ];
-   if( self != nil )
+   self = [super init];
+   if(self != nil)
       closeAllFromTimeout = NO;
 
    return self;
@@ -113,27 +113,27 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (void) applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-   [ [ NSNotificationCenter defaultCenter ] addObserver:self
-                                               selector:@selector( windowsMenuDidUpdate: )
-                                                   name:NSMenuDidAddItemNotification
-                                                 object:[ NSApp windowsMenu ] ];
-   NSUserDefaults *userDefaults = [ NSUserDefaults standardUserDefaults ];
-   if( [ userDefaults boolForKey:CSPrefDictKey_AutoOpen ] )
+   [[NSNotificationCenter defaultCenter] addObserver:self
+                                            selector:@selector(windowsMenuDidUpdate:)
+                                                name:NSMenuDidAddItemNotification
+                                              object:[NSApp windowsMenu]];
+   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+   if([userDefaults boolForKey:CSPrefDictKey_AutoOpen])
    {
-      NSDocumentController *sharedDocController = [ NSDocumentController sharedDocumentController ];
-      if( [ [ sharedDocController documents ] count ] == 0 )
+      NSDocumentController *sharedDocController = [NSDocumentController sharedDocumentController];
+      if([[sharedDocController documents] count] == 0)
       {
-         NSURL *fileURL = [ NSURL fileURLWithPath:[ userDefaults objectForKey:CSPrefDictKey_AutoOpenPath ] ];
+         NSURL *fileURL = [NSURL fileURLWithPath:[userDefaults objectForKey:CSPrefDictKey_AutoOpenPath]];
          NSError *openError = nil;
-         [ sharedDocController openDocumentWithContentsOfURL:fileURL display:YES error:&openError ];
+         [sharedDocController openDocumentWithContentsOfURL:fileURL display:YES error:&openError];
 #if defined(DEBUG)
-         if( openError != nil )
-            NSLog( @"CSAppController applicationDidFinishLaunching: errored at "
-                   @"openDocumentWithContentsOfURL:display:error: %@", openError );
+         if(openError != nil)
+            NSLog(@"CSAppController applicationDidFinishLaunching: errored at "
+                   @"openDocumentWithContentsOfURL:display:error: %@", openError);
 #endif
       }
    }
-   lastPBChangeCount = [ [ NSPasteboard generalPasteboard ] changeCount ] - 1;
+   lastPBChangeCount = [[NSPasteboard generalPasteboard] changeCount] - 1;
 }
 
 
@@ -144,11 +144,11 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (void) queuePendingCloseAll
 {
-   NSUserDefaults *userDefaults = [ NSUserDefaults standardUserDefaults ];
-   if( [ userDefaults boolForKey:CSPrefDictKey_CloseAfterTimeout ] )
-      [ self performSelector:@selector( closeAll: )
-                  withObject:self
-                  afterDelay:( [ userDefaults integerForKey:CSPrefDictKey_CloseTimeout ] * 60 ) ];
+   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+   if([userDefaults boolForKey:CSPrefDictKey_CloseAfterTimeout])
+      [self performSelector:@selector(closeAll:)
+                 withObject:self
+                 afterDelay:([userDefaults integerForKey:CSPrefDictKey_CloseTimeout] * 60)];
 }
 
 
@@ -157,9 +157,9 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (void) cancelPendingCloseAll
 {
-   [ [ self class ] cancelPreviousPerformRequestsWithTarget:self
-                                                   selector:@selector( closeAll: )
-                                                     object:self ];
+   [[self class] cancelPreviousPerformRequestsWithTarget:self
+                                                selector:@selector(closeAll:)
+                                                  object:self];
 }
 
 
@@ -168,7 +168,7 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (void) applicationDidResignActive:(NSNotification *)aNotification
 {
-   [ self queuePendingCloseAll ];
+   [self queuePendingCloseAll];
 }
 
 
@@ -177,7 +177,7 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (void) applicationDidBecomeActive:(NSNotification *)aNotification
 {
-   [ self cancelPendingCloseAll ];
+   [self cancelPendingCloseAll];
 }
 
 
@@ -207,12 +207,12 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (IBAction) closeAll:(id)sender
 {
-   if( sender == self )
+   if(sender == self)
       closeAllFromTimeout = YES;
-   [ [ NSDocumentController sharedDocumentController ]
-     closeAllDocumentsWithDelegate:self
-               didCloseAllSelector:@selector( docController:didCloseAll:contextInfo: )
-                       contextInfo:NULL ];
+   [[NSDocumentController sharedDocumentController]
+    closeAllDocumentsWithDelegate:self
+              didCloseAllSelector:@selector(docController:didCloseAll:contextInfo:)
+                      contextInfo:NULL];
 }
 
 
@@ -228,12 +228,12 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
     * occasionally, as opposed to every time the menu is updated; the
     * cancelPrevious... keeps from queueing them all up
     */
-   [ [ self class ] cancelPreviousPerformRequestsWithTarget:self
-                                                   selector:@selector( rearrangeWindowMenu: )
-                                                     object:nil ];
-   [ self performSelector:@selector( rearrangeWindowMenu: )
-               withObject:nil
-               afterDelay:0.1 ];
+   [[self class] cancelPreviousPerformRequestsWithTarget:self
+                                                selector:@selector(rearrangeWindowMenu:)
+                                                  object:nil];
+   [self performSelector:@selector(rearrangeWindowMenu:)
+              withObject:nil
+              afterDelay:0.1];
 }
 
 
@@ -243,10 +243,10 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (BOOL) isMenuItem:(id)menuItem forWindowControllerClass:(Class)theClass
 {
-   id target = [ menuItem target ];
+   id target = [menuItem target];
    // Only windows may have window controllers
-   if( [ target isKindOfClass:[ NSWindow class ] ] &&
-       [ [ target windowController ] isKindOfClass:[ theClass class ] ] )
+   if([target isKindOfClass:[NSWindow class]]
+      && [[target windowController] isKindOfClass:[theClass class]])
       return YES;
 
    return NO;
@@ -259,32 +259,32 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (void) rearrangeWindowMenu:(id)unused
 {
-   NSMenu *windowMenu = [ NSApp windowsMenu ];
+   NSMenu *windowMenu = [NSApp windowsMenu];
    /*
     * Use a copy since we'll be modifying the original list below, and this protects us in case 
     * the array from itemArray is just a reference to the original
     */
-   NSArray *itemArrayCopy = [ [ windowMenu itemArray ] copy ];
-   NSEnumerator *itemEnumerator = [ itemArrayCopy objectEnumerator ];
+   NSArray *itemArrayCopy = [[windowMenu itemArray] copy];
+   NSEnumerator *itemEnumerator = [itemArrayCopy objectEnumerator];
    id menuItem;
-   NSMutableArray *windowMenuSecondaryItems = [ NSMutableArray arrayWithCapacity:25 ];
+   NSMutableArray *windowMenuSecondaryItems = [NSMutableArray arrayWithCapacity:25];
    // First, remove all secondary items which we want to rearrange
-   while( ( menuItem = [ itemEnumerator nextObject ] ) != nil )
+   while((menuItem = [itemEnumerator nextObject]) != nil)
    {
       // We only rearrange windows owned by CSWinCtrlEntry subclasses
-      if( [ self isMenuItem:menuItem forWindowControllerClass:[ CSWinCtrlEntry class ] ] )
+      if([self isMenuItem:menuItem forWindowControllerClass:[CSWinCtrlEntry class]])
       {
-         [ menuItem setIndentationLevel:1 ];
-         [ windowMenuSecondaryItems addObject:menuItem ];
-         [ windowMenu removeItem:menuItem ];
+         [menuItem setIndentationLevel:1];
+         [windowMenuSecondaryItems addObject:menuItem];
+         [windowMenu removeItem:menuItem];
       }
    }
-   [ itemArrayCopy release ];
+   [itemArrayCopy release];
    // Now put them in proper order
-   if( [ windowMenuSecondaryItems count ] > 0 )
+   if([windowMenuSecondaryItems count] > 0)
    {
-      itemEnumerator = [ windowMenuSecondaryItems reverseObjectEnumerator ];
-      while( ( menuItem = [ itemEnumerator nextObject ] ) != nil )
+      itemEnumerator = [windowMenuSecondaryItems reverseObjectEnumerator];
+      while((menuItem = [itemEnumerator nextObject]) != nil)
       {
          /*
           * This looks ugly at first, but: from the menu item, get the target
@@ -295,17 +295,17 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
           * from that, we can get the parent window.  The newly-added menu item
           * goes after that window's menu item.
           */
-         int parentItemIndex = [ windowMenu indexOfItemWithTarget:[ [ [ [ [ menuItem target ]
-                                                                          windowController ]
-                                                                        document ]
-                                                                      mainWindowController ]
-                                                                    window ]
-                                                        andAction:@selector( makeKeyAndOrderFront: ) ];
-         NSAssert( parentItemIndex >= 0, @"No parent window menu item" );
-         if( parentItemIndex == [ windowMenu numberOfItems ] - 1 )
-            [ windowMenu addItem:menuItem ];
+         int parentItemIndex = [windowMenu indexOfItemWithTarget:[[[[[menuItem target]
+                                                                     windowController]
+                                                                    document]
+                                                                   mainWindowController]
+                                                                  window]
+                                                       andAction:@selector(makeKeyAndOrderFront:)];
+         NSAssert(parentItemIndex >= 0, @"No parent window menu item");
+         if(parentItemIndex == [windowMenu numberOfItems] - 1)
+            [windowMenu addItem:menuItem];
          else
-            [ windowMenu insertItem:menuItem atIndex:( parentItemIndex + 1 ) ];
+            [windowMenu insertItem:menuItem atIndex:(parentItemIndex + 1)];
       }
    }
 }
@@ -318,19 +318,19 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (void) updateSetCategoryMenuWithCategories:(NSArray *)categories action:(SEL)action
 {
-   NSMenu *categoriesMenu = [ editMenuSetCategory submenu ];
-   NSEnumerator *oldItemsEnum = [ [ categoriesMenu itemArray ] objectEnumerator ];
+   NSMenu *categoriesMenu = [editMenuSetCategory submenu];
+   NSEnumerator *oldItemsEnum = [[categoriesMenu itemArray] objectEnumerator];
    id oldItem;
-   while( ( oldItem = [ oldItemsEnum nextObject ] ) != nil )
-      [ categoriesMenu removeItem:oldItem ];
-   NSEnumerator *currentCategoriesEnum = [ categories objectEnumerator ];
+   while((oldItem = [oldItemsEnum nextObject]) != nil)
+      [categoriesMenu removeItem:oldItem];
+   NSEnumerator *currentCategoriesEnum = [categories objectEnumerator];
    id newItem;
-   while( ( newItem = [ currentCategoriesEnum nextObject ] ) != nil )
-      [ categoriesMenu addItemWithTitle:newItem action:action keyEquivalent:@"" ];
-   [ categoriesMenu addItem:[ NSMenuItem separatorItem ] ];
-   [ categoriesMenu addItemWithTitle:NSLocalizedString( @"New Category", @"" )
-                              action:action
-                       keyEquivalent:@"" ];
+   while((newItem = [currentCategoriesEnum nextObject]) != nil)
+      [categoriesMenu addItemWithTitle:newItem action:action keyEquivalent:@""];
+   [categoriesMenu addItem:[NSMenuItem separatorItem]];
+   [categoriesMenu addItemWithTitle:NSLocalizedString(@"New Category", @"")
+                             action:action
+                      keyEquivalent:@""];
 }
 
 
@@ -339,9 +339,9 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (BOOL) validateMenuItem:(id <NSMenuItem>)menuItem
 {
-   SEL menuItemAction = [ menuItem action ];
-   if( menuItemAction == @selector( closeAll: ) )
-      return ( [ [ [ NSDocumentController sharedDocumentController ] documents ] count ] > 0 );
+   SEL menuItemAction = [menuItem action];
+   if(menuItemAction == @selector(closeAll:))
+      return ([[[NSDocumentController sharedDocumentController] documents] count] > 0);
    
    return YES;
 }
@@ -356,15 +356,15 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
 - (BOOL) applicationShouldOpenUntitledFile:(NSApplication *)sender
 {
    static BOOL initialShouldOpen = YES;
-   NSUserDefaults *userDefaults = [ NSUserDefaults standardUserDefaults ];
-   if( initialShouldOpen )
+   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+   if(initialShouldOpen)
    {
       initialShouldOpen = NO;
-      return ( [ userDefaults boolForKey:CSPrefDictKey_CreateNew ] &&
-               ![ userDefaults boolForKey:CSPrefDictKey_AutoOpen ] );
+      return ([userDefaults boolForKey:CSPrefDictKey_CreateNew]
+              && ![userDefaults boolForKey:CSPrefDictKey_AutoOpen]);
    }
    else
-      return [ userDefaults boolForKey:CSPrefDictKey_CreateNew ];
+      return [userDefaults boolForKey:CSPrefDictKey_CreateNew];
 }
 
 
@@ -374,7 +374,7 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (void) notePBChangeCount
 {
-   lastPBChangeCount = [ [ NSPasteboard generalPasteboard ] changeCount ];
+   lastPBChangeCount = [[NSPasteboard generalPasteboard] changeCount];
 }
 
 
@@ -383,7 +383,7 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (IBAction) openPreferences:(id)sender
 {
-   [ [ CSPrefsController sharedPrefsController ] showWindow:sender ];
+   [[CSPrefsController sharedPrefsController] showWindow:sender];
 }
 
 
@@ -393,13 +393,13 @@ void ciphSafeCFDeallocate( void *ptr, void *info )
  */
 - (void) applicationWillTerminate:(NSNotification *)aNotification
 {
-   [ [ NSUserDefaults standardUserDefaults ] synchronize ];
-   NSPasteboard *generalPB = [ NSPasteboard generalPasteboard ];
-   if( [ [ NSUserDefaults standardUserDefaults ] boolForKey:CSPrefDictKey_ClearClipboard ] &&
-       ( [ generalPB changeCount ] == lastPBChangeCount ) )
+   [[NSUserDefaults standardUserDefaults] synchronize];
+   NSPasteboard *generalPB = [NSPasteboard generalPasteboard];
+   if([[NSUserDefaults standardUserDefaults] boolForKey:CSPrefDictKey_ClearClipboard]
+      && ([generalPB changeCount] == lastPBChangeCount))
    {
-      [ generalPB declareTypes:[ NSArray arrayWithObject:@"" ] owner:nil ];
-      [ generalPB setString:@"" forType:@"" ];
+      [generalPB declareTypes:[NSArray arrayWithObject:@""] owner:nil];
+      [generalPB setString:@"" forType:@""];
    }
 }
 

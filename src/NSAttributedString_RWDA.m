@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006,2011, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -42,12 +42,12 @@
 
 - (NSData *) RTFWithDocumentAttributes:(NSDictionary *)dict
 {
-   return [ self RTFFromRange:NSMakeRange( 0, [ self length ] ) documentAttributes:dict ];
+   return [self RTFFromRange:NSMakeRange(0, [self length]) documentAttributes:dict];
 }
 
 - (NSData *) RTFDWithDocumentAttributes:(NSDictionary *)dict
 {
-   return [ self RTFDFromRange:NSMakeRange( 0, [ self length ] ) documentAttributes:dict ];
+   return [self RTFDFromRange:NSMakeRange(0, [self length]) documentAttributes:dict];
 }
 
 @end

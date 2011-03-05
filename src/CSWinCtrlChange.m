@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007,2011, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -56,7 +56,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 + (void) initialize
 {
-   controllerList = [ [ NSMutableDictionary alloc ] initWithCapacity:25 ];
+   controllerList = [[NSMutableDictionary alloc] initWithCapacity:25];
 }
 
 
@@ -65,10 +65,10 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 - (id) initForEntryName:(NSString *)name
 {
-   self = [ super initWithWindowNibName:@"CSDocumentChange" ];
-   if( self != nil )
-      myEntryName = [ name copy ];
-   
+   self = [super initWithWindowNibName:@"CSDocumentChange"];
+   if(self != nil)
+      myEntryName = [name copy];
+
    return self;
 }
 
@@ -80,7 +80,7 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 + (NSNumber *) numberForDocument:(NSDocument *)document
 {
-   return [ NSNumber numberWithUnsignedInt:[ document hash ] ];
+   return [NSNumber numberWithUnsignedInt:[document hash]];
 }
 
 
@@ -90,14 +90,14 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 + (void) addController:(CSWinCtrlChange *)newController
            forDocument:(NSDocument *)document
 {
-   NSMutableArray *arrayForDocument = [ controllerList objectForKey:
-                                                          [ CSWinCtrlChange numberForDocument:document ] ];
-   if( arrayForDocument == nil )
+   NSMutableArray *arrayForDocument = [controllerList objectForKey:
+                                                         [CSWinCtrlChange numberForDocument:document]];
+   if(arrayForDocument == nil)
    {
-      arrayForDocument = [ NSMutableArray arrayWithCapacity:5 ];
-      [ controllerList setObject:arrayForDocument forKey:[ CSWinCtrlChange numberForDocument:document ] ];
+      arrayForDocument = [NSMutableArray arrayWithCapacity:5];
+      [controllerList setObject:arrayForDocument forKey:[CSWinCtrlChange numberForDocument:document]];
    }
-   [ arrayForDocument addObject:newController ];
+   [arrayForDocument addObject:newController];
 }
 
 
@@ -107,11 +107,11 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 + (void) removeController:(CSWinCtrlChange *)oldController
               forDocument:(NSDocument *)document
 {
-   NSMutableArray *arrayForDocument = [ controllerList objectForKey:
-                                                          [ CSWinCtrlChange numberForDocument:document ] ];
-   NSAssert( arrayForDocument != nil,
-             @"attempt to remove controller for document with no controllers" );
-   [ arrayForDocument removeObject:oldController ];
+   NSMutableArray *arrayForDocument = [controllerList objectForKey:
+                                                         [CSWinCtrlChange numberForDocument:document]];
+   NSAssert(arrayForDocument != nil,
+            @"attempt to remove controller for document with no controllers");
+   [arrayForDocument removeObject:oldController];
 }
 
 
@@ -121,14 +121,14 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 + (CSWinCtrlChange *) controllerForEntryName:(NSString *)entryName
                                   inDocument:(NSDocument *)document
 {
-   NSArray *arrayForDocument = [ controllerList objectForKey:[ CSWinCtrlChange numberForDocument:document ] ];
-   if( arrayForDocument != nil )
+   NSArray *arrayForDocument = [controllerList objectForKey:[CSWinCtrlChange numberForDocument:document]];
+   if(arrayForDocument != nil)
    {
-      NSEnumerator *controllerEnumerator = [ arrayForDocument objectEnumerator ];
+      NSEnumerator *controllerEnumerator = [arrayForDocument objectEnumerator];
       id currentController;
-      while( ( currentController = [ controllerEnumerator nextObject ] ) != nil )
+      while((currentController = [controllerEnumerator nextObject]) != nil)
       {
-         if( [ [ currentController entryName ] isEqualToString:entryName ] )
+         if([[currentController entryName] isEqualToString:entryName])
             return currentController;
       }
    }
@@ -142,11 +142,11 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 + (void) closeOpenControllersForDocument:(NSDocument *)document
 {
-   NSArray *arrayForDocument = [ controllerList objectForKey:[ CSWinCtrlChange numberForDocument:document ] ];
-   if( arrayForDocument != nil )
+   NSArray *arrayForDocument = [controllerList objectForKey:[CSWinCtrlChange numberForDocument:document]];
+   if(arrayForDocument != nil)
    {
-      while( [ arrayForDocument count ] > 0 )
-         [ [ [ arrayForDocument objectAtIndex:0 ] window ] performClose:self ];
+      while([arrayForDocument count] > 0)
+         [[[arrayForDocument objectAtIndex:0] window] performClose:self];
    }
 }
 
@@ -158,8 +158,8 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 - (void) setDocument:(NSDocument *)document
 {
-   [ super setDocument:document ];
-   [ CSWinCtrlChange addController:self forDocument:document ];
+   [super setDocument:document];
+   [CSWinCtrlChange addController:self forDocument:document];
 }
 
 
@@ -177,12 +177,12 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 - (void) setEntryName:(NSString *)newEntryName
 {
-   if( myEntryName != newEntryName )
+   if(myEntryName != newEntryName)
    {
-      [ myEntryName autorelease ];
-      myEntryName = [ newEntryName retain ];
-      [ self updateFields ];
-      [ self synchronizeWindowTitleWithDocumentName ];
+      [myEntryName autorelease];
+      myEntryName = [newEntryName retain];
+      [self updateFields];
+      [self synchronizeWindowTitleWithDocumentName];
    }
 }
 
@@ -194,41 +194,41 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 - (IBAction) change:(id)sender
 {
-   NSRange fullNotesRange = NSMakeRange( 0, [ [ notes textStorage ] length ] );
-   if( [ [ self document ] changeEntryWithName:myEntryName
-                                       newName:[ nameText stringValue ]
-                                       account:[ accountText stringValue ]
-                                      password:[ passwordText stringValue ]
-                                           URL:[ urlText stringValue ]
-                                      category:[ category stringValue ]
-                                     notesRTFD:[ notes RTFDFromRange:fullNotesRange ] ] )
+   NSRange fullNotesRange = NSMakeRange(0, [[notes textStorage] length]);
+   if([[self document] changeEntryWithName:myEntryName
+                                   newName:[nameText stringValue]
+                                   account:[accountText stringValue]
+                                  password:[passwordText stringValue]
+                                       URL:[urlText stringValue]
+                                  category:[category stringValue]
+                                 notesRTFD:[notes RTFDFromRange:fullNotesRange]])
    {
-      [ [ self window ] setDocumentEdited:NO ];
-      if( ![ [ NSUserDefaults standardUserDefaults ] boolForKey:CSPrefDictKey_CloseEdit ] )
+      [[self window] setDocumentEdited:NO];
+      if(![[NSUserDefaults standardUserDefaults] boolForKey:CSPrefDictKey_CloseEdit])
       {
-         [ self setEntryName:[ nameText stringValue ] ];
+         [self setEntryName:[nameText stringValue]];
          // This won't work if we do it right away, so put it on the event queue
-         [ [ NSRunLoop currentRunLoop ]
-           performSelector:@selector( makeFirstResponder: )
-                    target:[ self window ]
-                  argument:nameText
-                     order:9999
-                     modes:[ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ] ];
+         [[NSRunLoop currentRunLoop]
+          performSelector:@selector(makeFirstResponder:)
+                   target:[self window]
+                 argument:nameText
+                    order:9999
+                    modes:[NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil]];
       }
       else
-         [ [ self window ] performClose:self ];
+         [[self window] performClose:self];
    }
    else
-      NSBeginInformationalAlertSheet( CSWINCTRLENTRY_LOC_ENTRYEXISTS,
-                                      nil,
-                                      nil,
-                                      nil,
-                                      [ self window ],
-                                      nil,
-                                      nil,
-                                      nil,
-                                      NULL,
-                                      CSWINCTRLENTRY_LOC_ENTRYEXISTSRENAME );
+      NSBeginInformationalAlertSheet(CSWINCTRLENTRY_LOC_ENTRYEXISTS,
+                                     nil,
+                                     nil,
+                                     nil,
+                                     [self window],
+                                     nil,
+                                     nil,
+                                     nil,
+                                     NULL,
+                                     CSWINCTRLENTRY_LOC_ENTRYEXISTSRENAME);
 }
 
 
@@ -239,9 +239,9 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 - (IBAction) showWindow:(id)sender
 {
-   [ self updateFields ];
-   [ [ self window ] makeFirstResponder:nameText ];
-   [ super showWindow:sender ];
+   [self updateFields];
+   [[self window] makeFirstResponder:nameText];
+   [super showWindow:sender];
 }
 
 
@@ -251,9 +251,9 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 - (BOOL) windowShouldClose:(id)sender
 {
-   BOOL superShouldClose = [ super windowShouldClose:sender ];
-   if( superShouldClose )
-      [ CSWinCtrlChange removeController:self forDocument:[ self document ] ];
+   BOOL superShouldClose = [super windowShouldClose:sender];
+   if(superShouldClose)
+      [CSWinCtrlChange removeController:self forDocument:[self document]];
    
    return superShouldClose;
 }
@@ -264,9 +264,9 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 - (void) synchronizeWindowTitleWithDocumentName
 {
-   [ [ self window ] setTitle:[ NSString stringWithFormat:NSLocalizedString( @"View/Change %@ in %@", @"" ),
-      myEntryName,
-      [ [ self document ] displayName ] ] ];
+   [[self window] setTitle:[NSString stringWithFormat:NSLocalizedString(@"View/Change %@ in %@", @""),
+                                                      myEntryName,
+                                                      [[self document] displayName]]];
 }
 
 
@@ -278,9 +278,9 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 - (BOOL) doesField:(NSTextField *)field matchStringWithKey:(NSString *)key
 {
-   int row = [ [ self document ] rowForName:myEntryName ];
+   int row = [[self document] rowForName:myEntryName];
    
-   return [ [ field stringValue ] isEqualToString:[ [ self document ] stringForKey:key atRow:row ] ];
+   return [[field stringValue] isEqualToString:[[self document] stringForKey:key atRow:row]];
 }
 
 
@@ -290,19 +290,19 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
 - (void) updateFields
 {
    // XXX If it were possible, we'd clear out controls here
-   [ nameText setStringValue:myEntryName ];
-   int myEntryRowNum = [ [ self document ] rowForName:myEntryName ];
-   if( myEntryRowNum >= 0 )
+   [nameText setStringValue:myEntryName];
+   int myEntryRowNum = [[self document] rowForName:myEntryName];
+   if(myEntryRowNum >= 0)
    {
-      [ mainButton setEnabled:YES ];
-      CSDocument *document = [ self document ];
-      [ accountText setStringValue:[ document stringForKey:CSDocModelKey_Acct atRow:myEntryRowNum ] ];
-      [ passwordText setStringValue:[ document stringForKey:CSDocModelKey_Passwd atRow:myEntryRowNum ] ];
-      [ urlText setStringValue:[ document stringForKey:CSDocModelKey_URL atRow:myEntryRowNum ] ];
-      [ category setStringValue:[ document stringForKey:CSDocModelKey_Category atRow:myEntryRowNum ] ];
-      NSRange fullNotesRange = NSMakeRange( 0, [ [ notes textStorage ] length ] );
-      [ notes replaceCharactersInRange:fullNotesRange withRTFD:[ document RTFDNotesAtRow:myEntryRowNum ] ];
-      [ self updateDocumentEditedStatus ];
+      [mainButton setEnabled:YES];
+      CSDocument *document = [self document];
+      [accountText setStringValue:[document stringForKey:CSDocModelKey_Acct atRow:myEntryRowNum]];
+      [passwordText setStringValue:[document stringForKey:CSDocModelKey_Passwd atRow:myEntryRowNum]];
+      [urlText setStringValue:[document stringForKey:CSDocModelKey_URL atRow:myEntryRowNum]];
+      [category setStringValue:[document stringForKey:CSDocModelKey_Category atRow:myEntryRowNum]];
+      NSRange fullNotesRange = NSMakeRange(0, [[notes textStorage] length]);
+      [notes replaceCharactersInRange:fullNotesRange withRTFD:[document RTFDNotesAtRow:myEntryRowNum]];
+      [self updateDocumentEditedStatus];
    }
 }
 
@@ -312,8 +312,8 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 - (void) dealloc
 {
-   [ myEntryName release ];
-   [ super dealloc ];
+   [myEntryName release];
+   [super dealloc];
 }
 
 
@@ -324,34 +324,34 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 - (BOOL) nameChanged
 {
-   return ![ [ nameText stringValue ] isEqualToString:myEntryName ];
+   return ![[nameText stringValue] isEqualToString:myEntryName];
 }
 
 - (BOOL) accountChanged
 {
-   return ![ self doesField:accountText matchStringWithKey:CSDocModelKey_Acct ];
+   return ![self doesField:accountText matchStringWithKey:CSDocModelKey_Acct];
 }
 
 - (BOOL) passwordChanged
 {
-   return ![ self doesField:passwordText matchStringWithKey:CSDocModelKey_Passwd ];
+   return ![self doesField:passwordText matchStringWithKey:CSDocModelKey_Passwd];
 }
 
 - (BOOL) urlChanged
 {
-   return ![ self doesField:urlText matchStringWithKey:CSDocModelKey_URL ];
+   return ![self doesField:urlText matchStringWithKey:CSDocModelKey_URL];
 }
 
 - (BOOL) categoryChanged
 {
-   return ![ self doesField:category matchStringWithKey:CSDocModelKey_Category ];
+   return ![self doesField:category matchStringWithKey:CSDocModelKey_Category];
 }
 
 - (BOOL) notesChanged
 {
-   int row = [ [ self document ] rowForName:myEntryName ];
+   int row = [[self document] rowForName:myEntryName];
 
-   return ![ [ notes textStorage ] isEqualToAttributedString:[ [ self document ] RTFDStringNotesAtRow:row ] ];
+   return ![[notes textStorage] isEqualToAttributedString:[[self document] RTFDStringNotesAtRow:row]];
 }
 
 @end

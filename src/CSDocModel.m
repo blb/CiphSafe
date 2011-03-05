@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007,2011, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -60,7 +60,7 @@ NSString * const CSDocModelNotificationInfoKey_DeletedNames = @"CSDocModelNotifi
 
 
 // Used to sort the array
-int sortEntries( id dict1, id dict2, void *context );
+int sortEntries(id dict1, id dict2, void *context);
 
 @interface CSDocModel (InternalMethods)
 - (NSString *) nonNilStringFrom:(NSDictionary *)dict forKey:(NSString *)key;
@@ -77,15 +77,15 @@ static NSArray *keyArray;
 + (void) initialize
 {
 #if defined(DEBUG)
-   [ NSData setCompressLogging:YES ];
-   [ NSData setCryptoLogging:YES ];
+   [NSData setCompressLogging:YES];
+   [NSData setCryptoLogging:YES];
 #else
-   [ NSData setCompressLogging:NO ];
-   [ NSData setCryptoLogging:NO ];
+   [NSData setCompressLogging:NO];
+   [NSData setCryptoLogging:NO];
 #endif
-   keyArray = [ [ NSArray alloc ] initWithObjects:CSDocModelKey_Name, CSDocModelKey_Acct,
-                                                  CSDocModelKey_Passwd, CSDocModelKey_URL,
-                                                  CSDocModelKey_Category, CSDocModelKey_Notes, nil ];
+   keyArray = [[NSArray alloc] initWithObjects:CSDocModelKey_Name, CSDocModelKey_Acct,
+                                               CSDocModelKey_Passwd, CSDocModelKey_URL,
+                                               CSDocModelKey_Category, CSDocModelKey_Notes, nil];
 }
 
 
@@ -104,13 +104,13 @@ static NSArray *keyArray;
  */
 - (id) init
 {
-   self = [ super init ];
-   if( self != nil )
+   self = [super init];
+   if(self != nil)
    {
-      allEntries = [ [ NSMutableArray alloc ] initWithCapacity:25 ];
-      entryASCache = [ [ NSMutableDictionary alloc ] initWithCapacity:25 ];
-      nameRowCache = [ [ NSMutableDictionary alloc ] initWithCapacity:25 ];
-      [ self setupSelf ];
+      allEntries = [[NSMutableArray alloc] initWithCapacity:25];
+      entryASCache = [[NSMutableDictionary alloc] initWithCapacity:25];
+      nameRowCache = [[NSMutableDictionary alloc] initWithCapacity:25];
+      [self setupSelf];
    }
    
    return self;
@@ -123,58 +123,58 @@ static NSArray *keyArray;
  */
 - (id) initWithEncryptedData:(NSData *)encryptedData bfKey:(NSData *)bfKey
 {
-   if( encryptedData == nil || bfKey == nil )
+   if(encryptedData == nil || bfKey == nil)
    {
 #if defined(DEBUG)
-      NSLog( @"CSDocModel initWithEncryptedData:bfKey: nil argument: %@ %@",
-             ( encryptedData == nil ? @"encryptedData" : @"" ),
-             ( bfKey == nil ? @"bfKey" : @"" ) );
+      NSLog(@"CSDocModel initWithEncryptedData:bfKey: nil argument: %@ %@",
+            (encryptedData == nil ? @"encryptedData" : @""),
+            (bfKey == nil ? @"bfKey" : @""));
 #endif
       return nil;
    }
    
-   self = [ super init ];
-   if( self != nil )
+   self = [super init];
+   if(self != nil)
    {
       allEntries = nil;
       // Separate into the IV and compressed & encrypted data
-      NSData *iv = [ encryptedData subdataWithRange:NSMakeRange( 0, 8 ) ];
-      NSData *ceData = [ encryptedData subdataWithRange:NSMakeRange( 8, [ encryptedData length ] - 8 ) ];
+      NSData *iv = [encryptedData subdataWithRange:NSMakeRange(0, 8)];
+      NSData *ceData = [encryptedData subdataWithRange:NSMakeRange(8, [encryptedData length] - 8)];
       
-      NSMutableData *decryptedData = [ ceData blowfishDecryptedDataWithKey:bfKey iv:iv ];
-      if( decryptedData != nil )
+      NSMutableData *decryptedData = [ceData blowfishDecryptedDataWithKey:bfKey iv:iv];
+      if(decryptedData != nil)
       {
-         NSMutableData *uncompressedData = [ decryptedData uncompressedData ];
-         [ decryptedData clearOutData ];
-         if( uncompressedData != nil )
+         NSMutableData *uncompressedData = [decryptedData uncompressedData];
+         [decryptedData clearOutData];
+         if(uncompressedData != nil)
          {
-            allEntries = [ NSUnarchiver unarchiveObjectWithData:uncompressedData ];
-            [ uncompressedData clearOutData ];
-            if( allEntries != nil )
+            allEntries = [NSUnarchiver unarchiveObjectWithData:uncompressedData];
+            [uncompressedData clearOutData];
+            if(allEntries != nil)
             {
-               [ allEntries retain ];
-               entryASCache = [ [ NSMutableDictionary alloc ] initWithCapacity:[ allEntries count ] ];
-               nameRowCache = [ [ NSMutableDictionary alloc ] initWithCapacity:[ allEntries count ] ];
-               [ self setupSelf ];
-               [ self sortEntries ];
+               [allEntries retain];
+               entryASCache = [[NSMutableDictionary alloc] initWithCapacity:[allEntries count]];
+               nameRowCache = [[NSMutableDictionary alloc] initWithCapacity:[allEntries count]];
+               [self setupSelf];
+               [self sortEntries];
             }
 #if defined(DEBUG)
             else
-               NSLog( @"CSDocModel initWithEncryptedData:bfKey: unarchiving of uncompressed data failed" );
+               NSLog(@"CSDocModel initWithEncryptedData:bfKey: unarchiving of uncompressed data failed");
 #endif
          }
 #if defined(DEBUG)
          else
-            NSLog( @"CSDocModel initWithEncryptedData:bfKey: uncompressing of decrypted data failed" );
+            NSLog(@"CSDocModel initWithEncryptedData:bfKey: uncompressing of decrypted data failed");
 #endif
       }
 #if defined(DEBUG)
       else
-         NSLog( @"CSDocModel initWithEncryptedData:bfKey: decryption failed" );
+         NSLog(@"CSDocModel initWithEncryptedData:bfKey: decryption failed");
 #endif
-      if( allEntries == nil )
+      if(allEntries == nil)
       {
-         [ self release ];
+         [self release];
          self = nil;
       }
    }
@@ -190,9 +190,9 @@ static NSArray *keyArray;
  */
 - (NSMutableDictionary *) findEntryWithName:(NSString *)name
 {
-   int row = [ self rowForName:name ];
-   if( row != -1 )
-      return [ allEntries objectAtIndex:row ];
+   int row = [self rowForName:name];
+   if(row != -1)
+      return [allEntries objectAtIndex:row];
    else
       return nil;
 }
@@ -203,15 +203,15 @@ static NSArray *keyArray;
  */
 - (NSData *) encryptedDataWithKey:(NSData *)bfKey
 {
-   NSData *iv = [ NSData randomDataOfLength:8 ];
-   NSData *archivedData = [ NSArchiver archivedDataWithRootObject:allEntries ];
-   NSMutableData *compressedData = [ archivedData compressedData ];
-   [ archivedData clearOutData ];
-   NSData *ceData = [ compressedData blowfishEncryptedDataWithKey:bfKey iv:iv ];
-   [ compressedData clearOutData ];
-   NSMutableData *ivAndData = [ NSMutableData dataWithCapacity:[ iv length ] + [ ceData length ] ];
-   [ ivAndData appendData:iv ];
-   [ ivAndData appendData:ceData ];
+   NSData *iv = [NSData randomDataOfLength:8];
+   NSData *archivedData = [NSArchiver archivedDataWithRootObject:allEntries];
+   NSMutableData *compressedData = [archivedData compressedData];
+   [archivedData clearOutData];
+   NSData *ceData = [compressedData blowfishEncryptedDataWithKey:bfKey iv:iv];
+   [compressedData clearOutData];
+   NSMutableData *ivAndData = [NSMutableData dataWithCapacity:[iv length] + [ceData length]];
+   [ivAndData appendData:iv];
+   [ivAndData appendData:ceData];
 
    return ivAndData;
 }
@@ -222,7 +222,7 @@ static NSArray *keyArray;
  */
 - (int) entryCount
 {
-   return [ allEntries count ];
+   return [allEntries count];
 }
 
 
@@ -232,11 +232,11 @@ static NSArray *keyArray;
 - (NSString *) stringForKey:(NSString *)key atRow:(int)row
 {
    NSString *result;
-   if( [ key isEqualToString:CSDocModelKey_Notes ] )
-      result = [ [ self RTFDStringNotesAtRow:row ] string ];
+   if([key isEqualToString:CSDocModelKey_Notes])
+      result = [[self RTFDStringNotesAtRow:row] string];
    else
-      result = [ [ allEntries objectAtIndex:row ] objectForKey:key ];
-   if( result == nil )
+      result = [[allEntries objectAtIndex:row] objectForKey:key];
+   if(result == nil)
       result = @"";
    
    return result;
@@ -248,11 +248,11 @@ static NSArray *keyArray;
  */
 - (NSArray *) stringArrayForEntryAtRow:(int)row
 {
-   NSMutableArray *stringArray = [ NSMutableArray arrayWithCapacity:6 ];
-   NSEnumerator *keyEnumerator = [ keyArray objectEnumerator ];
+   NSMutableArray *stringArray = [NSMutableArray arrayWithCapacity:6];
+   NSEnumerator *keyEnumerator = [keyArray objectEnumerator];
    id oneKey;
-   while( ( oneKey = [ keyEnumerator nextObject ] ) != nil )
-      [ stringArray addObject:[ self stringForKey:oneKey atRow:row ] ];
+   while((oneKey = [keyEnumerator nextObject]) != nil)
+      [stringArray addObject:[self stringForKey:oneKey atRow:row]];
    
    return stringArray;
 }
@@ -263,7 +263,7 @@ static NSArray *keyArray;
  */
 - (NSData *) RTFDNotesAtRow:(int)row
 {
-   return [ [ allEntries objectAtIndex:row ] objectForKey:CSDocModelKey_Notes ];
+   return [[allEntries objectAtIndex:row] objectForKey:CSDocModelKey_Notes];
 }
 
 
@@ -275,7 +275,7 @@ static NSArray *keyArray;
  */
 - (NSData *) RTFNotesAtRow:(int)row
 {
-   return [ [ self RTFDStringNotesAtRow:row ] RTFWithDocumentAttributes:NULL ];
+   return [[self RTFDStringNotesAtRow:row] RTFWithDocumentAttributes:NULL];
 }
 
 
@@ -288,16 +288,16 @@ static NSArray *keyArray;
  */
 - (NSAttributedString *) RTFDStringNotesAtRow:(int)row
 {
-   NSString *cacheKey = [ self stringForKey:CSDocModelKey_Name atRow:row ];
-   NSAttributedString *rtfdString = [ entryASCache objectForKey:cacheKey ];
-   if( rtfdString == nil )
+   NSString *cacheKey = [self stringForKey:CSDocModelKey_Name atRow:row];
+   NSAttributedString *rtfdString = [entryASCache objectForKey:cacheKey];
+   if(rtfdString == nil)
    {
-      NSData *rtfdData = [ self RTFDNotesAtRow:row ];
-      if( rtfdData != nil )
+      NSData *rtfdData = [self RTFDNotesAtRow:row];
+      if(rtfdData != nil)
       {
-         rtfdString = [ [ NSAttributedString alloc ] initWithRTFD:rtfdData documentAttributes:NULL ];
-         [ entryASCache setObject:rtfdString forKey:cacheKey ];
-         [ rtfdString release ];   // entryASCache has it retained now
+         rtfdString = [[NSAttributedString alloc] initWithRTFD:rtfdData documentAttributes:NULL];
+         [entryASCache setObject:rtfdString forKey:cacheKey];
+         [rtfdString release];   // entryASCache has it retained now
       }
    }
    
@@ -313,9 +313,9 @@ static NSArray *keyArray;
  */
 - (NSAttributedString *) RTFStringNotesAtRow:(int)row
 {
-   return [ [ [ NSAttributedString alloc ]
-              initWithRTF:[ self RTFNotesAtRow:row ] documentAttributes:NULL ]
-      autorelease ];
+   return [[[NSAttributedString alloc]
+            initWithRTF:[self RTFNotesAtRow:row] documentAttributes:NULL]
+           autorelease];
 }
 
 
@@ -324,9 +324,9 @@ static NSArray *keyArray;
  */
 - (int) rowForName:(NSString *)name
 {
-   NSNumber *rowNumber = [ nameRowCache objectForKey:name ];
-   if( rowNumber != nil )
-      return [ rowNumber intValue ];
+   NSNumber *rowNumber = [nameRowCache objectForKey:name];
+   if(rowNumber != nil)
+      return [rowNumber intValue];
    else
       return -1;
 }
@@ -339,18 +339,18 @@ static NSArray *keyArray;
                                 ignoreCase:(BOOL)ignoreCase
                                     forKey:(NSString *)key
 {
-   NSRange searchRange = NSMakeRange( 0, [ findString length ] );
+   NSRange searchRange = NSMakeRange(0, [findString length]);
    unsigned int compareOptions = 0;
-   if( ignoreCase )
+   if(ignoreCase)
       compareOptions = NSCaseInsensitiveSearch;
    NSNumber *retval = nil;
    int index;
-   for( index = 0; index < [ self entryCount ] && retval == nil; index++ )
+   for(index = 0; index < [self entryCount] && retval == nil; index++)
    {
-      if( [ [ self stringForKey:key atRow:index ] compare:findString
-                                                  options:compareOptions
-                                                    range:searchRange ] == NSOrderedSame )
-         retval = [ NSNumber numberWithInt:index ];
+      if([[self stringForKey:key atRow:index] compare:findString
+                                              options:compareOptions
+                                                range:searchRange] == NSOrderedSame)
+         retval = [NSNumber numberWithInt:index];
    }
    
    return retval;
@@ -365,21 +365,21 @@ static NSArray *keyArray;
                       ignoreCase:(BOOL)ignoreCase
                           forKey:(NSString *)key
 {
-   NSMutableArray *retval = [ NSMutableArray arrayWithCapacity:10 ];
+   NSMutableArray *retval = [NSMutableArray arrayWithCapacity:10];
    unsigned compareOptions = 0;
-   if( ignoreCase )
+   if(ignoreCase)
       compareOptions = NSCaseInsensitiveSearch;
    int index;
-   for( index = 0; index < [ self entryCount ]; index++ )
+   for(index = 0; index < [self entryCount]; index++)
    {
       NSString *stringToSearch;
-      if( key == nil )
-         stringToSearch = [ [ self stringArrayForEntryAtRow:index ] componentsJoinedByString:@" " ];
+      if(key == nil)
+         stringToSearch = [[self stringArrayForEntryAtRow:index] componentsJoinedByString:@" "];
       else
-         stringToSearch = [ self stringForKey:key atRow:index ];
-      NSRange searchResult = [ stringToSearch rangeOfString:findString options:compareOptions ];
-      if( searchResult.location != NSNotFound )
-         [ retval addObject:[ NSNumber numberWithInt:index ] ];
+         stringToSearch = [self stringForKey:key atRow:index];
+      NSRange searchResult = [stringToSearch rangeOfString:findString options:compareOptions];
+      if(searchResult.location != NSNotFound)
+         [retval addObject:[NSNumber numberWithInt:index]];
    }
    
    return retval;
@@ -393,10 +393,10 @@ static NSArray *keyArray;
  */
 - (void) setUndoManager:(NSUndoManager *)newManager
 {
-   if( undoManager != newManager )
+   if(undoManager != newManager)
    {
-      [ undoManager autorelease ];
-      undoManager = [ newManager retain ];
+      [undoManager autorelease];
+      undoManager = [newManager retain];
    }
 }
 
@@ -415,7 +415,7 @@ static NSArray *keyArray;
  */
 - (void) setSortKey:(NSString *)newSortKey
 {
-   [ self setSortKey:newSortKey ascending:sortAscending ];
+   [self setSortKey:newSortKey ascending:sortAscending];
 }
 
 
@@ -433,7 +433,7 @@ static NSArray *keyArray;
  */
 - (void) setSortAscending:(BOOL)sortAsc
 {
-   [ self setSortKey:sortKey ascending:sortAsc ];
+   [self setSortKey:sortKey ascending:sortAsc];
 }
 
 
@@ -457,9 +457,9 @@ static NSArray *keyArray;
     */
    sortKey = newSortKey;
    sortAscending = sortAsc;
-   [ [ NSNotificationCenter defaultCenter ] postNotificationName:CSDocModelDidChangeSortNotification
-                                                          object:self ];
-   [ self sortEntries ];
+   [[NSNotificationCenter defaultCenter] postNotificationName:CSDocModelDidChangeSortNotification
+                                                       object:self];
+   [self sortEntries];
 }
 
 
@@ -479,27 +479,27 @@ static NSArray *keyArray;
                  category:(NSString *)category
                 notesRTFD:(NSData *)notes
 {
-   BOOL result = [ self addBulkEntryWithName:name
-                                     account:account
-                                    password:password
-                                         URL:url
-                                    category:category
-                                   notesRTFD:notes ];
-   if( result )
+   BOOL result = [self addBulkEntryWithName:name
+                                    account:account
+                                   password:password
+                                        URL:url
+                                   category:category
+                                  notesRTFD:notes];
+   if(result)
    {
-      if( undoManager != nil )
+      if(undoManager != nil)
       {
-         [ undoManager registerUndoWithTarget:self selector:@selector( deleteEntryWithName: ) object:name ];
-         if( ![ undoManager isUndoing ] && ![ undoManager isRedoing ] )
-            [ undoManager setActionName:NSLocalizedString( @"Add", @"" ) ];
+         [undoManager registerUndoWithTarget:self selector:@selector(deleteEntryWithName:) object:name];
+         if(![undoManager isUndoing] && ![undoManager isRedoing])
+            [undoManager setActionName:NSLocalizedString(@"Add", @"")];
       }
 
-      NSDictionary *userInfo = [ NSDictionary dictionaryWithObject:[ NSArray arrayWithObject:name ]
-                                                            forKey:CSDocModelNotificationInfoKey_AddedNames ];
-      [ [ NSNotificationCenter defaultCenter ] postNotificationName:CSDocModelDidAddEntryNotification
-                                                             object:self
-                                                           userInfo:userInfo ];
-      [ self sortEntries ];
+      NSDictionary *userInfo = [NSDictionary dictionaryWithObject:[NSArray arrayWithObject:name]
+                                                           forKey:CSDocModelNotificationInfoKey_AddedNames];
+      [[NSNotificationCenter defaultCenter] postNotificationName:CSDocModelDidAddEntryNotification
+                                                          object:self
+                                                        userInfo:userInfo];
+      [self sortEntries];
    }
       
    return result;
@@ -519,17 +519,17 @@ static NSArray *keyArray;
                     notesRTFD:(NSData *)notes
 {
    // If it already exists, we're outta here
-   if( [ self rowForName:name ] != -1 )
+   if([self rowForName:name] != -1)
       return NO;
    
-   [ allEntries addObject:[ NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                                   name, CSDocModelKey_Name,
-                                                   account, CSDocModelKey_Acct,
-                                                   password, CSDocModelKey_Passwd,
-                                                   url, CSDocModelKey_URL,
-                                                   category, CSDocModelKey_Category,
-                                                   notes, CSDocModelKey_Notes,
-                                                   nil ] ];
+   [allEntries addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                                 name, CSDocModelKey_Name,
+                                                 account, CSDocModelKey_Acct,
+                                                 password, CSDocModelKey_Passwd,
+                                                 url, CSDocModelKey_URL,
+                                                 category, CSDocModelKey_Category,
+                                                 notes, CSDocModelKey_Notes,
+                                                 nil]];
 
    return YES;
 }
@@ -541,21 +541,21 @@ static NSArray *keyArray;
  */
 - (void) registerAddForNamesInArray:(NSArray *)nameArray
 {
-   if( undoManager != nil )
+   if(undoManager != nil)
    {
-      [ undoManager registerUndoWithTarget:self
-                                  selector:@selector( deleteEntriesWithNamesInArray: )
-                                    object:nameArray ];
-      if( ![ undoManager isUndoing ] && ![ undoManager isRedoing ] )
-         [ undoManager setActionName:NSLocalizedString( @"Add", @"" ) ];
+      [undoManager registerUndoWithTarget:self
+                                 selector:@selector(deleteEntriesWithNamesInArray:)
+                                   object:nameArray];
+      if(![undoManager isUndoing] && ![undoManager isRedoing])
+         [undoManager setActionName:NSLocalizedString(@"Add", @"")];
    }
 
-   NSDictionary *userInfo = [ NSDictionary dictionaryWithObject:nameArray
-                                                         forKey:CSDocModelNotificationInfoKey_AddedNames ];
-   [ [ NSNotificationCenter defaultCenter ] postNotificationName:CSDocModelDidAddEntryNotification
-                                                          object:self
-                                                        userInfo:userInfo ];
-   [ self sortEntries ];
+   NSDictionary *userInfo = [NSDictionary dictionaryWithObject:nameArray
+                                                        forKey:CSDocModelNotificationInfoKey_AddedNames];
+   [[NSNotificationCenter defaultCenter] postNotificationName:CSDocModelDidAddEntryNotification
+                                                       object:self
+                                                     userInfo:userInfo];
+   [self sortEntries];
 }
 
 
@@ -576,52 +576,52 @@ static NSArray *keyArray;
                     category:(NSString *)category
                    notesRTFD:(NSData *)notes
 {
-   NSMutableDictionary *theEntry = [ self findEntryWithName:name ];
+   NSMutableDictionary *theEntry = [self findEntryWithName:name];
    /*
     * If theEntry is nil, we can't change it...
     * Also, if newName is not the same as name, and newName is already present,
     * we can't change
     */
-   if( theEntry == nil || ( ![ name isEqualToString:newName ] && [ self rowForName:newName ] != -1 ) )
+   if(theEntry == nil || (![name isEqualToString:newName] && [self rowForName:newName] != -1))
       return NO;
 
-   [ entryASCache removeObjectForKey:name ];
-   NSString *realNewName = ( newName != nil ? newName : name );
-   if( undoManager != nil )
+   [entryASCache removeObjectForKey:name];
+   NSString *realNewName = (newName != nil ? newName : name);
+   if(undoManager != nil)
    {
-      [ [ undoManager prepareWithInvocationTarget:self ]
+      [[undoManager prepareWithInvocationTarget:self]
         changeEntryWithName:realNewName
                     newName:name
-                    account:[ self nonNilStringFrom:theEntry forKey:CSDocModelKey_Acct ]
-                   password:[ self nonNilStringFrom:theEntry forKey:CSDocModelKey_Passwd ]
-                        URL:[ self nonNilStringFrom:theEntry forKey:CSDocModelKey_URL ]
-                   category:[ self nonNilStringFrom:theEntry forKey:CSDocModelKey_Category ]
-                  notesRTFD:[ self nonNilDataFrom:theEntry forKey:CSDocModelKey_Notes ] ];
-      if( ![ undoManager isUndoing ] && ![ undoManager isRedoing ] )
-         [ undoManager setActionName:NSLocalizedString( @"Change", @"" ) ];
+                    account:[self nonNilStringFrom:theEntry forKey:CSDocModelKey_Acct]
+                   password:[self nonNilStringFrom:theEntry forKey:CSDocModelKey_Passwd]
+                        URL:[self nonNilStringFrom:theEntry forKey:CSDocModelKey_URL]
+                   category:[self nonNilStringFrom:theEntry forKey:CSDocModelKey_Category]
+                  notesRTFD:[self nonNilDataFrom:theEntry forKey:CSDocModelKey_Notes]];
+      if(![undoManager isUndoing] && ![undoManager isRedoing])
+         [undoManager setActionName:NSLocalizedString(@"Change", @"")];
    }
 
-   if( newName != nil )
-      [ theEntry setObject:newName forKey:CSDocModelKey_Name ];
-   if( account != nil )
-      [ theEntry setObject:account forKey:CSDocModelKey_Acct ];
-   if( password != nil )
-      [ theEntry setObject:password forKey:CSDocModelKey_Passwd ];
-   if( url != nil )
-      [ theEntry setObject:url forKey:CSDocModelKey_URL ];
-   if( category != nil )
-      [ theEntry setObject:category forKey:CSDocModelKey_Category ];
-   if( notes != nil )
-      [ theEntry setObject:notes forKey:CSDocModelKey_Notes ];
+   if(newName != nil)
+      [theEntry setObject:newName forKey:CSDocModelKey_Name];
+   if(account != nil)
+      [theEntry setObject:account forKey:CSDocModelKey_Acct];
+   if(password != nil)
+      [theEntry setObject:password forKey:CSDocModelKey_Passwd];
+   if(url != nil)
+      [theEntry setObject:url forKey:CSDocModelKey_URL];
+   if(category != nil)
+      [theEntry setObject:category forKey:CSDocModelKey_Category];
+   if(notes != nil)
+      [theEntry setObject:notes forKey:CSDocModelKey_Notes];
 
-   NSDictionary *userInfo = [ NSDictionary dictionaryWithObjectsAndKeys:
-                                              name, CSDocModelNotificationInfoKey_ChangedNameFrom,
-                                              realNewName, CSDocModelNotificationInfoKey_ChangedNameTo,
-                                              nil ];
-   [ [ NSNotificationCenter defaultCenter ] postNotificationName:CSDocModelDidChangeEntryNotification
-                                                          object:self
-                                                        userInfo:userInfo ];
-   [ self sortEntries ];
+   NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                             name, CSDocModelNotificationInfoKey_ChangedNameFrom,
+                                             realNewName, CSDocModelNotificationInfoKey_ChangedNameTo,
+                                             nil];
+   [[NSNotificationCenter defaultCenter] postNotificationName:CSDocModelDidChangeEntryNotification
+                                                       object:self
+                                                     userInfo:userInfo];
+   [self sortEntries];
 
    return YES;
 }
@@ -642,48 +642,48 @@ static NSArray *keyArray;
     * Build a list, do this in advance since they will be deleted soon, causing the entry array to be
     * modified during this operation
     */
-   NSEnumerator *nameEnumerator = [ nameArray objectEnumerator ];
+   NSEnumerator *nameEnumerator = [nameArray objectEnumerator];
    id nameToDelete;
-   NSMutableArray *entriesToDelete = [ NSMutableArray arrayWithCapacity:[ nameArray count ] ];
-   while( ( nameToDelete = [ nameEnumerator nextObject ] ) != nil )
+   NSMutableArray *entriesToDelete = [NSMutableArray arrayWithCapacity:[nameArray count]];
+   while((nameToDelete = [nameEnumerator nextObject]) != nil)
    {
-      NSMutableDictionary *theEntry = [ self findEntryWithName:nameToDelete ];
-      if( theEntry != nil )
-         [ entriesToDelete addObject:theEntry ];
+      NSMutableDictionary *theEntry = [self findEntryWithName:nameToDelete];
+      if(theEntry != nil)
+         [entriesToDelete addObject:theEntry];
    }
 
-   NSEnumerator *entryEnumerator = [ entriesToDelete objectEnumerator ];
+   NSEnumerator *entryEnumerator = [entriesToDelete objectEnumerator];
    id entryToDelete;
-   while( ( entryToDelete = [ entryEnumerator nextObject ] ) != nil )
+   while((entryToDelete = [entryEnumerator nextObject]) != nil)
    {
       numDeleted++;
-      [ entryASCache removeObjectForKey:[ entryToDelete objectForKey:CSDocModelKey_Name ] ];
+      [entryASCache removeObjectForKey:[entryToDelete objectForKey:CSDocModelKey_Name]];
       // removeObject: is going to release it, so we hold it for a bit here
-      [ entryToDelete retain ];
-      [ allEntries removeObject:entryToDelete ];
-      if( undoManager != nil )
+      [entryToDelete retain];
+      [allEntries removeObject:entryToDelete];
+      if(undoManager != nil)
       {
-         id undoInvocation = [ undoManager prepareWithInvocationTarget:self ];
-         [ undoInvocation addEntryWithName:[ entryToDelete objectForKey:CSDocModelKey_Name ]
-                                   account:[ entryToDelete objectForKey:CSDocModelKey_Acct ]
-                                  password:[ entryToDelete objectForKey:CSDocModelKey_Passwd ]
-                                       URL:[ entryToDelete objectForKey:CSDocModelKey_URL ]
-                                  category:[ entryToDelete objectForKey:CSDocModelKey_Category ]
-                                 notesRTFD:[ entryToDelete objectForKey:CSDocModelKey_Notes ] ];
-         if( ![ undoManager isUndoing ] && ![ undoManager isRedoing ] )
-            [ undoManager setActionName:NSLocalizedString( @"Delete", @"" ) ];
+         id undoInvocation = [undoManager prepareWithInvocationTarget:self];
+         [undoInvocation addEntryWithName:[entryToDelete objectForKey:CSDocModelKey_Name]
+                                  account:[entryToDelete objectForKey:CSDocModelKey_Acct]
+                                 password:[entryToDelete objectForKey:CSDocModelKey_Passwd]
+                                      URL:[entryToDelete objectForKey:CSDocModelKey_URL]
+                                 category:[entryToDelete objectForKey:CSDocModelKey_Category]
+                                notesRTFD:[entryToDelete objectForKey:CSDocModelKey_Notes]];
+         if(![undoManager isUndoing] && ![undoManager isRedoing])
+            [undoManager setActionName:NSLocalizedString(@"Delete", @"")];
       }
-      [ entryToDelete release ];
+      [entryToDelete release];
    }
 
-   if( numDeleted > 0 )
+   if(numDeleted > 0)
    {
-      NSDictionary *userInfo = [ NSDictionary dictionaryWithObject:nameArray
-                                                            forKey:CSDocModelNotificationInfoKey_DeletedNames ];
-      [ [ NSNotificationCenter defaultCenter ] postNotificationName:CSDocModelDidRemoveEntryNotification
-                                                             object:self
-                                                           userInfo:userInfo ];
-      [ self sortEntries ];
+      NSDictionary *userInfo = [NSDictionary dictionaryWithObject:nameArray
+                                                           forKey:CSDocModelNotificationInfoKey_DeletedNames];
+      [[NSNotificationCenter defaultCenter] postNotificationName:CSDocModelDidRemoveEntryNotification
+                                                          object:self
+                                                        userInfo:userInfo];
+      [self sortEntries];
    }
 
    return numDeleted;
@@ -696,7 +696,7 @@ static NSArray *keyArray;
  */
 - (BOOL) deleteEntryWithName:(NSString *)name
 {
-   return ( [ self deleteEntriesWithNamesInArray:[ NSArray arrayWithObject:name ] ] > 0 );
+   return ([self deleteEntriesWithNamesInArray:[NSArray arrayWithObject:name]] > 0);
 }
 
 
@@ -707,13 +707,13 @@ static NSArray *keyArray;
  */
 - (void) sortEntries
 {
-   [ allEntries sortUsingFunction:sortEntries context:self ];
-   [ nameRowCache removeAllObjects ];
+   [allEntries sortUsingFunction:sortEntries context:self];
+   [nameRowCache removeAllObjects];
    int row;
-   int entryCount = [ self entryCount ];
-   for( row = 0; row < entryCount; row++ )
-      [ nameRowCache setObject:[ NSNumber numberWithInt:row ]
-                        forKey:[ self stringForKey:CSDocModelKey_Name atRow:row ] ];
+   int entryCount = [self entryCount];
+   for(row = 0; row < entryCount; row++)
+      [nameRowCache setObject:[NSNumber numberWithInt:row]
+                       forKey:[self stringForKey:CSDocModelKey_Name atRow:row]];
 }
 
 
@@ -722,8 +722,8 @@ static NSArray *keyArray;
  */
 - (NSString *) nonNilStringFrom:(NSDictionary *)dict forKey:(NSString *)key
 {
-   NSString *result = [ dict objectForKey:key ];
-   if( result == nil )
+   NSString *result = [dict objectForKey:key];
+   if(result == nil)
       result = @"";
    
    return result;
@@ -735,9 +735,9 @@ static NSArray *keyArray;
  */
 - (NSData *) nonNilDataFrom:(NSDictionary *)dict forKey:(NSString *)key
 {
-   NSData *result = [ dict objectForKey:key ];
-   if( result == nil )
-      result = [ NSData data ];
+   NSData *result = [dict objectForKey:key];
+   if(result == nil)
+      result = [NSData data];
    
    return result;
 }
@@ -755,10 +755,10 @@ static NSArray *keyArray;
     * CFString being more difficult to look into than, say, NSData, we can't
     * clear it out.
     */
-   [ allEntries release ];
-   [ entryASCache release ];
-   [ undoManager release ];
-   [ super dealloc ];
+   [allEntries release];
+   [entryASCache release];
+   [undoManager release];
+   [super dealloc];
 }
 
 
@@ -767,12 +767,12 @@ static NSArray *keyArray;
  * is the CSDocModel's self, the two ids are each an NSMutableDictionary
  * (one entry)
  */
-int sortEntries( id dict1, id dict2, void *context )
+int sortEntries(id dict1, id dict2, void *context)
 {
    CSDocModel *objSelf = (CSDocModel *) context;
-   NSString *sortKey = [ objSelf sortKey ];
+   NSString *sortKey = [objSelf sortKey];
    NSDictionary *dictFirst, *dictSecond;
-   if( [ objSelf isSortAscending ] )
+   if([objSelf isSortAscending])
    {
       dictFirst = dict1;
       dictSecond = dict2;
@@ -783,24 +783,24 @@ int sortEntries( id dict1, id dict2, void *context )
       dictSecond = dict1;
    }
    NSString *value1, *value2;
-   if( [ sortKey isEqualToString:CSDocModelKey_Notes ] )
+   if([sortKey isEqualToString:CSDocModelKey_Notes])
    {
-      unsigned int row = [ objSelf rowForName:[ dictFirst objectForKey:CSDocModelKey_Name ] ];
-      value1 = [ [ objSelf RTFDStringNotesAtRow:row ] string ];
-      row = [ objSelf rowForName:[ dictSecond objectForKey:CSDocModelKey_Name ] ];
-      value2 = [ [ objSelf RTFDStringNotesAtRow:row ] string ];
+      unsigned int row = [objSelf rowForName:[dictFirst objectForKey:CSDocModelKey_Name]];
+      value1 = [[objSelf RTFDStringNotesAtRow:row] string];
+      row = [objSelf rowForName:[dictSecond objectForKey:CSDocModelKey_Name]];
+      value2 = [[objSelf RTFDStringNotesAtRow:row] string];
    }
    else
    {
-      value1 = [ dictFirst objectForKey:sortKey ];
-      value2 = [ dictSecond objectForKey:sortKey ];
+      value1 = [dictFirst objectForKey:sortKey];
+      value2 = [dictSecond objectForKey:sortKey];
    }
-   if( value1 == nil )
+   if(value1 == nil)
       value1 = @"";
-   if( value2 == nil )
+   if(value2 == nil)
       value2 = @"";
 
-   return [ value1 caseInsensitiveCompare:value2 ];
+   return [value1 caseInsensitiveCompare:value2];
 }
 
 @end

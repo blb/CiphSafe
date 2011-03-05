@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007,2011, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -44,10 +44,10 @@
  */
 - (void) awakeFromNib
 {
-   NSEnumerator *columnEnumerator = [ [ self tableColumns ] objectEnumerator ];
+   NSEnumerator *columnEnumerator = [[self tableColumns] objectEnumerator];
    id column;
-   while( ( column = [ columnEnumerator nextObject ] ) != nil )
-      [ [ column dataCell ] setDrawsBackground:NO ];
+   while((column = [columnEnumerator nextObject]) != nil)
+      [[column dataCell] setDrawsBackground:NO];
 }
 
 
@@ -60,24 +60,24 @@
  */
 - (void) drawStripesInRect:(NSRect)clipRect
 {
-   float fullRowHeight = [ self rowHeight ] + [ self intercellSpacing ].height;
-   float clipBottom = NSMaxY( clipRect );
+   float fullRowHeight = [self rowHeight] + [self intercellSpacing].height;
+   float clipBottom = NSMaxY(clipRect);
    int firstStripe = clipRect.origin.y / fullRowHeight;
-   if( firstStripe % 2 == 1 )
+   if(firstStripe % 2 == 1)
       firstStripe++;   // We're only interested in drawing the stripes
    
    // Set up first rect
-   NSRect stripeRect = NSMakeRect( clipRect.origin.x,
-                                   firstStripe * fullRowHeight,
-                                   clipRect.size.width,
-                                   fullRowHeight );
+   NSRect stripeRect = NSMakeRect(clipRect.origin.x,
+                                  firstStripe * fullRowHeight,
+                                  clipRect.size.width,
+                                  fullRowHeight);
    
    // Set the color
-   [ stripeColor set ];
+   [stripeColor set];
    // ...and draw the stripes
-   while( stripeRect.origin.y < clipBottom )
+   while(stripeRect.origin.y < clipBottom)
    {
-      NSRectFill( stripeRect );
+      NSRectFill(stripeRect);
       stripeRect.origin.y += fullRowHeight * 2.0;
    }
 }
@@ -88,8 +88,8 @@
  */
 - (void) addTableColumn:(NSTableColumn *)aColumn
 {
-   [ super addTableColumn:aColumn ];
-   [ [ aColumn dataCell ] setDrawsBackground:NO ];
+   [super addTableColumn:aColumn];
+   [[aColumn dataCell] setDrawsBackground:NO];
 }
 
 
@@ -98,11 +98,11 @@
  */
 - (void) setStripeColor:(NSColor *)newStripeColor
 {
-   if( newStripeColor != stripeColor )
+   if(newStripeColor != stripeColor)
    {
-      [ stripeColor autorelease ];
-      stripeColor = [ newStripeColor retain ];
-      [ self setNeedsDisplay:YES ];
+      [stripeColor autorelease];
+      stripeColor = [newStripeColor retain];
+      [self setNeedsDisplay:YES];
    }
 }
 
@@ -112,9 +112,9 @@
  */
 - (void) highlightSelectionInClipRect:(NSRect)clipRect
 {
-   if( stripeColor != nil )
-      [ self drawStripesInRect:clipRect ];
-   [ super highlightSelectionInClipRect:clipRect ];
+   if(stripeColor != nil)
+      [self drawStripesInRect:clipRect];
+   [super highlightSelectionInClipRect:clipRect];
 }
 
 
@@ -126,16 +126,16 @@
  */
 - (NSMenu *) menuForEvent:(NSEvent *)theEvent
 {
-   if( [ [ self delegate ] respondsToSelector:@selector( contextualMenuForBLBTableView:row:column: ) ] )
+   if([[self delegate] respondsToSelector:@selector(contextualMenuForBLBTableView:row:column:)])
    {
-      NSPoint clickPoint = [ self convertPoint:[ theEvent locationInWindow ] fromView:nil ];
-      int clickColumn = [ self columnAtPoint:clickPoint ];
-      int clickRow = [ self rowAtPoint:clickPoint ];
+      NSPoint clickPoint = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+      int clickColumn = [self columnAtPoint:clickPoint];
+      int clickRow = [self rowAtPoint:clickPoint];
 
-      if( clickColumn >= 0 && clickRow >= 0 )
-         return [ [ self delegate ] contextualMenuForBLBTableView:self
-                                                              row:clickRow
-                                                           column:clickColumn ];
+      if(clickColumn >= 0 && clickRow >= 0)
+         return [[self delegate] contextualMenuForBLBTableView:self
+                                                           row:clickRow
+                                                        column:clickColumn];
    }
 
    return nil;
@@ -147,9 +147,9 @@
  */
 - (void) keyDown:(NSEvent *)theEvent
 {
-   if( ![ [ self delegate ] respondsToSelector:@selector( blbTableView:didReceiveKeyDownEvent: ) ] ||
-       ![ [ self delegate ] blbTableView:self didReceiveKeyDownEvent:theEvent ] )
-      [ super keyDown:theEvent ];
+   if(![[self delegate] respondsToSelector:@selector(blbTableView:didReceiveKeyDownEvent:)]
+      || ![[self delegate] blbTableView:self didReceiveKeyDownEvent:theEvent])
+      [super keyDown:theEvent];
 }
 
 
@@ -158,9 +158,9 @@
  */
 - (void) draggedImage:(NSImage *)anImage endedAt:(NSPoint)aPoint operation:(NSDragOperation)operation
 {
-   [ super draggedImage:anImage endedAt:aPoint operation:operation ];
-   if( [ [ self delegate ] respondsToSelector:@selector( blbTableView:completedDragAtPoint:operation: ) ] )
-      [ [ self delegate ] blbTableView:self completedDragAtPoint:aPoint operation:operation ];
+   [super draggedImage:anImage endedAt:aPoint operation:operation];
+   if([[self delegate] respondsToSelector:@selector(blbTableView:completedDragAtPoint:operation:)])
+      [[self delegate] blbTableView:self completedDragAtPoint:aPoint operation:operation];
 }
 
 
@@ -171,8 +171,8 @@
  */
 - (void) dealloc
 {
-   [ self setStripeColor:nil ];
-   [ super dealloc ];
+   [self setStripeColor:nil];
+   [super dealloc];
 }
 
 @end

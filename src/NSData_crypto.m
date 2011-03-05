@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006,2011, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -44,8 +44,8 @@
 
 
 // Localized strings
-#define NSDATA_CRYPTO_LOC_SETKEYLENFAIL NSLocalizedString( @"EVP_CIPHER_CTX_set_key_length failed", @"" )
-#define NSDATA_CRYPTO_LOC_IVBAD         NSLocalizedString( @"iv is %d bytes, not 8", @"" )
+#define NSDATA_CRYPTO_LOC_SETKEYLENFAIL NSLocalizedString(@"EVP_CIPHER_CTX_set_key_length failed", @"")
+#define NSDATA_CRYPTO_LOC_IVBAD         NSLocalizedString(@"iv is %d bytes, not 8", @"")
 
 
 @implementation NSData (withay_crypto)
@@ -57,12 +57,12 @@ static BOOL cryptoLoggingEnabled = YES;
  */
 + (void) logCryptoMessage:(NSString *)format, ...
 {
-   if( cryptoLoggingEnabled )
+   if(cryptoLoggingEnabled)
    {
       va_list args;
-      va_start( args, format );
-      NSLogv( [ NSString stringWithFormat:@"NSData_crypto: %@\n", format ], args );
-      va_end( args );
+      va_start(args, format);
+      NSLogv([NSString stringWithFormat:@"NSData_crypto: %@\n", format], args);
+      va_end(args);
    }
 }
 
@@ -84,33 +84,33 @@ static BOOL cryptoLoggingEnabled = YES;
 {
    NSMutableData *randomData = nil;
    ssize_t amtRead = 0;
-   NSFileHandle *devRandom = [ NSFileHandle fileHandleForReadingAtPath:@"/dev/random" ];
-   if( devRandom != nil )
+   NSFileHandle *devRandom = [NSFileHandle fileHandleForReadingAtPath:@"/dev/random"];
+   if(devRandom != nil)
    {
-      randomData = [ NSMutableData dataWithLength:len ];
-      while( amtRead < len )
+      randomData = [NSMutableData dataWithLength:len];
+      while(amtRead < len)
       {
          /*
           * Here, we use read() instead of NSFileHandle's readDataOfLength:
           * because readDataOfLength: returns an NSData *, not NSMutableData *.
           */
-         ssize_t oneRead = read( [ devRandom fileDescriptor ],
-                                 [ randomData mutableBytes ],
-                                 len - amtRead );
-         if( oneRead <= 0 && ( errno != EINTR && errno != EAGAIN ) )
+         ssize_t oneRead = read([devRandom fileDescriptor],
+                                [randomData mutableBytes],
+                                len - amtRead);
+         if(oneRead <= 0 && (errno != EINTR && errno != EAGAIN))
          {
-            [ NSData logCryptoMessage:NSLocalizedString( @"read() error in randomDataOfLength: %s (%d)", @"" ),
-                                      strerror( errno ),
-                                      errno ];
+            [NSData logCryptoMessage:NSLocalizedString(@"read() error in randomDataOfLength: %s (%d)", @""),
+                                     strerror(errno),
+                                     errno];
             randomData = nil;
             break;
          }
          amtRead += oneRead;
       }
-      [ devRandom closeFile ];
+      [devRandom closeFile];
    }
    else
-      [ NSData logCryptoMessage:NSLocalizedString( @"failed to open /dev/random", @"" ) ];
+      [NSData logCryptoMessage:NSLocalizedString(@"failed to open /dev/random", @"")];
 
    return randomData;
 }
@@ -124,52 +124,52 @@ static BOOL cryptoLoggingEnabled = YES;
 {
    NSMutableData *encryptedData = nil;
    unsigned int finalLen = 0;
-   if( [ iv length ] == 8 )
+   if([iv length] == 8)
    {
       EVP_CIPHER_CTX cipherContext;
-      if( EVP_EncryptInit( &cipherContext, EVP_bf_cbc(), NULL, [ iv bytes ] ) )
+      if(EVP_EncryptInit(&cipherContext, EVP_bf_cbc(), NULL, [iv bytes]))
       {
-         if( EVP_CIPHER_CTX_set_key_length( &cipherContext, [ key length ] ) )
+         if(EVP_CIPHER_CTX_set_key_length(&cipherContext, [key length]))
          {
-            if( EVP_EncryptInit( &cipherContext, NULL, [ key bytes ], NULL ) )
+            if(EVP_EncryptInit(&cipherContext, NULL, [key bytes], NULL))
             {
-               unsigned int encLen = [ self length ] + 8;   // Make sure we have enough space
-               encryptedData = [ NSMutableData dataWithLength:encLen ];
-               if( EVP_EncryptUpdate( &cipherContext,
-                                      [ encryptedData mutableBytes ],
-                                      (int *) &encLen,
-                                      [ self bytes ],
-                                      [ self length ] ) )
+               unsigned int encLen = [self length] + 8;   // Make sure we have enough space
+               encryptedData = [NSMutableData dataWithLength:encLen];
+               if(EVP_EncryptUpdate(&cipherContext,
+                                    [encryptedData mutableBytes],
+                                    (int *) &encLen,
+                                    [self bytes],
+                                    [self length]))
                {
                   finalLen = encLen;
-                  encLen = [ encryptedData length ] - finalLen;
-                  if( EVP_EncryptFinal( &cipherContext,
-                                        [ encryptedData mutableBytes ] + finalLen,
-                                        (int *) &encLen ) )
+                  encLen = [encryptedData length] - finalLen;
+                  if(EVP_EncryptFinal(&cipherContext,
+                                      [encryptedData mutableBytes] + finalLen,
+                                      (int *) &encLen))
                   {
                      finalLen += encLen;
-                     [ encryptedData setLength:finalLen ];
+                     [encryptedData setLength:finalLen];
                   }
                   else
-                     [ NSData logCryptoMessage:NSLocalizedString( @"EVP_EncryptFinal() failed", @"" ) ];
+                     [NSData logCryptoMessage:NSLocalizedString(@"EVP_EncryptFinal() failed", @"")];
                }
                else
-                  [ NSData logCryptoMessage:NSLocalizedString( @"EVP_EncryptUpdate() failed", @"" ) ];
+                  [NSData logCryptoMessage:NSLocalizedString(@"EVP_EncryptUpdate() failed", @"")];
             }
             else
-               [ NSData logCryptoMessage:NSLocalizedString( @"EVP_EncryptInit() failed (setting key)", @"" ) ];
+               [NSData logCryptoMessage:NSLocalizedString(@"EVP_EncryptInit() failed (setting key)", @"")];
          }
          else
-            [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_SETKEYLENFAIL ];
-         EVP_CIPHER_CTX_cleanup( &cipherContext );
+            [NSData logCryptoMessage:NSDATA_CRYPTO_LOC_SETKEYLENFAIL];
+         EVP_CIPHER_CTX_cleanup(&cipherContext);
       }
       else
-         [ NSData logCryptoMessage:NSLocalizedString( @"EVP_EncryptInit() failed (initial)", @"" ) ];
+         [NSData logCryptoMessage:NSLocalizedString(@"EVP_EncryptInit() failed (initial)", @"")];
    }
    else
-      [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_IVBAD, [ iv length ] ];
+      [NSData logCryptoMessage:NSDATA_CRYPTO_LOC_IVBAD, [iv length]];
 
-   if( encryptedData != nil && [ encryptedData length ] != finalLen )
+   if(encryptedData != nil && [encryptedData length] != finalLen)
       encryptedData = nil;
 
    return encryptedData;
@@ -184,52 +184,52 @@ static BOOL cryptoLoggingEnabled = YES;
 {
    NSMutableData *plainData = nil;
    unsigned int finalLen = 0;
-   if( [ iv length ] == 8 )
+   if([iv length] == 8)
    {
       EVP_CIPHER_CTX cipherContext;
-      if( EVP_DecryptInit( &cipherContext, EVP_bf_cbc(), NULL, [ iv bytes ] ) )
+      if(EVP_DecryptInit(&cipherContext, EVP_bf_cbc(), NULL, [iv bytes]))
       {
-         if( EVP_CIPHER_CTX_set_key_length( &cipherContext, [ key length ] ) )
+         if(EVP_CIPHER_CTX_set_key_length(&cipherContext, [key length]))
          {
-            if( EVP_DecryptInit( &cipherContext, NULL, [ key bytes ], NULL ) )
+            if(EVP_DecryptInit(&cipherContext, NULL, [key bytes], NULL))
             {
-               unsigned int decLen = [ self length ] + 8;   // Make sure there's enough room
-               plainData = [ NSMutableData dataWithLength:decLen ];
-               if( EVP_DecryptUpdate( &cipherContext,
-                                      [ plainData mutableBytes ],
-                                      (int *) &decLen,
-                                      [ self bytes ],
-                                      [ self length ] ) )
+               unsigned int decLen = [self length] + 8;   // Make sure there's enough room
+               plainData = [NSMutableData dataWithLength:decLen];
+               if(EVP_DecryptUpdate(&cipherContext,
+                                    [plainData mutableBytes],
+                                    (int *) &decLen,
+                                    [self bytes],
+                                    [self length]))
                {
                   finalLen = decLen;
-                  decLen = [ plainData length ] - finalLen;
-                  if( EVP_DecryptFinal( &cipherContext,
-                                        [ plainData mutableBytes ] + finalLen,
-                                        (int *) &decLen ) )
+                  decLen = [plainData length] - finalLen;
+                  if(EVP_DecryptFinal(&cipherContext,
+                                      [plainData mutableBytes] + finalLen,
+                                      (int *) &decLen))
                   {
                      finalLen += decLen;
-                     [ plainData setLength:finalLen ];
+                     [plainData setLength:finalLen];
                   }
                   else
-                     [ NSData logCryptoMessage:NSLocalizedString( @"EVP_DecryptFinal() failed", @"" ) ];
+                     [NSData logCryptoMessage:NSLocalizedString(@"EVP_DecryptFinal() failed", @"")];
                }
                else
-                  [ NSData logCryptoMessage:NSLocalizedString( @"EVP_DecryptUpdate() failed", @"" ) ];
+                  [NSData logCryptoMessage:NSLocalizedString(@"EVP_DecryptUpdate() failed", @"")];
             }
             else
-               [ NSData logCryptoMessage:NSLocalizedString( @"EVP_DecryptInit() failed (setting key)", @"" ) ];
+               [NSData logCryptoMessage:NSLocalizedString(@"EVP_DecryptInit() failed (setting key)", @"")];
          }
          else
-            [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_SETKEYLENFAIL ];
-         EVP_CIPHER_CTX_cleanup( &cipherContext );
+            [NSData logCryptoMessage:NSDATA_CRYPTO_LOC_SETKEYLENFAIL];
+         EVP_CIPHER_CTX_cleanup(&cipherContext);
       }
       else
-         [ NSData logCryptoMessage:NSLocalizedString( @"EVP_DecryptInit() failed (initial)", @"" ) ];
+         [NSData logCryptoMessage:NSLocalizedString(@"EVP_DecryptInit() failed (initial)", @"")];
    }
    else
-      [ NSData logCryptoMessage:NSDATA_CRYPTO_LOC_IVBAD, [ iv length ] ];
+      [NSData logCryptoMessage:NSDATA_CRYPTO_LOC_IVBAD, [iv length]];
 
-   if( plainData != nil && [ plainData length ] != finalLen )
+   if(plainData != nil && [plainData length] != finalLen)
       plainData = nil;
 
    return plainData;
@@ -242,18 +242,18 @@ static BOOL cryptoLoggingEnabled = YES;
 - (NSMutableData *) SHA1Hash
 {
    EVP_MD_CTX digestContext;
-   EVP_DigestInit( &digestContext, EVP_sha1() );
-   unsigned int hashLen = EVP_MD_CTX_size( &digestContext );
-   NSMutableData *hashValue = [ NSMutableData dataWithLength:hashLen ];
-   EVP_DigestUpdate( &digestContext, [ self bytes ], [ self length ] );
+   EVP_DigestInit(&digestContext, EVP_sha1());
+   unsigned int hashLen = EVP_MD_CTX_size(&digestContext);
+   NSMutableData *hashValue = [NSMutableData dataWithLength:hashLen];
+   EVP_DigestUpdate(&digestContext, [self bytes], [self length]);
    unsigned int writtenLen;
-   EVP_DigestFinal( &digestContext, [ hashValue mutableBytes ], &writtenLen );
-   if( writtenLen != hashLen )
+   EVP_DigestFinal(&digestContext, [hashValue mutableBytes], &writtenLen);
+   if(writtenLen != hashLen)
    {
-      [ NSData logCryptoMessage:NSLocalizedString( @"EVP_DigestFinal wrote %u bytes, not the expected of %u",
-                                                   @"" ),
-                                writtenLen,
-                                hashLen ];
+      [NSData logCryptoMessage:NSLocalizedString(@"EVP_DigestFinal wrote %u bytes, not the expected of %u",
+                                                 @""),
+                               writtenLen,
+                               hashLen];
       hashValue = nil;
    }
 

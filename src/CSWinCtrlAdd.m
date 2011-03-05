@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007,2011, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -45,7 +45,7 @@
 #pragma mark Initialization
 - (id) init
 {
-   self = [ super initWithWindowNibName:@"CSDocumentAdd" ];
+   self = [super initWithWindowNibName:@"CSDocumentAdd"];
 
    return self;
 }
@@ -56,7 +56,7 @@
  */
 - (void) awakeFromNib
 {
-   [ self clear:self ];
+   [self clear:self];
 }
 
 
@@ -68,15 +68,15 @@
 - (IBAction) clear:(id)sender
 {
    // XXX If there's a way to clear out a control's data space, we'd do that here
-   [ nameText setStringValue:@"" ];
-   [ accountText setStringValue:@"" ];
-   [ passwordText setStringValue:@"" ];
-   [ urlText setStringValue:@"" ];
-   [ category selectItemAtIndex:0 ];
-   [ notes setString:@"" ];
-   [ [ notes undoManager ] removeAllActions ];
-   [ mainButton setEnabled:NO ];
-   [ [ self window ] setDocumentEdited:NO ];
+   [nameText setStringValue:@""];
+   [accountText setStringValue:@""];
+   [passwordText setStringValue:@""];
+   [urlText setStringValue:@""];
+   [category selectItemAtIndex:0];
+   [notes setString:@""];
+   [[notes undoManager] removeAllActions];
+   [mainButton setEnabled:NO];
+   [[self window] setDocumentEdited:NO];
 }
 
 
@@ -85,39 +85,39 @@
  */
 - (IBAction) add:(id)sender
 {
-   NSRange fullNotesRange = NSMakeRange( 0, [ [ notes textStorage ] length ] );
-   if( [ [ self document ] addEntryWithName:[ nameText stringValue ]
-                                    account:[ accountText stringValue ]
-                                   password:[ passwordText stringValue ]
-                                        URL:[ urlText stringValue ]
-                                   category:[ category stringValue ]
-                                  notesRTFD:[ notes RTFDFromRange:fullNotesRange ] ] )
+   NSRange fullNotesRange = NSMakeRange(0, [[notes textStorage] length]);
+   if([[self document] addEntryWithName:[nameText stringValue]
+                                account:[accountText stringValue]
+                               password:[passwordText stringValue]
+                                    URL:[urlText stringValue]
+                               category:[category stringValue]
+                              notesRTFD:[notes RTFDFromRange:fullNotesRange]])
    {
-      [ self clear:self ];
-      if( ![ [ NSUserDefaults standardUserDefaults ] boolForKey:CSPrefDictKey_CloseAdd ] )
+      [self clear:self];
+      if(![[NSUserDefaults standardUserDefaults] boolForKey:CSPrefDictKey_CloseAdd])
       {
          // We queue it here as doing it immediately won't work
-         [ [ NSRunLoop currentRunLoop ]
-           performSelector:@selector( makeFirstResponder: )
-                    target:[ self window ]
-                  argument:nameText
-                     order:9999
-                     modes:[ NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil ] ];
+         [[NSRunLoop currentRunLoop]
+          performSelector:@selector(makeFirstResponder:)
+                   target:[self window]
+                 argument:nameText
+                    order:9999
+                    modes:[NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil]];
       }
       else
-         [ [ self window ] performClose:self ];
+         [[self window] performClose:self];
    }
    else
-      NSBeginInformationalAlertSheet( CSWINCTRLENTRY_LOC_ENTRYEXISTS,
-                                      nil,
-                                      nil,
-                                      nil,
-                                      [ self window ],
-                                      nil,
-                                      nil,
-                                      nil,
-                                      NULL,
-                                      CSWINCTRLENTRY_LOC_ENTRYEXISTSRENAME );
+      NSBeginInformationalAlertSheet(CSWINCTRLENTRY_LOC_ENTRYEXISTS,
+                                     nil,
+                                     nil,
+                                     nil,
+                                     [self window],
+                                     nil,
+                                     nil,
+                                     nil,
+                                     NULL,
+                                     CSWINCTRLENTRY_LOC_ENTRYEXISTSRENAME);
 }
 
 
@@ -128,8 +128,8 @@
  */
 - (void) synchronizeWindowTitleWithDocumentName
 {
-   [ [ self window ] setTitle:[ NSString stringWithFormat:NSLocalizedString( @"Add to %@", @"" ),
-      [ [ self document ] displayName ] ] ];
+   [[self window] setTitle:[NSString stringWithFormat:NSLocalizedString(@"Add to %@", @""),
+                                                      [[self document] displayName]]];
 }
 
 
@@ -140,32 +140,32 @@
  */
 - (BOOL) nameChanged
 {
-   return ( [ [ nameText stringValue ] length ] > 0 );
+   return ([[nameText stringValue] length] > 0);
 }
 
 - (BOOL) accountChanged
 {
-   return ( [ [ accountText stringValue ] length ] > 0 );
+   return ([[accountText stringValue] length] > 0);
 }
 
 - (BOOL) passwordChanged
 {
-   return ( [ [ passwordText stringValue ] length ] > 0 );
+   return ([[passwordText stringValue] length] > 0);
 }
 
 - (BOOL) urlChanged
 {
-   return ( [ [ urlText stringValue ] length ] > 0 );
+   return ([[urlText stringValue] length] > 0);
 }
 
 - (BOOL) categoryChanged
 {
-   return [ category indexOfSelectedItem ] != 0;
+   return [category indexOfSelectedItem] != 0;
 }
 
 - (BOOL) notesChanged
 {
-   return ( [ [ notes textStorage ] length ] > 0 );
+   return ([[notes textStorage] length] > 0);
 }
 
 @end

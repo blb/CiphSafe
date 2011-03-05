@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006,2011, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -50,7 +50,7 @@ const int NSDataCompressionLevelHigh = Z_BEST_COMPRESSION;
 
 
 // Localized strings
-#define NSDATA_COMPRESS_LOC_MEMERR NSLocalizedString( @"memory error", @"" )
+#define NSDATA_COMPRESS_LOC_MEMERR NSLocalizedString(@"memory error", @"")
 
 
 @implementation NSData (withay_compress)
@@ -63,12 +63,12 @@ static BOOL compressLoggingEnabled = YES;
  */
 + (void) logCompressMessage:(NSString *)format, ...
 {
-   if( compressLoggingEnabled )
+   if(compressLoggingEnabled)
    {
       va_list args;
-      va_start( args, format );
-      NSLogv( [ NSString stringWithFormat:@"NSData_compress: %@\n", format ], args );
-      va_end( args );
+      va_start(args, format);
+      NSLogv([NSString stringWithFormat:@"NSData_compress: %@\n", format], args);
+      va_end(args);
    }
 }
 
@@ -87,7 +87,7 @@ static BOOL compressLoggingEnabled = YES;
  */
 - (NSMutableData *) compressedData
 {
-   return [ self compressedDataAtLevel:NSDataCompressionLevelDefault ];
+   return [self compressedDataAtLevel:NSDataCompressionLevelDefault];
 }
 
 
@@ -101,31 +101,31 @@ static BOOL compressLoggingEnabled = YES;
     * zlib says to make sure the destination has 0.1% more + 12 bytes; last
     * additional bytes to store the original size (needed for uncompress)
     */
-   unsigned long bufferLength = ceil( (float) [ self length ] * 1.001 ) + 12 + sizeof( unsigned );
-   NSMutableData *newData = [ NSMutableData dataWithLength:bufferLength ];
-   if( newData != nil )
+   unsigned long bufferLength = ceil((float) [self length] * 1.001) + 12 + sizeof(unsigned);
+   NSMutableData *newData = [NSMutableData dataWithLength:bufferLength];
+   if(newData != nil)
    {
-      int zlibError = compress2( [ newData mutableBytes ],
-                                 &bufferLength,
-                                 [ self bytes ],
-                                 [ self length ],
-                                 level );
-      if( zlibError == Z_OK )
+      int zlibError = compress2([newData mutableBytes],
+                                &bufferLength,
+                                [self bytes],
+                                [self length],
+                                level);
+      if(zlibError == Z_OK)
       {
          // Add original size to the end of the buffer, written big-endian
-         *( (unsigned *) ( [ newData mutableBytes ] + bufferLength ) ) = NSSwapHostIntToBig( [ self length ] );
-         [ newData setLength:bufferLength + sizeof( unsigned ) ];
+         *((unsigned *) ([newData mutableBytes] + bufferLength)) = NSSwapHostIntToBig([self length]);
+         [newData setLength:bufferLength + sizeof(unsigned)];
       }
       else
       {
-         [ NSData logCompressMessage:NSLocalizedString( @"call to compress2() failed: %d - %s", @"" ),
-                                     zlibError,
-                                     zError( zlibError ) ];
+         [NSData logCompressMessage:NSLocalizedString(@"call to compress2() failed: %d - %s", @""),
+                                    zlibError,
+                                    zError(zlibError)];
          newData = nil;
       }
    }
    else
-      [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_MEMERR ];
+      [NSData logCompressMessage:NSDATA_COMPRESS_LOC_MEMERR];
 
    return newData;
 }
@@ -137,10 +137,10 @@ static BOOL compressLoggingEnabled = YES;
 - (NSMutableData *) uncompressedData
 {
    NSMutableData *newData = nil;
-   if( [ self isCompressedFormat ] )
+   if([self isCompressedFormat])
    {
-      unsigned int originalSize = NSSwapBigIntToHost( *( (unsigned *) ( [ self bytes ] + [ self length ] -
-                                                                        sizeof( unsigned ) ) ) );
+      unsigned int originalSize = NSSwapBigIntToHost(*((unsigned *) ([self bytes] + [self length] -
+                                                                     sizeof(unsigned))));
       /*
        * In the rare circumstance that data which is not compressed happens to
        * pass the checks above, we need to deal with the possibility that there
@@ -151,43 +151,43 @@ static BOOL compressLoggingEnabled = YES;
        * in the uncompress() call.
        */
       NS_DURING
-         newData = [ NSMutableData dataWithLength:originalSize ];
+         newData = [NSMutableData dataWithLength:originalSize];
       NS_HANDLER
-         if( [ [ localException name ] isEqualToString:NSInvalidArgumentException ] )
+         if([[localException name] isEqualToString:NSInvalidArgumentException])
          {
-            [ NSData logCompressMessage:NSLocalizedString( @"bad size in data, is it really compressed? "
-                                                           @"(reason is %@)",
-                                                           @"" ),
-                                        [ localException reason ] ];
-            NS_VALUERETURN( nil, NSMutableData * );
+            [NSData logCompressMessage:NSLocalizedString(@"bad size in data, is it really compressed? "
+                                                         @"(reason is %@)",
+                                                         @""),
+                                       [localException reason]];
+            NS_VALUERETURN(nil, NSMutableData *);
          }
          else
-            [ localException raise ];   // This should NEVER happen...
+            [localException raise];   // This should NEVER happen...
       NS_ENDHANDLER
-      if( newData != nil )
+      if(newData != nil)
       {
          unsigned long outSize = originalSize;
-         int zlibError = uncompress( [ newData mutableBytes ],
-                                     &outSize,
-                                     [ self bytes ],
-                                     [ self length ] - sizeof( unsigned ) );
-         if( zlibError != Z_OK )
+         int zlibError = uncompress([newData mutableBytes],
+                                    &outSize,
+                                    [self bytes],
+                                    [self length] - sizeof(unsigned));
+         if(zlibError != Z_OK)
          {
-            [ NSData logCompressMessage:NSLocalizedString( @"call to uncompress() failed: %d - %s", @"" ),
-                                        zlibError,
-                                        zError( zlibError ) ];
+            [NSData logCompressMessage:NSLocalizedString(@"call to uncompress() failed: %d - %s", @""),
+                                       zlibError,
+                                       zError(zlibError)];
             newData = nil;
          }
-         else if( originalSize != outSize )
-            [ NSData logCompressMessage:NSLocalizedString( @"(warning) data size was %u, expected %u", @"" ),
-                                        outSize,
-                                        originalSize ];
+         else if(originalSize != outSize)
+            [NSData logCompressMessage:NSLocalizedString(@"(warning) data size was %u, expected %u", @""),
+                                       outSize,
+                                       originalSize];
       }
       else
-         [ NSData logCompressMessage:NSDATA_COMPRESS_LOC_MEMERR ];
+         [NSData logCompressMessage:NSDATA_COMPRESS_LOC_MEMERR];
    }
    else
-      [ NSData logCompressMessage:NSLocalizedString( @"data is not in zlib-compatible format", @"" ) ];
+      [NSData logCompressMessage:NSLocalizedString(@"data is not in zlib-compatible format", @"")];
 
    return newData;
 }
@@ -199,21 +199,21 @@ static BOOL compressLoggingEnabled = YES;
  */
 - (BOOL) isCompressedFormat
 {
-   const unsigned char *bytes = [ self bytes ];
+   const unsigned char *bytes = [self bytes];
    /*
     * The checks are:
-    *    ( *bytes & 0x0F ) == 8           : method is deflate (this is called CM,
+    *    (*bytes & 0x0F) == 8           : method is deflate (this is called CM,
     *                                       compression method, in the RFC)
-    *    ( *bytes & 0x80 ) == 0           : info must be at most seven, this makes
+    *    (*bytes & 0x80) == 0           : info must be at most seven, this makes
     *                                       sure the MSB is not set, otherwise it
     *                                       is at least 8 (this is called CINFO,
     *                                       compression info, in the RFC)
-    *    *( (short *) bytes ) ) % 31 == 0 : the two first bytes as a whole (big
+    *    *((short *) bytes)) % 31 == 0 : the two first bytes as a whole (big
     *                                       endian format) must be a multiple of 31
     *                                       (this is discussed in the FCHECK in
     *                                       FLG, flags, section)
     */
-   if( ( *bytes & 0x0F ) == 8 && ( *bytes & 0x80 ) == 0 && NSSwapBigShortToHost( *( (short *) bytes ) ) % 31 == 0 )
+   if((*bytes & 0x0F) == 8 && (*bytes & 0x80) == 0 && NSSwapBigShortToHost(*((short *) bytes)) % 31 == 0)
       return YES;
 
    return NO;

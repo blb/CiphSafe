@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007,2011, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,9 +35,9 @@
 #import <Cocoa/Cocoa.h>
 
 // Defines for localized strings
-#define CSWINCTRLENTRY_LOC_ENTRYEXISTS NSLocalizedString( @"Entry Already Exists", @"" )
-#define CSWINCTRLENTRY_LOC_ENTRYEXISTSRENAME NSLocalizedString( @"An entry with that name already " \
-                                                                @"exists, enter another name", @"" )
+#define CSWINCTRLENTRY_LOC_ENTRYEXISTS NSLocalizedString(@"Entry Already Exists", @"")
+#define CSWINCTRLENTRY_LOC_ENTRYEXISTSRENAME NSLocalizedString(@"An entry with that name already " \
+                                                               @"exists, enter another name", @"")
 
 @interface CSWinCtrlEntry : NSWindowController
 {

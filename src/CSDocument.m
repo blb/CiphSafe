@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007,2011, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -67,37 +67,37 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (void) setupModel
 {
-   NSAssert( docModel != nil, @"docModel is nil" );
+   NSAssert(docModel != nil, @"docModel is nil");
    
-   [ docModel setUndoManager:[ self undoManager ] ];
-   NSNotificationCenter *defaultCenter = [ NSNotificationCenter defaultCenter ];
-   [ defaultCenter addObserver:self
-                      selector:@selector( updateViewForNotification: )
-                          name:CSDocModelDidChangeSortNotification
-                        object:docModel ];
-   [ defaultCenter addObserver:self
-                      selector:@selector( updateViewForNotification: )
-                          name:CSDocModelDidAddEntryNotification
-                        object:docModel ];
-   [ defaultCenter addObserver:self
-                      selector:@selector( updateViewForNotification: )
-                          name:CSDocModelDidChangeEntryNotification
-                        object:docModel ];
-   [ defaultCenter addObserver:self
-                      selector:@selector( updateViewForNotification: )
-                          name:CSDocModelDidRemoveEntryNotification
-                        object:docModel ];
-   [ mainWindowController refreshWindow ];
+   [docModel setUndoManager:[self undoManager]];
+   NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
+   [defaultCenter addObserver:self
+                     selector:@selector(updateViewForNotification:)
+                         name:CSDocModelDidChangeSortNotification
+                       object:docModel];
+   [defaultCenter addObserver:self
+                     selector:@selector(updateViewForNotification:)
+                         name:CSDocModelDidAddEntryNotification
+                       object:docModel];
+   [defaultCenter addObserver:self
+                     selector:@selector(updateViewForNotification:)
+                         name:CSDocModelDidChangeEntryNotification
+                       object:docModel];
+   [defaultCenter addObserver:self
+                     selector:@selector(updateViewForNotification:)
+                         name:CSDocModelDidRemoveEntryNotification
+                       object:docModel];
+   [mainWindowController refreshWindow];
 }
 
 
 - (id) init
 {
-   self = [ super init ];
-   if( self != nil )
+   self = [super init];
+   if(self != nil)
    {
       // Note this window controller is NOT added to NSDocument's list
-      passphraseWindowController = [ [ CSWinCtrlPassphrase alloc ] init ];
+      passphraseWindowController = [[CSWinCtrlPassphrase alloc] init];
    }
    
    return self;
@@ -109,8 +109,8 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (void) makeWindowControllers
 {
-   mainWindowController = [ [ [ CSWinCtrlMain alloc ] init ] autorelease ];
-   [ self addWindowController:mainWindowController ];
+   mainWindowController = [[[CSWinCtrlMain alloc] init] autorelease];
+   [self addWindowController:mainWindowController];
 }
 
 
@@ -126,11 +126,11 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
          didSaveSelector:(SEL)didSaveSelector
              contextInfo:(void *)contextInfo
 {
-   [ super saveToFile:fileName
-        saveOperation:saveOperation
-             delegate:delegate
-      didSaveSelector:didSaveSelector
-          contextInfo:contextInfo ];
+   [super saveToFile:fileName
+       saveOperation:saveOperation
+            delegate:delegate
+     didSaveSelector:didSaveSelector
+         contextInfo:contextInfo];
 }
 
 
@@ -147,32 +147,32 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
     * If a filename was given and we don't yet have a key, or we're doing a
     * save as
     */
-   if( fileName != nil && ( bfKey == nil || ![ fileName isEqualToString:[ [ self fileURL ] path ] ] ) )
+   if(fileName != nil && (bfKey == nil || ![fileName isEqualToString:[[self fileURL] path]]))
    {
-      // Setup to call [ self superSaveToFile:... ] on successful passphrase request
-      SEL mySelector = @selector( superSaveToFile:saveOperation:delegate:didSaveSelector:contextInfo: );
-      NSMethodSignature *mySelSig = [ CSDocument instanceMethodSignatureForSelector:mySelector ];
-      getKeyInvocation = [ NSInvocation invocationWithMethodSignature:mySelSig ];
-      [ getKeyInvocation setTarget:self ];
-      [ getKeyInvocation setSelector:mySelector ];
-      [ getKeyInvocation retainArguments ];
-      [ getKeyInvocation setArgument:&fileName atIndex:2 ];
-      [ getKeyInvocation setArgument:&saveOperation atIndex:3 ];
-      [ getKeyInvocation setArgument:&delegate atIndex:4 ];
-      [ getKeyInvocation setArgument:&didSaveSelector atIndex:5 ];
-      [ getKeyInvocation setArgument:&contextInfo atIndex:6 ];
-      [ getKeyInvocation retain ];
-      [ passphraseWindowController getEncryptionKeyWithNote:CSPassphraseNote_Save
-                                                   inWindow:[ mainWindowController window ]
-                                              modalDelegate:self
-                                             sendToSelector:@selector( getKeyResult:) ];
+      // Setup to call [self superSaveToFile:...] on successful passphrase request
+      SEL mySelector = @selector(superSaveToFile:saveOperation:delegate:didSaveSelector:contextInfo:);
+      NSMethodSignature *mySelSig = [CSDocument instanceMethodSignatureForSelector:mySelector];
+      getKeyInvocation = [NSInvocation invocationWithMethodSignature:mySelSig];
+      [getKeyInvocation setTarget:self];
+      [getKeyInvocation setSelector:mySelector];
+      [getKeyInvocation retainArguments];
+      [getKeyInvocation setArgument:&fileName atIndex:2];
+      [getKeyInvocation setArgument:&saveOperation atIndex:3];
+      [getKeyInvocation setArgument:&delegate atIndex:4];
+      [getKeyInvocation setArgument:&didSaveSelector atIndex:5];
+      [getKeyInvocation setArgument:&contextInfo atIndex:6];
+      [getKeyInvocation retain];
+      [passphraseWindowController getEncryptionKeyWithNote:CSPassphraseNote_Save
+                                                  inWindow:[mainWindowController window]
+                                             modalDelegate:self
+                                            sendToSelector:@selector(getKeyResult:)];
    }
    else
-      [ super saveToFile:fileName
-           saveOperation:saveOperation
-                delegate:delegate
-         didSaveSelector:didSaveSelector
-             contextInfo:contextInfo ];
+      [super saveToFile:fileName
+          saveOperation:saveOperation
+               delegate:delegate
+        didSaveSelector:didSaveSelector
+            contextInfo:contextInfo];
 }
 
 
@@ -185,15 +185,15 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
                           originalContentsURL:(NSURL *)absoluteOriginalContentsURL
                                         error:(NSError **)outError
 {
-   NSDictionary *attrDictionary = [ super fileAttributesToWriteToURL:absoluteURL
-                                                              ofType:typeName
-                                                    forSaveOperation:saveOperation
-                                                 originalContentsURL:absoluteOriginalContentsURL
-                                                               error:outError ];
-   if( attrDictionary != nil )
+   NSDictionary *attrDictionary = [super fileAttributesToWriteToURL:absoluteURL
+                                                             ofType:typeName
+                                                   forSaveOperation:saveOperation
+                                                originalContentsURL:absoluteOriginalContentsURL
+                                                              error:outError];
+   if(attrDictionary != nil)
    {
-      NSMutableDictionary *newDictionary = [ NSMutableDictionary dictionaryWithDictionary:attrDictionary ];
-      [ newDictionary setValue:[ NSNumber numberWithUnsignedLong:0600 ] forKey:NSFilePosixPermissions ];
+      NSMutableDictionary *newDictionary = [NSMutableDictionary dictionaryWithDictionary:attrDictionary];
+      [newDictionary setValue:[NSNumber numberWithUnsignedLong:0600] forKey:NSFilePosixPermissions];
       attrDictionary = newDictionary;
    }
 
@@ -206,10 +206,10 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (NSData *) dataOfType:(NSString *)typeName error:(NSError **)outError
 {
-   NSAssert( [ typeName isEqualToString:CSDocument_Name ], @"Unknown file type" );
-   NSAssert( bfKey != nil, @"key is nil" );
+   NSAssert([typeName isEqualToString:CSDocument_Name], @"Unknown file type");
+   NSAssert(bfKey != nil, @"key is nil");
 
-   return [ [ self model ] encryptedDataWithKey:bfKey ];
+   return [[self model] encryptedDataWithKey:bfKey];
 }
 
 
@@ -218,43 +218,43 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (BOOL) readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError
 {
-   NSAssert( [ typeName isEqualToString:CSDocument_Name ], @"Unknown file type" );
+   NSAssert([typeName isEqualToString:CSDocument_Name], @"Unknown file type");
 
-   if( docModel != nil )   // This'll happen on revert
+   if(docModel != nil)   // This'll happen on revert
    {
-      [ CSWinCtrlChange closeOpenControllersForDocument:self ];
-      [ docModel release ];
+      [CSWinCtrlChange closeOpenControllersForDocument:self];
+      [docModel release];
       docModel = nil;
    }
    
    // Loop through until we either successfully open it, or the user cancels
-   while( docModel == nil )
+   while(docModel == nil)
    {
-      if( bfKey == nil )
-         [ self setBFKey:[ passphraseWindowController getEncryptionKeyWithNote:CSPassphraseNote_Load
-                                                              forDocumentNamed:[ self displayName ] ] ];
-      if( bfKey != nil )
+      if(bfKey == nil)
+         [self setBFKey:[passphraseWindowController getEncryptionKeyWithNote:CSPassphraseNote_Load
+                                                            forDocumentNamed:[self displayName]]];
+      if(bfKey != nil)
       {
-         docModel = [ [ CSDocModel alloc ] initWithEncryptedData:data bfKey:bfKey ];
-         if( docModel != nil )
-            [ self setupModel ];
+         docModel = [[CSDocModel alloc] initWithEncryptedData:data bfKey:bfKey];
+         if(docModel != nil)
+            [self setupModel];
          else
-            [ self setBFKey:nil ];
+            [self setBFKey:nil];
       }
       else
       {
-         if( outError != NULL )
+         if(outError != NULL)
          {
             /* The error object must be set (even though this isn't a true error) or doing a cancel twice
             * will cause it to crash in the depths of NSDocumentController code
             */
-            *outError = [ NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil ];
+            *outError = [NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil];
          }
          break;   // User cancelled
       }
    }
 
-   return ( docModel != nil );
+   return (docModel != nil);
 }
 
 
@@ -265,10 +265,10 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (CSDocModel *) model
 {
-   if( docModel == nil )
+   if(docModel == nil)
    {
-      docModel = [ [ CSDocModel alloc ] init ];
-      [ self setupModel ];
+      docModel = [[CSDocModel alloc] init];
+      [self setupModel];
    }
    
    return docModel;
@@ -284,11 +284,11 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
     * Normally, we could just retain, release, and set, but since we clear, we
     * have to check stuff first
     */
-   if( ![ newKey isEqual:bfKey ] )
+   if(![newKey isEqual:bfKey])
    {
-      [ newKey retain ];
-      [ bfKey clearOutData ];
-      [ bfKey release ];
+      [newKey retain];
+      [bfKey clearOutData];
+      [bfKey release];
       bfKey = newKey;
    }
 }
@@ -299,18 +299,18 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (IBAction) changePassphrase:(id)sender
 {
-   // Setup to call [ self saveDocument:self ] on successful passphrase request
-   SEL mySelector = @selector( saveDocument: );
-   NSMethodSignature *mySelSig = [ CSDocument instanceMethodSignatureForSelector:mySelector ];
-   getKeyInvocation = [ NSInvocation invocationWithMethodSignature:mySelSig ];
-   [ getKeyInvocation setTarget:self ];
-   [ getKeyInvocation setSelector:mySelector ];
-   [ getKeyInvocation setArgument:&self atIndex:2 ];
-   [ getKeyInvocation retain ];
-   [ passphraseWindowController getEncryptionKeyWithNote:CSPassphraseNote_Change
-                                                inWindow:[ mainWindowController window ]
-                                           modalDelegate:self
-                                          sendToSelector:@selector( getKeyResult:) ];
+   // Setup to call [self saveDocument:self] on successful passphrase request
+   SEL mySelector = @selector(saveDocument:);
+   NSMethodSignature *mySelSig = [CSDocument instanceMethodSignatureForSelector:mySelector];
+   getKeyInvocation = [NSInvocation invocationWithMethodSignature:mySelSig];
+   [getKeyInvocation setTarget:self];
+   [getKeyInvocation setSelector:mySelector];
+   [getKeyInvocation setArgument:&self atIndex:2];
+   [getKeyInvocation retain];
+   [passphraseWindowController getEncryptionKeyWithNote:CSPassphraseNote_Change
+                                               inWindow:[mainWindowController window]
+                                          modalDelegate:self
+                                         sendToSelector:@selector(getKeyResult:)];
 }
 
 
@@ -322,19 +322,19 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
                   shouldCloseSelector:(SEL)shouldCloseSelector
                           contextInfo:(void *)contextInfo
 {
-   CSAppController *appController = (CSAppController *) [ NSApp delegate ];
-   if( [ appController closeAllFromTimeout ] )
+   CSAppController *appController = (CSAppController *) [NSApp delegate];
+   if([appController closeAllFromTimeout])
    {
-      int saveOption = [ [ NSUserDefaults standardUserDefaults ]
-                         integerForKey:CSPrefDictKey_CloseAfterTimeoutSaveOption ];
-      if( saveOption == CSPrefCloseAfterTimeoutSaveOption_Save )
-         [ self saveDocument:self ];
-      else if( saveOption == CSPrefCloseAfterTimeoutSaveOption_Discard )
-         [ self updateChangeCount:NSChangeCleared ];
+      int saveOption = [[NSUserDefaults standardUserDefaults]
+                        integerForKey:CSPrefDictKey_CloseAfterTimeoutSaveOption];
+      if(saveOption == CSPrefCloseAfterTimeoutSaveOption_Save)
+         [self saveDocument:self];
+      else if(saveOption == CSPrefCloseAfterTimeoutSaveOption_Discard)
+         [self updateChangeCount:NSChangeCleared];
    }
-   [ super canCloseDocumentWithDelegate:delegate
-                    shouldCloseSelector:shouldCloseSelector
-                            contextInfo:contextInfo ]; 
+   [super canCloseDocumentWithDelegate:delegate
+                   shouldCloseSelector:shouldCloseSelector
+                           contextInfo:contextInfo]; 
 }
 
 
@@ -345,7 +345,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (BOOL) keepBackupFile
 {
-   return [ [ NSUserDefaults standardUserDefaults ] boolForKey:CSPrefDictKey_SaveBackup ];
+   return [[NSUserDefaults standardUserDefaults] boolForKey:CSPrefDictKey_SaveBackup];
 }
 
 
@@ -364,23 +364,23 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 - (NSArray *) categories
 {
    NSMutableArray *categories;
-   if( [ [ NSUserDefaults standardUserDefaults ] boolForKey:CSPrefDictKey_IncludeDefaultCategories ] )
+   if([[NSUserDefaults standardUserDefaults] boolForKey:CSPrefDictKey_IncludeDefaultCategories])
    {
-      NSString *defaultCategoriesValuesPath = [ [ NSBundle mainBundle ] pathForResource:@"DefaultCategories" 
-                                                                                 ofType:@"plist" ];
-      categories = [ NSMutableArray arrayWithContentsOfFile:defaultCategoriesValuesPath ];
+      NSString *defaultCategoriesValuesPath = [[NSBundle mainBundle] pathForResource:@"DefaultCategories" 
+                                                                              ofType:@"plist"];
+      categories = [NSMutableArray arrayWithContentsOfFile:defaultCategoriesValuesPath];
    }
    else
-      categories = [ NSMutableArray arrayWithCapacity:10 ];
+      categories = [NSMutableArray arrayWithCapacity:10];
    int index;
-   for( index = 0; index < [ self entryCount ]; index++ )
+   for(index = 0; index < [self entryCount]; index++)
    {
-      NSString *category = [ self stringForKey:CSDocModelKey_Category atRow:index ];
-      if( category != nil && ( [ category length ] > 0 ) && ![ categories containsObject:category ] )
-         [ categories addObject:category ];
+      NSString *category = [self stringForKey:CSDocModelKey_Category atRow:index];
+      if(category != nil && ([category length] > 0) && ![categories containsObject:category])
+         [categories addObject:category];
    }
-   
-   return [ categories sortedArrayUsingSelector:@selector( caseInsensitiveCompare: ) ];
+
+   return [categories sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 }
 
 
@@ -391,39 +391,39 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (NSData *) generateCSVDataForIndexes:(NSIndexSet *)indexes withHeader:(BOOL)includeHeader
 {
-   NSMutableData *csvData = [ NSMutableData data ];
-   if( includeHeader )
-      [ csvData appendData:[ [ NSString stringWithFormat:@"\"%@\",\"%@\",\"%@\",\"%@\",\"%@\",\"%@\"\n",
-                                                         NSLocalizedString( CSDocModelKey_Name, @"" ),
-                                                         NSLocalizedString( CSDocModelKey_Acct, @"" ),
-                                                         NSLocalizedString( CSDocModelKey_Passwd, @"" ),
-                                                         NSLocalizedString( CSDocModelKey_URL, @"" ),
-                                                         NSLocalizedString( CSDocModelKey_Category, @"" ),
-                                                         NSLocalizedString( CSDocModelKey_Notes, @"" ) ]
-                             dataUsingEncoding:NSUTF8StringEncoding ] ];
+   NSMutableData *csvData = [NSMutableData data];
+   if(includeHeader)
+      [csvData appendData:[[NSString stringWithFormat:@"\"%@\",\"%@\",\"%@\",\"%@\",\"%@\",\"%@\"\n",
+                                                         NSLocalizedString(CSDocModelKey_Name, @""),
+                                                         NSLocalizedString(CSDocModelKey_Acct, @""),
+                                                         NSLocalizedString(CSDocModelKey_Passwd, @""),
+                                                         NSLocalizedString(CSDocModelKey_URL, @""),
+                                                         NSLocalizedString(CSDocModelKey_Category, @""),
+                                                         NSLocalizedString(CSDocModelKey_Notes, @"")]
+                           dataUsingEncoding:NSUTF8StringEncoding]];
    unsigned int rowIndex;
-   for( rowIndex = [ indexes firstIndex ];
-        rowIndex != NSNotFound;
-        rowIndex = [ indexes indexGreaterThanIndex:rowIndex ] )
+   for(rowIndex = [indexes firstIndex];
+       rowIndex != NSNotFound;
+       rowIndex = [indexes indexGreaterThanIndex:rowIndex])
    {
-      NSArray *entryArray = [ [ self model ] stringArrayForEntryAtRow:rowIndex ];
-      NSMutableString *entryString = [ NSMutableString string ];
-      NSEnumerator *arrayEnum = [ entryArray objectEnumerator ];
+      NSArray *entryArray = [[self model] stringArrayForEntryAtRow:rowIndex];
+      NSMutableString *entryString = [NSMutableString string];
+      NSEnumerator *arrayEnum = [entryArray objectEnumerator];
       id entryField;
-      while( ( entryField = [ arrayEnum nextObject ] ) != nil )
+      while((entryField = [arrayEnum nextObject]) != nil)
       {
-         NSMutableString *newString = [ NSMutableString stringWithString:entryField ];
-         [ newString replaceOccurrencesOfString:@"\""
-                                     withString:@"\"\""
-                                        options:0
-                                          range:NSMakeRange( 0, [ newString length ] ) ];
-         if( [ entryString length ] > 0 )
-            [ entryString appendString:@"," ];
-         if( [ newString length ] > 0 )
-            [ entryString appendFormat:@"\"%@\"", newString ];
+         NSMutableString *newString = [NSMutableString stringWithString:entryField];
+         [newString replaceOccurrencesOfString:@"\""
+                                    withString:@"\"\""
+                                       options:0
+                                         range:NSMakeRange(0, [newString length])];
+         if([entryString length] > 0)
+            [entryString appendString:@","];
+         if([newString length] > 0)
+            [entryString appendFormat:@"\"%@\"", newString];
       }
-      [ entryString appendString:@"\n" ];
-      [ csvData appendData:[ entryString dataUsingEncoding:NSUTF8StringEncoding ] ];
+      [entryString appendString:@"\n"];
+      [csvData appendData:[entryString dataUsingEncoding:NSUTF8StringEncoding]];
    }
 
    return csvData;
@@ -435,38 +435,38 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (NSXMLDocument *) xmlDocumentForIndexes:(NSIndexSet *)indexes plainText:(BOOL)plainText
 {
-   NSXMLElement *rootElement = [ NSXMLNode elementWithName:CSDocumentXML_RootNode ];
-   NSArray *keyArray = [ NSArray arrayWithObjects:CSDocModelKey_Name, CSDocModelKey_Acct,
-                                                  CSDocModelKey_Passwd, CSDocModelKey_URL,
-                                                  CSDocModelKey_Category, CSDocModelKey_Notes, nil ];
+   NSXMLElement *rootElement = [NSXMLNode elementWithName:CSDocumentXML_RootNode];
+   NSArray *keyArray = [NSArray arrayWithObjects:CSDocModelKey_Name, CSDocModelKey_Acct,
+                                                 CSDocModelKey_Passwd, CSDocModelKey_URL,
+                                                 CSDocModelKey_Category, CSDocModelKey_Notes, nil];
    unsigned int rowIndex;
-   for( rowIndex = [ indexes firstIndex ];
-        rowIndex != NSNotFound;
-        rowIndex = [ indexes indexGreaterThanIndex:rowIndex ] )
+   for(rowIndex = [indexes firstIndex];
+       rowIndex != NSNotFound;
+       rowIndex = [indexes indexGreaterThanIndex:rowIndex])
    {
-      NSXMLElement *entryElement = [ NSXMLNode elementWithName:CSDocumentXML_EntryNode ];
-      NSEnumerator *keyEnumerator = [ keyArray objectEnumerator ];
+      NSXMLElement *entryElement = [NSXMLNode elementWithName:CSDocumentXML_EntryNode];
+      NSEnumerator *keyEnumerator = [keyArray objectEnumerator];
       id key;
-      while( ( key = [ keyEnumerator nextObject ] ) != nil )
+      while((key = [keyEnumerator nextObject]) != nil)
       {
          NSXMLNode *childElement;
-         if( [ key isEqualToString:CSDocModelKey_Notes ] && !plainText )
+         if([key isEqualToString:CSDocModelKey_Notes] && !plainText)
          {
-            childElement = [ NSXMLNode elementWithName:key ];
-            [ childElement setObjectValue:[ [ self model ] RTFDNotesAtRow:rowIndex ] ];
+            childElement = [NSXMLNode elementWithName:key];
+            [childElement setObjectValue:[[self model] RTFDNotesAtRow:rowIndex]];
          }
          else
-            childElement = [ NSXMLNode elementWithName:key
-                                           stringValue:[ [ self model ] stringForKey:key atRow:rowIndex ] ];
-         [ entryElement addChild:childElement ];
+            childElement = [NSXMLNode elementWithName:key
+                                          stringValue:[[self model] stringForKey:key atRow:rowIndex]];
+         [entryElement addChild:childElement];
       }
-      [ rootElement addChild:entryElement ];
+      [rootElement addChild:entryElement];
    }
-   NSXMLDocument *xmlDoc = [ [ NSXMLDocument alloc ] initWithRootElement:rootElement ];
-   [ xmlDoc setVersion:@"1.0" ];
-   [ xmlDoc setCharacterEncoding:@"UTF-8" ];
+   NSXMLDocument *xmlDoc = [[NSXMLDocument alloc] initWithRootElement:rootElement];
+   [xmlDoc setVersion:@"1.0"];
+   [xmlDoc setCharacterEncoding:@"UTF-8"];
 
-   return [ xmlDoc autorelease ];
+   return [xmlDoc autorelease];
 }
 
 
@@ -475,33 +475,35 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (NSData *) generateXMLDataForIndexes:(NSIndexSet *)indexes
 {
-   return [ [ self xmlDocumentForIndexes:indexes plainText:YES ] XMLDataWithOptions:NSXMLNodePrettyPrint ];
+   return [[self xmlDocumentForIndexes:indexes plainText:YES] XMLDataWithOptions:NSXMLNodePrettyPrint];
 }
 
 
 /*
  * Handle the actual export
  */
-- (void) exportPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+- (void) exportPanelDidEnd:(NSSavePanel *)sheet
+                returnCode:(int)returnCode
+               contextInfo:(void *)contextInfo
 {
-   if( returnCode == NSOKButton )
+   if(returnCode == NSOKButton)
    {
       NSIndexSet *entriesToExport;
-      if( exportIsSelectedItemsOnly )
-         entriesToExport = [ mainWindowController selectedRowIndexes ];
+      if(exportIsSelectedItemsOnly)
+         entriesToExport = [mainWindowController selectedRowIndexes];
       else
-         entriesToExport = [ NSIndexSet indexSetWithIndexesInRange:NSMakeRange( 0, [ self entryCount ] ) ];
+         entriesToExport = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [self entryCount])];
       NSData *myData = nil;
-      if( [ mainWindowController exportType ] == CSWinCtrlMainExportType_CSV )
-         myData = [ self generateCSVDataForIndexes:entriesToExport
-                                        withHeader:[ mainWindowController exportCSVHeader ] ];
+      if([mainWindowController exportType] == CSWinCtrlMainExportType_CSV)
+         myData = [self generateCSVDataForIndexes:entriesToExport
+                                       withHeader:[mainWindowController exportCSVHeader]];
       else
-         myData = [ self generateXMLDataForIndexes:entriesToExport ];
-      NSDictionary *fileAttr = [ NSDictionary dictionaryWithObject:[ NSNumber numberWithUnsignedLong:0600 ]
-                                                            forKey:NSFilePosixPermissions ];
-      [ [ NSFileManager defaultManager ] createFileAtPath:[ sheet filename ]
-                                                 contents:myData
-                                               attributes:fileAttr ];
+         myData = [self generateXMLDataForIndexes:entriesToExport];
+      NSDictionary *fileAttr = [NSDictionary dictionaryWithObject:[NSNumber numberWithUnsignedLong:0600]
+                                                           forKey:NSFilePosixPermissions];
+      [[NSFileManager defaultManager] createFileAtPath:[sheet filename]
+                                              contents:myData
+                                            attributes:fileAttr];
    }
 }
 
@@ -511,16 +513,16 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (void) startExportPanel
 {
-   NSSavePanel *savePanel = [ NSSavePanel savePanel ];
-   [ savePanel setAccessoryView:[ mainWindowController exportAccessoryView ] ];
-   [ savePanel setCanCreateDirectories:YES ];
-   [ savePanel setAllowsOtherFileTypes:YES ];
-   [ savePanel beginSheetForDirectory:nil
-                                 file:nil
-                       modalForWindow:[ self windowForSheet ]
-                        modalDelegate:self
-                       didEndSelector:@selector( exportPanelDidEnd:returnCode:contextInfo: )
-                          contextInfo:NULL ];   
+   NSSavePanel *savePanel = [NSSavePanel savePanel];
+   [savePanel setAccessoryView:[mainWindowController exportAccessoryView]];
+   [savePanel setCanCreateDirectories:YES];
+   [savePanel setAllowsOtherFileTypes:YES];
+   [savePanel beginSheetForDirectory:nil
+                                file:nil
+                      modalForWindow:[self windowForSheet]
+                       modalDelegate:self
+                      didEndSelector:@selector(exportPanelDidEnd:returnCode:contextInfo:)
+                         contextInfo:NULL];   
 }
 
 
@@ -530,7 +532,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 - (IBAction) exportDocument:(id)sender
 {
    exportIsSelectedItemsOnly = NO;
-   [ self startExportPanel ];
+   [self startExportPanel];
 }
 
 
@@ -540,7 +542,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 - (IBAction) exportSelectedItems:(id)sender
 {
    exportIsSelectedItemsOnly = YES;
-   [ self startExportPanel ];
+   [self startExportPanel];
 }
 
 
@@ -563,62 +565,62 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
     *    NSTabularTextPboardType - simple string, each entry tab-delimited
     *    NSStringPboardType - same as NSTabularTextPboardType
     */
-   NSMutableArray *docArray = [ NSMutableArray arrayWithCapacity:[ rows count ] ];
-   NSAttributedString *attrEOL = [ [ NSAttributedString alloc ] initWithString:@"\n" ];
-   NSMutableAttributedString *rtfdStringRows = [ [ NSMutableAttributedString alloc ] initWithString:@"" ];
+   NSMutableArray *docArray = [NSMutableArray arrayWithCapacity:[rows count]];
+   NSAttributedString *attrEOL = [[NSAttributedString alloc] initWithString:@"\n"];
+   NSMutableAttributedString *rtfdStringRows = [[NSMutableAttributedString alloc] initWithString:@""];
    int row;
-   for( row = [ rows firstIndex ]; row != NSNotFound; row = [ rows indexGreaterThanIndex:row ] )
+   for(row = [rows firstIndex]; row != NSNotFound; row = [rows indexGreaterThanIndex:row])
    {
-      NSString *nameString = [ self stringForKey:CSDocModelKey_Name atRow:row ];
-      NSString *acctString = [ self stringForKey:CSDocModelKey_Acct atRow:row ];
-      NSString *urlString = [ self stringForKey:CSDocModelKey_URL atRow:row ];
-      NSString *categoryString = [ self stringForKey:CSDocModelKey_Category atRow:row ];
-      NSString *passwdString = [ self stringForKey:CSDocModelKey_Passwd atRow:row ];
-      NSData *notesData = [ self RTFDNotesAtRow:row ];
-      [ docArray addObject:[ NSDictionary dictionaryWithObjectsAndKeys:
-                                             nameString, CSDocModelKey_Name,
-                                             acctString, CSDocModelKey_Acct,
-                                             passwdString, CSDocModelKey_Passwd,
-                                             urlString, CSDocModelKey_URL,
-                                             categoryString, CSDocModelKey_Category,
-                                             notesData, CSDocModelKey_Notes,
-                                             nil ] ];
+      NSString *nameString = [self stringForKey:CSDocModelKey_Name atRow:row];
+      NSString *acctString = [self stringForKey:CSDocModelKey_Acct atRow:row];
+      NSString *urlString = [self stringForKey:CSDocModelKey_URL atRow:row];
+      NSString *categoryString = [self stringForKey:CSDocModelKey_Category atRow:row];
+      NSString *passwdString = [self stringForKey:CSDocModelKey_Passwd atRow:row];
+      NSData *notesData = [self RTFDNotesAtRow:row];
+      [docArray addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+                                           nameString, CSDocModelKey_Name,
+                                           acctString, CSDocModelKey_Acct,
+                                           passwdString, CSDocModelKey_Passwd,
+                                           urlString, CSDocModelKey_URL,
+                                           categoryString, CSDocModelKey_Category,
+                                           notesData, CSDocModelKey_Notes,
+                                           nil]];
       NSAttributedString *attrString;
-      if( [ [ NSUserDefaults standardUserDefaults ] boolForKey:CSPrefDictKey_IncludePasswd ] )
-         attrString = [ [ NSAttributedString alloc ] initWithString:
-            [ NSString stringWithFormat:@"%@\t%@\t%@\t%@\t%@\t",
-                          nameString,
-                          acctString,
-                          passwdString,
-                          urlString,
-                          categoryString ] ];
+      if([[NSUserDefaults standardUserDefaults] boolForKey:CSPrefDictKey_IncludePasswd])
+         attrString = [[NSAttributedString alloc] initWithString:
+            [NSString stringWithFormat:@"%@\t%@\t%@\t%@\t%@\t",
+                                       nameString,
+                                       acctString,
+                                       passwdString,
+                                       urlString,
+                                       categoryString]];
       else
-         attrString = [ [ NSAttributedString alloc ] initWithString:
-            [ NSString stringWithFormat:@"%@\t%@\t%@\t%@\t",
-                          nameString,
-                          acctString,
-                          urlString,
-                          categoryString ] ];
-      [ rtfdStringRows appendAttributedString:attrString ];
-      [ attrString release ];
-      [ rtfdStringRows appendAttributedString:[ self RTFDStringNotesAtRow:row ] ];
-      [ rtfdStringRows appendAttributedString:attrEOL ];
+         attrString = [[NSAttributedString alloc] initWithString:
+            [NSString stringWithFormat:@"%@\t%@\t%@\t%@\t",
+                                       nameString,
+                                       acctString,
+                                       urlString,
+                                       categoryString]];
+      [rtfdStringRows appendAttributedString:attrString];
+      [attrString release];
+      [rtfdStringRows appendAttributedString:[self RTFDStringNotesAtRow:row]];
+      [rtfdStringRows appendAttributedString:attrEOL];
    }
 
-   [ pboard declareTypes:[ NSArray arrayWithObjects:CSDocumentPboardType,
-                                      NSRTFDPboardType,
-                                      NSRTFPboardType,
-                                      NSTabularTextPboardType,
-                                      NSStringPboardType,
-                                      nil ]
-                   owner:nil ];
-   [ pboard setData:[ NSArchiver archivedDataWithRootObject:docArray ] forType:CSDocumentPboardType ];
-   [ pboard setData:[ rtfdStringRows RTFDWithDocumentAttributes:NULL ] forType:NSRTFDPboardType ];
-   [ pboard setData:[ rtfdStringRows RTFWithDocumentAttributes:NULL ] forType:NSRTFPboardType ];
-   [ pboard setString:[ rtfdStringRows string ] forType:NSTabularTextPboardType ];
-   [ pboard setString:[ rtfdStringRows string ] forType:NSStringPboardType ];
-   [ rtfdStringRows release ];
-   [ attrEOL release ];
+   [pboard declareTypes:[NSArray arrayWithObjects:CSDocumentPboardType,
+                                                  NSRTFDPboardType,
+                                                  NSRTFPboardType,
+                                                  NSTabularTextPboardType,
+                                                  NSStringPboardType,
+                                                  nil]
+                  owner:nil];
+   [pboard setData:[NSArchiver archivedDataWithRootObject:docArray] forType:CSDocumentPboardType];
+   [pboard setData:[rtfdStringRows RTFDWithDocumentAttributes:NULL] forType:NSRTFDPboardType];
+   [pboard setData:[rtfdStringRows RTFWithDocumentAttributes:NULL] forType:NSRTFPboardType];
+   [pboard setString:[rtfdStringRows string] forType:NSTabularTextPboardType];
+   [pboard setString:[rtfdStringRows string] forType:NSStringPboardType];
+   [rtfdStringRows release];
+   [attrEOL release];
 
    return YES;
 }
@@ -631,25 +633,25 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
                               undoName:(NSString *)undoName
 {
    BOOL retval = NO;
-   NSArray *entryArray = [ NSUnarchiver unarchiveObjectWithData:[ pboard dataForType:CSDocumentPboardType ] ];
-   if( entryArray != nil && [ entryArray count ] > 0 )
+   NSArray *entryArray = [NSUnarchiver unarchiveObjectWithData:[pboard dataForType:CSDocumentPboardType]];
+   if(entryArray != nil && [entryArray count] > 0)
    {
-      NSMutableArray *nameArray = [ NSMutableArray arrayWithCapacity:[ entryArray count ] ];
-      NSEnumerator *entryEnumerator = [ entryArray objectEnumerator ];
+      NSMutableArray *nameArray = [NSMutableArray arrayWithCapacity:[entryArray count]];
+      NSEnumerator *entryEnumerator = [entryArray objectEnumerator];
       id entryDictionary;
-      while( ( entryDictionary = [ entryEnumerator nextObject ] ) != nil )
+      while((entryDictionary = [entryEnumerator nextObject]) != nil)
       {
-         NSString *uniqueName = [ self uniqueNameForName:[ entryDictionary objectForKey:CSDocModelKey_Name ] ];
-         [ nameArray addObject:uniqueName ];
-         [ [ self model ] addBulkEntryWithName:uniqueName
-                                       account:[ entryDictionary objectForKey:CSDocModelKey_Acct ]
-                                      password:[ entryDictionary objectForKey:CSDocModelKey_Passwd ]
-                                           URL:[ entryDictionary objectForKey:CSDocModelKey_URL ]
-                                      category:[ entryDictionary objectForKey:CSDocModelKey_Category ]
-                                     notesRTFD:[ entryDictionary objectForKey:CSDocModelKey_Notes ] ];
+         NSString *uniqueName = [self uniqueNameForName:[entryDictionary objectForKey:CSDocModelKey_Name]];
+         [nameArray addObject:uniqueName];
+         [[self model] addBulkEntryWithName:uniqueName
+                                    account:[entryDictionary objectForKey:CSDocModelKey_Acct]
+                                   password:[entryDictionary objectForKey:CSDocModelKey_Passwd]
+                                        URL:[entryDictionary objectForKey:CSDocModelKey_URL]
+                                   category:[entryDictionary objectForKey:CSDocModelKey_Category]
+                                  notesRTFD:[entryDictionary objectForKey:CSDocModelKey_Notes]];
       }
-      [ [ self model ] registerAddForNamesInArray:nameArray ];
-      [ [ self undoManager ] setActionName:undoName ];
+      [[self model] registerAddForNamesInArray:nameArray];
+      [[self undoManager] setActionName:undoName];
       retval = YES;
    }
 
@@ -667,7 +669,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (int) entryCount
 {
-   return [ [ self model ] entryCount ];
+   return [[self model] entryCount];
 }
 
 
@@ -676,7 +678,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (void) setSortKey:(NSString *)newSortKey
 {
-   [ [ self model ] setSortKey:newSortKey ];
+   [[self model] setSortKey:newSortKey];
 }
 
 
@@ -685,7 +687,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (NSString *) sortKey
 {
-   return [ [ self model ] sortKey ];
+   return [[self model] sortKey];
 }
 
 
@@ -694,7 +696,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (void) setSortAscending:(BOOL)sortAsc
 {
-   [ [ self model ] setSortAscending:sortAsc ];
+   [[self model] setSortAscending:sortAsc];
 }
 
 
@@ -703,7 +705,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (BOOL) isSortAscending
 {
-   return [ [ self model ] isSortAscending ];
+   return [[self model] isSortAscending];
 }
 
 
@@ -712,7 +714,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (void) setSortKey:(NSString *)newSortKey ascending:(BOOL)sortAsc
 {
-   [ [ self model ] setSortKey:newSortKey ascending:sortAsc ];
+   [[self model] setSortKey:newSortKey ascending:sortAsc];
 }
 
 
@@ -721,7 +723,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (NSString *) stringForKey:(NSString *)key atRow:(int)row
 {
-   return [ [ self model ] stringForKey:key atRow:row ];
+   return [[self model] stringForKey:key atRow:row];
 }
 
 
@@ -730,7 +732,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (NSData *) RTFDNotesAtRow:(int)row
 {
-   return [ [ self model ] RTFDNotesAtRow:row ];
+   return [[self model] RTFDNotesAtRow:row];
 }
 
 
@@ -739,7 +741,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (NSData *) RTFNotesAtRow:(int)row
 {
-   return [ [ self model ] RTFNotesAtRow:row ];
+   return [[self model] RTFNotesAtRow:row];
 }
 
 
@@ -748,7 +750,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (NSAttributedString *) RTFDStringNotesAtRow:(int)row
 {
-   return [ [ self model ] RTFDStringNotesAtRow:row ];
+   return [[self model] RTFDStringNotesAtRow:row];
 }
 
 
@@ -757,7 +759,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (NSAttributedString *) RTFStringNotesAtRow:(int)row
 {
-   return [ [ self model ] RTFStringNotesAtRow:row ];
+   return [[self model] RTFStringNotesAtRow:row];
 }
 
 
@@ -766,7 +768,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (int) rowForName:(NSString *)name
 {
-   return [ [ self model ] rowForName:name ];
+   return [[self model] rowForName:name];
 }
 
 
@@ -780,12 +782,12 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
                  category:(NSString *)category
                 notesRTFD:(NSData *)notes
 {
-   return [ [ self model ] addEntryWithName:name
-                                    account:account
-                                   password:password
-                                        URL:url
-                                   category:category
-                                  notesRTFD:notes ];
+   return [[self model] addEntryWithName:name
+                                 account:account
+                                password:password
+                                     URL:url
+                                category:category
+                               notesRTFD:notes];
 }
 
 
@@ -801,19 +803,19 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
                     category:(NSString *)category
                    notesRTFD:(NSData *)notes
 {
-   NSMutableArray *selectedNames = [ NSMutableArray arrayWithArray:[ mainWindowController getSelectedNames ] ];
-   if( newName != nil && ![ name isEqualToString:newName ] )
-      [ selectedNames replaceObjectAtIndex:[ selectedNames indexOfObject:name ]
-                                withObject:newName ];
-   BOOL changeSuccessful = [ [ self model ] changeEntryWithName:name
-                                                        newName:newName
-                                                        account:account
-                                                       password:password
-                                                            URL:url
-                                                       category:category
-                                                      notesRTFD:notes ];
-   if( changeSuccessful )
-      [ mainWindowController selectNames:selectedNames ];
+   NSMutableArray *selectedNames = [NSMutableArray arrayWithArray:[mainWindowController getSelectedNames]];
+   if(newName != nil && ![name isEqualToString:newName])
+      [selectedNames replaceObjectAtIndex:[selectedNames indexOfObject:name]
+                               withObject:newName];
+   BOOL changeSuccessful = [[self model] changeEntryWithName:name
+                                                     newName:newName
+                                                     account:account
+                                                    password:password
+                                                         URL:url
+                                                    category:category
+                                                   notesRTFD:notes];
+   if(changeSuccessful)
+      [mainWindowController selectNames:selectedNames];
 
    return changeSuccessful;
 }
@@ -824,7 +826,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (unsigned) deleteEntriesWithNamesInArray:(NSArray *)nameArray
 {
-   return [ [ self model ] deleteEntriesWithNamesInArray:nameArray ];
+   return [[self model] deleteEntriesWithNamesInArray:nameArray];
 }
 
 
@@ -835,9 +837,9 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
                                 ignoreCase:(BOOL)ignoreCase
                                     forKey:(NSString *)key
 {
-   return [ [ self model ] firstRowBeginningWithString:findMe
-                                            ignoreCase:ignoreCase
-                                                forKey:key ];
+   return [[self model] firstRowBeginningWithString:findMe
+                                         ignoreCase:ignoreCase
+                                             forKey:key];
 }
 
 
@@ -848,9 +850,9 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
                       ignoreCase:(BOOL)ignoreCase
                           forKey:(NSString *)key
 {
-   return [ [ self model ] rowsMatchingString:findMe
-                                   ignoreCase:ignoreCase
-                                       forKey:key ];
+   return [[self model] rowsMatchingString:findMe
+                                ignoreCase:ignoreCase
+                                    forKey:key];
 }
 
 
@@ -866,30 +868,30 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
     * Need to keep change windows synchronized on changes and remove them
     * on deletes, as undo/redo will change them outside our control
     */
-   if( [ [ notification name ] isEqualToString:CSDocModelDidChangeEntryNotification ] )
+   if([[notification name] isEqualToString:CSDocModelDidChangeEntryNotification])
    {
-      NSString *oldName = [ [ notification userInfo ]
-                            objectForKey:CSDocModelNotificationInfoKey_ChangedNameFrom ];
-      changeController = [ CSWinCtrlChange controllerForEntryName:oldName inDocument:self ];
-      if( changeController != nil )
-         [ changeController setEntryName:[ [ notification userInfo ]
-                                           objectForKey:CSDocModelNotificationInfoKey_ChangedNameTo ] ];
+      NSString *oldName = [[notification userInfo]
+                           objectForKey:CSDocModelNotificationInfoKey_ChangedNameFrom];
+      changeController = [CSWinCtrlChange controllerForEntryName:oldName inDocument:self];
+      if(changeController != nil)
+         [changeController setEntryName:[[notification userInfo]
+                                         objectForKey:CSDocModelNotificationInfoKey_ChangedNameTo]];
    }
-   else if( [ [ notification name ] isEqualToString:CSDocModelDidRemoveEntryNotification ] )
+   else if([[notification name] isEqualToString:CSDocModelDidRemoveEntryNotification])
    {
-      NSArray *deletedNames = [ [ notification userInfo ]
-                                objectForKey:CSDocModelNotificationInfoKey_DeletedNames ];
-      NSEnumerator *nameEnumerator = [ deletedNames objectEnumerator ];
+      NSArray *deletedNames = [[notification userInfo]
+                               objectForKey:CSDocModelNotificationInfoKey_DeletedNames];
+      NSEnumerator *nameEnumerator = [deletedNames objectEnumerator];
       id deletedName;
-      while( ( deletedName = [ nameEnumerator nextObject ] ) != nil )
+      while((deletedName = [nameEnumerator nextObject]) != nil)
       {
-         changeController = [ CSWinCtrlChange controllerForEntryName:deletedName inDocument:self ];
-         if( changeController != nil )
-            [ [ changeController window ] performClose:self ];
+         changeController = [CSWinCtrlChange controllerForEntryName:deletedName inDocument:self];
+         if(changeController != nil)
+            [[changeController window] performClose:self];
       }
    }
    
-   [ mainWindowController refreshWindow ];
+   [mainWindowController refreshWindow];
 }
 
 
@@ -899,15 +901,15 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (void) getKeyResult:(NSMutableData *)newKey
 {
-   NSAssert( getKeyInvocation != nil, @"getKeyInvocation is nil" );
+   NSAssert(getKeyInvocation != nil, @"getKeyInvocation is nil");
    
-   if( newKey != nil )
+   if(newKey != nil)
    {
-      [ self setBFKey:newKey ];
-      [ getKeyInvocation invoke ];
+      [self setBFKey:newKey];
+      [getKeyInvocation invoke];
    }
    
-   [ getKeyInvocation release ];
+   [getKeyInvocation release];
    getKeyInvocation = nil;
 }
 
@@ -917,14 +919,14 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (void) openAddEntryWindow
 {
-   CSWinCtrlAdd *winController = [ [ self windowControllers ] firstObjectOfClass:[ CSWinCtrlAdd class ] ];
-   if( winController == nil )   // Doesn't exist yet
+   CSWinCtrlAdd *winController = [[self windowControllers] firstObjectOfClass:[CSWinCtrlAdd class]];
+   if(winController == nil)   // Doesn't exist yet
    {
-      winController = [ [ CSWinCtrlAdd alloc ] init ];
-      [ self addWindowController:winController ];
-      [ winController release ];
+      winController = [[CSWinCtrlAdd alloc] init];
+      [self addWindowController:winController];
+      [winController release];
    }
-   [ winController showWindow:self ];
+   [winController showWindow:self];
 }
 
 
@@ -933,19 +935,19 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (void) viewEntries:(NSArray *)namesArray
 {
-   NSEnumerator *nameEnumerator = [ namesArray objectEnumerator ];
+   NSEnumerator *nameEnumerator = [namesArray objectEnumerator];
    id oneName;
-   while( ( oneName = [ nameEnumerator nextObject ] ) != nil )
+   while((oneName = [nameEnumerator nextObject]) != nil)
    {
-      CSWinCtrlChange *winController = [ CSWinCtrlChange controllerForEntryName:oneName
-                                                                     inDocument:self ];
-      if( winController == nil )
+      CSWinCtrlChange *winController = [CSWinCtrlChange controllerForEntryName:oneName
+                                                                    inDocument:self];
+      if(winController == nil)
       {
-         winController = [ [ CSWinCtrlChange alloc ] initForEntryName:oneName ];
-         [ self addWindowController:winController ];
-         [ winController release ];
+         winController = [[CSWinCtrlChange alloc] initForEntryName:oneName];
+         [self addWindowController:winController];
+         [winController release];
       }
-      [ winController showWindow:self ];
+      [winController showWindow:self];
    }
 }
 
@@ -955,23 +957,23 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (BOOL) validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem
 {
-   SEL itemAction = [ anItem action ];
+   SEL itemAction = [anItem action];
    
-   if( itemAction == @selector( changePassphrase: ) )
-      return ( bfKey != nil );
-   else if( itemAction == @selector( revertDocumentToSaved: ) )
+   if(itemAction == @selector(changePassphrase:))
+      return (bfKey != nil);
+   else if(itemAction == @selector(revertDocumentToSaved:))
    {
-      if( [ self isDocumentEdited ] )
-         return [ super validateUserInterfaceItem:anItem ];
+      if([self isDocumentEdited])
+         return [super validateUserInterfaceItem:anItem];
       else
          return NO;
    }
-   else if( itemAction == @selector( exportSelectedItems: ) )
-      return ( [ [ [ self mainWindowController ] selectedRowIndexes ] count ] > 0 );
-   else if( itemAction == @selector( exportDocument: ) )
-      return ( [ self entryCount ] > 0 );
+   else if(itemAction == @selector(exportSelectedItems:))
+      return ([[[self mainWindowController] selectedRowIndexes] count] > 0);
+   else if(itemAction == @selector(exportDocument:))
+      return ([self entryCount] > 0);
    else
-      return [ super validateUserInterfaceItem:anItem ];
+      return [super validateUserInterfaceItem:anItem];
 }
 
 
@@ -980,10 +982,10 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
  */
 - (void) dealloc
 {
-   [ self setBFKey:nil ];
-   [ passphraseWindowController release ];
-   [ docModel release ];
-   [ super dealloc ];
+   [self setBFKey:nil];
+   [passphraseWindowController release];
+   [docModel release];
+   [super dealloc];
 }
 
 
@@ -1000,12 +1002,12 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 {
    NSString *uniqueName = name;
    int index;
-   for( index = 0; [ self rowForName:uniqueName ] != -1; index++ )
+   for(index = 0; [self rowForName:uniqueName] != -1; index++)
    {
-      if( index )
-         uniqueName = [ NSString stringWithFormat:NSLocalizedString( @"%@ copy %d", @"" ), name, index ];
+      if(index)
+         uniqueName = [NSString stringWithFormat:NSLocalizedString(@"%@ copy %d", @""), name, index];
       else
-         uniqueName = [ NSString stringWithFormat:NSLocalizedString( @"%@ copy", @"" ), name ];
+         uniqueName = [NSString stringWithFormat:NSLocalizedString(@"%@ copy", @""), name];
    }
    
    return uniqueName;

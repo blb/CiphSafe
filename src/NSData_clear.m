@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003,2006-2007, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2003,2006-2007,2011, Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -42,38 +42,38 @@
  */
 - (void) clearOutData
 {
-   if( [ self isKindOfClass:NSClassFromString( @"NSConcreteData" ) ] ||
-       [ self isKindOfClass:NSClassFromString( @"NSConcreteMutableData" ) ] )
+   if([self isKindOfClass:NSClassFromString(@"NSConcreteData")]
+      || [self isKindOfClass:NSClassFromString(@"NSConcreteMutableData")])
    {
       BOOL isMutable = YES;
-      if( [ self isKindOfClass:NSClassFromString( @"NSConcreteData" ) ] )
+      if([self isKindOfClass:NSClassFromString(@"NSConcreteData")])
          isMutable = NO;
       char *someData = NULL;
       int index;
-      for( index = 0; index < isa->ivars->ivar_count; index++ )
+      for(index = 0; index < isa->ivars->ivar_count; index++)
       {
-         Ivar ivar = &isa->ivars->ivar_list[ index ];
-         if( strcmp( ivar->ivar_name, "_bytes" ) == 0 )
+         Ivar ivar = &isa->ivars->ivar_list[index];
+         if(strcmp(ivar->ivar_name, "_bytes") == 0)
          {
-            if( isMutable )
-               someData = *( (char **) ( (char *) self + ivar->ivar_offset ) );
+            if(isMutable)
+               someData = *((char **) ((char *) self + ivar->ivar_offset));
             else
-               someData = ( (char *) self + ivar->ivar_offset );
+               someData = ((char *) self + ivar->ivar_offset);
          }
       }
-      if( someData != NULL )   // We found _bytes
+      if(someData != NULL)   // We found _bytes
       {
-         for( index = 0; index < [ self length ]; index++ )
-            someData[ index ] = 0;
+         for(index = 0; index < [self length]; index++)
+            someData[index] = 0;
       }
 #if defined(DEBUG)
       else
-         NSLog( @"NSData_clear: warning, couldn't find _bytes\n" );
+         NSLog(@"NSData_clear: warning, couldn't find _bytes\n");
 #endif
    }
 #if defined(DEBUG)
    else
-      NSLog( @"NSData_clear: warning, can't clear class %@\n", NSStringFromClass( [ self class ] ) );
+      NSLog(@"NSData_clear: warning, can't clear class %@\n", NSStringFromClass([self class]));
 #endif
 }
 

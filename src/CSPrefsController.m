@@ -1,5 +1,5 @@
 /*
- * Copyright © 2007, Bryan L Blackburn.  All rights reserved.
+ * Copyright © 2007,2011 Bryan L Blackburn.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -86,35 +86,35 @@ static CSPrefsController *sharedPrefsController = nil;
  */
 + (void) initialize
 {
-   NSString *defaultPrefsPath = [ [ NSBundle mainBundle ] pathForResource:@"DefaultPrefs"
-                                                                   ofType:@"plist" ];
-   NSDictionary *defaultPrefs = [ NSDictionary dictionaryWithContentsOfFile:defaultPrefsPath ];
-   NSUserDefaults *userDefaults = [ NSUserDefaults standardUserDefaults ];
-   [ userDefaults registerDefaults:defaultPrefs ];
-   [ [ NSUserDefaultsController sharedUserDefaultsController ] setInitialValues:defaultPrefs ];
+   NSString *defaultPrefsPath = [[NSBundle mainBundle] pathForResource:@"DefaultPrefs"
+                                                                ofType:@"plist"];
+   NSDictionary *defaultPrefs = [NSDictionary dictionaryWithContentsOfFile:defaultPrefsPath];
+   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+   [userDefaults registerDefaults:defaultPrefs];
+   [[NSUserDefaultsController sharedUserDefaultsController] setInitialValues:defaultPrefs];
    // Sanity checks
-   if( [ userDefaults integerForKey:CSPrefDictKey_GenSize ] < 1 ||
-       [ userDefaults integerForKey:CSPrefDictKey_GenSize ] > 255 )
-      [ userDefaults setInteger:8 forKey:CSPrefDictKey_GenSize ];
-   if( [ userDefaults integerForKey:CSPrefDictKey_CloseTimeout ] < 1 ||
-       [ userDefaults integerForKey:CSPrefDictKey_CloseTimeout ] > 3600 )
-      [ userDefaults setInteger:10 forKey:CSPrefDictKey_CloseTimeout ];
-   int cellSpacing = [ userDefaults integerForKey:CSPrefDictKey_CellSpacing ];
-   if( cellSpacing != CSPrefCellSpacingOption_Small &&
-       cellSpacing != CSPrefCellSpacingOption_Medium &&
-       cellSpacing != CSPrefCellSpacingOption_Large )
-      [ userDefaults setInteger:CSPrefCellSpacingOption_Small forKey:CSPrefDictKey_CellSpacing ];
-   int timeoutSaveOption = [ userDefaults integerForKey:CSPrefDictKey_CloseAfterTimeoutSaveOption ];
-   if( timeoutSaveOption != CSPrefCloseAfterTimeoutSaveOption_Save &&
-       timeoutSaveOption != CSPrefCloseAfterTimeoutSaveOption_Discard &&
-       timeoutSaveOption != CSPrefCloseAfterTimeoutSaveOption_Ask )
-      [ userDefaults setInteger:CSPrefCloseAfterTimeoutSaveOption_Save
-                         forKey:CSPrefDictKey_CloseAfterTimeoutSaveOption ];
+   if([userDefaults integerForKey:CSPrefDictKey_GenSize] < 1
+      || [userDefaults integerForKey:CSPrefDictKey_GenSize] > 255)
+      [userDefaults setInteger:8 forKey:CSPrefDictKey_GenSize];
+   if([userDefaults integerForKey:CSPrefDictKey_CloseTimeout] < 1
+      || [userDefaults integerForKey:CSPrefDictKey_CloseTimeout] > 3600)
+      [userDefaults setInteger:10 forKey:CSPrefDictKey_CloseTimeout];
+   int cellSpacing = [userDefaults integerForKey:CSPrefDictKey_CellSpacing];
+   if(cellSpacing != CSPrefCellSpacingOption_Small
+      && cellSpacing != CSPrefCellSpacingOption_Medium
+      && cellSpacing != CSPrefCellSpacingOption_Large)
+      [userDefaults setInteger:CSPrefCellSpacingOption_Small forKey:CSPrefDictKey_CellSpacing];
+   int timeoutSaveOption = [userDefaults integerForKey:CSPrefDictKey_CloseAfterTimeoutSaveOption];
+   if(timeoutSaveOption != CSPrefCloseAfterTimeoutSaveOption_Save
+      && timeoutSaveOption != CSPrefCloseAfterTimeoutSaveOption_Discard
+      && timeoutSaveOption != CSPrefCloseAfterTimeoutSaveOption_Ask)
+      [userDefaults setInteger:CSPrefCloseAfterTimeoutSaveOption_Save
+                        forKey:CSPrefDictKey_CloseAfterTimeoutSaveOption];
 
-   toolbarItemIDs = [ [ NSArray alloc ] initWithObjects:CSPrefsControllerToolbarID_General,
-                                                        CSPrefsControllerToolbarID_Appearance,
-                                                        CSPrefsControllerToolbarID_Security,
-                                                        nil ];
+   toolbarItemIDs = [[NSArray alloc] initWithObjects:CSPrefsControllerToolbarID_General,
+                                                     CSPrefsControllerToolbarID_Appearance,
+                                                     CSPrefsControllerToolbarID_Security,
+                                                     nil];
 }
 
 
@@ -123,13 +123,13 @@ static CSPrefsController *sharedPrefsController = nil;
  */
 - (id) initWithWindow:(NSWindow *)window
 {
-   if( sharedPrefsController != nil )
+   if(sharedPrefsController != nil)
    {
-      [ self release ];
+      [self release];
       return sharedPrefsController;
    }
    
-   return [ super initWithWindow:window ];
+   return [super initWithWindow:window];
 }
 
 
@@ -138,38 +138,38 @@ static CSPrefsController *sharedPrefsController = nil;
  */
 - (void) awakeFromNib
 {
-   NSToolbarItem *generalItem = [ self createToolbarItemWithID:CSPrefsControllerToolbarID_General
-                                                    imageNamed:@"lightswitch" ];
-   NSToolbarItem *appearanceItem = [ self createToolbarItemWithID:CSPrefsControllerToolbarID_Appearance
-                                                       imageNamed:@"mini window ciphsafe" ];
-   NSToolbarItem *securityItem = [ self createToolbarItemWithID:CSPrefsControllerToolbarID_Security
-                                                     imageNamed:@"padlock caution behind" ];
-   toolbarItems = [ [ NSDictionary alloc ] initWithObjectsAndKeys:
-      generalItem, CSPrefsControllerToolbarID_General,
-      appearanceItem, CSPrefsControllerToolbarID_Appearance,
-      securityItem, CSPrefsControllerToolbarID_Security,
-      nil ];
-   [ generalItem release ];
-   [ appearanceItem release ];
-   [ securityItem release ];
+   NSToolbarItem *generalItem = [self createToolbarItemWithID:CSPrefsControllerToolbarID_General
+                                                   imageNamed:@"lightswitch"];
+   NSToolbarItem *appearanceItem = [self createToolbarItemWithID:CSPrefsControllerToolbarID_Appearance
+                                                      imageNamed:@"mini window ciphsafe"];
+   NSToolbarItem *securityItem = [self createToolbarItemWithID:CSPrefsControllerToolbarID_Security
+                                                    imageNamed:@"padlock caution behind"];
+   toolbarItems = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                           generalItem, CSPrefsControllerToolbarID_General,
+                                           appearanceItem, CSPrefsControllerToolbarID_Appearance,
+                                           securityItem, CSPrefsControllerToolbarID_Security,
+                                           nil];
+   [generalItem release];
+   [appearanceItem release];
+   [securityItem release];
    
-   toolbarViews = [ [ NSDictionary alloc ] initWithObjectsAndKeys:
-      generalView, CSPrefsControllerToolbarID_General,
-      appearanceView, CSPrefsControllerToolbarID_Appearance,
-      securityView, CSPrefsControllerToolbarID_Security,
-      nil ];
+   toolbarViews = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                           generalView, CSPrefsControllerToolbarID_General,
+                                           appearanceView, CSPrefsControllerToolbarID_Appearance,
+                                           securityView, CSPrefsControllerToolbarID_Security,
+                                           nil];
    
-   NSToolbar *toolbar = [ [ NSToolbar alloc ] initWithIdentifier:@"PreferencesToolbar" ];
-   [ toolbar setAllowsUserCustomization:NO ];
-   [ toolbar setAutosavesConfiguration:NO ];
-   [ toolbar setDelegate:self ];
-   [ toolbar setDisplayMode:NSToolbarDisplayModeIconAndLabel ];
-   [ toolbar setSizeMode:NSToolbarSizeModeDefault ];
-   [ toolbar setSelectedItemIdentifier:CSPrefsControllerToolbarID_General ];
-   [ self setWindowContentToView:generalView ];
-   [ [ self window ] setShowsToolbarButton:NO ];
-   [ [ self window ] setToolbar:toolbar ];
-   [ toolbar release ];
+   NSToolbar *toolbar = [[NSToolbar alloc] initWithIdentifier:@"PreferencesToolbar"];
+   [toolbar setAllowsUserCustomization:NO];
+   [toolbar setAutosavesConfiguration:NO];
+   [toolbar setDelegate:self];
+   [toolbar setDisplayMode:NSToolbarDisplayModeIconAndLabel];
+   [toolbar setSizeMode:NSToolbarSizeModeDefault];
+   [toolbar setSelectedItemIdentifier:CSPrefsControllerToolbarID_General];
+   [self setWindowContentToView:generalView];
+   [[self window] setShowsToolbarButton:NO];
+   [[self window] setToolbar:toolbar];
+   [toolbar release];
 }
 
 
@@ -180,11 +180,11 @@ static CSPrefsController *sharedPrefsController = nil;
  */
 - (NSToolbarItem *) createToolbarItemWithID:(NSString *)itemID imageNamed:(NSString *)imageName
 {
-   NSToolbarItem *newItem = [ [ NSToolbarItem alloc ] initWithItemIdentifier:itemID ];
-   [ newItem setAction:@selector( toolbarSelectedAnItem: ) ];
-   [ newItem setImage:[ NSImage imageNamed:imageName ] ];
-   [ newItem setLabel:NSLocalizedString( itemID, @"" ) ];
-   [ newItem setTarget:self ];
+   NSToolbarItem *newItem = [[NSToolbarItem alloc] initWithItemIdentifier:itemID];
+   [newItem setAction:@selector(toolbarSelectedAnItem:)];
+   [newItem setImage:[NSImage imageNamed:imageName]];
+   [newItem setLabel:NSLocalizedString(itemID, @"")];
+   [newItem setTarget:self];
 
    return newItem;
 }
@@ -224,7 +224,7 @@ static CSPrefsController *sharedPrefsController = nil;
       itemForItemIdentifier:(NSString *)itemIdentifier
   willBeInsertedIntoToolbar:(BOOL)flag
 {
-   return [ toolbarItems objectForKey:itemIdentifier ];
+   return [toolbarItems objectForKey:itemIdentifier];
 }
 
 
@@ -233,7 +233,7 @@ static CSPrefsController *sharedPrefsController = nil;
  */
 - (void) toolbarSelectedAnItem:(NSToolbarItem *)toolbarItem
 {
-   [ self setWindowContentToView:[ toolbarViews objectForKey:[ toolbarItem itemIdentifier ] ] ];
+   [self setWindowContentToView:[toolbarViews objectForKey:[toolbarItem itemIdentifier]]];
 }
 
 
@@ -244,17 +244,17 @@ static CSPrefsController *sharedPrefsController = nil;
  */
 - (IBAction) displayHelpAppearance:(id)sender
 {
-   [ [ NSHelpManager sharedHelpManager ] openHelpAnchor:@"appearanceprefs" inBook:@"CiphSafe Help" ]; 
+   [[NSHelpManager sharedHelpManager] openHelpAnchor:@"appearanceprefs" inBook:@"CiphSafe Help"]; 
 }
 
 - (IBAction) displayHelpGeneral:(id)sender
 {
-   [ [ NSHelpManager sharedHelpManager ] openHelpAnchor:@"generalprefs" inBook:@"CiphSafe Help" ]; 
+   [[NSHelpManager sharedHelpManager] openHelpAnchor:@"generalprefs" inBook:@"CiphSafe Help"]; 
 }
 
 - (IBAction) displayHelpSecurity:(id)sender
 {
-   [ [ NSHelpManager sharedHelpManager ] openHelpAnchor:@"securityprefs" inBook:@"CiphSafe Help" ]; 
+   [[NSHelpManager sharedHelpManager] openHelpAnchor:@"securityprefs" inBook:@"CiphSafe Help"]; 
 }
 
 
@@ -265,8 +265,8 @@ static CSPrefsController *sharedPrefsController = nil;
  */
 + (CSPrefsController *) sharedPrefsController
 {
-   if( sharedPrefsController == nil )
-      sharedPrefsController = [ [ CSPrefsController alloc ] initWithWindowNibName:@"CSPreferences" ];
+   if(sharedPrefsController == nil)
+      sharedPrefsController = [[CSPrefsController alloc] initWithWindowNibName:@"CSPreferences"];
    
    return sharedPrefsController;
 }
@@ -277,20 +277,20 @@ static CSPrefsController *sharedPrefsController = nil;
  */
 - (void) setWindowContentToView:(NSView *)newView
 {
-   NSWindow *window = [ self window ];
-   NSView *contentView = [ window contentView ];
+   NSWindow *window = [self window];
+   NSView *contentView = [window contentView];
    NSView *currentSubview = nil;
-   if( [ [ contentView subviews ] count ] > 0 )
-      currentSubview = [ [ contentView subviews ] objectAtIndex:0 ];
-   if( ![ currentSubview isEqual:newView ] )
+   if([[contentView subviews] count] > 0)
+      currentSubview = [[contentView subviews] objectAtIndex:0];
+   if(![currentSubview isEqual:newView])
    {
-      NSRect windowFrame = [ window frame ];
-      NSRect newFrame = [ window frameRectForContentRect:[ newView frame ] ];
+      NSRect windowFrame = [window frame];
+      NSRect newFrame = [window frameRectForContentRect:[newView frame]];
       newFrame.origin = windowFrame.origin;
-      newFrame.origin.y -= NSHeight( newFrame ) - NSHeight( windowFrame );
-      [ currentSubview removeFromSuperview ];
-      [ window setFrame:newFrame display:YES animate:YES ];
-      [ contentView addSubview:newView ];
+      newFrame.origin.y -= NSHeight(newFrame) - NSHeight(windowFrame);
+      [currentSubview removeFromSuperview];
+      [window setFrame:newFrame display:YES animate:YES];
+      [contentView addSubview:newView];
    }
 }
 
@@ -305,25 +305,25 @@ static CSPrefsController *sharedPrefsController = nil;
     * Query the bundle information to get the file types we can handle; this way we avoid hardcoding it
     * below in the beginSheet... call
     */
-   NSArray *docTypes = [ [ [ NSBundle mainBundle ] infoDictionary ] objectForKey:@"CFBundleDocumentTypes" ];
-   NSMutableArray *extensionArray = [ NSMutableArray arrayWithCapacity:4 ];
-   NSEnumerator *typeEnumerator = [ docTypes objectEnumerator ];
+   NSArray *docTypes = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDocumentTypes"];
+   NSMutableArray *extensionArray = [NSMutableArray arrayWithCapacity:4];
+   NSEnumerator *typeEnumerator = [docTypes objectEnumerator];
    id typeDictionary;
-   while( ( typeDictionary = [ typeEnumerator nextObject ] ) != nil )
-      [ extensionArray addObjectsFromArray:[ typeDictionary objectForKey:@"CFBundleTypeExtensions" ] ];
+   while((typeDictionary = [typeEnumerator nextObject]) != nil)
+      [extensionArray addObjectsFromArray:[typeDictionary objectForKey:@"CFBundleTypeExtensions"]];
    
-   NSOpenPanel *openPanel = [ NSOpenPanel openPanel ];
-   [ openPanel setCanChooseFiles:YES ];
-   [ openPanel setCanChooseDirectories:NO ];
-   [ openPanel setAllowsMultipleSelection:NO ];
-   [ openPanel beginSheetForDirectory:nil
-                                 file:[ [ NSUserDefaults standardUserDefaults ]
-                                        objectForKey:CSPrefDictKey_AutoOpenPath ]
-                                types:extensionArray
-                       modalForWindow:[ self window ]
-                        modalDelegate:self
-                       didEndSelector:@selector( selectPathSheetDidEnd:returnCode:contextInfo: )
-                          contextInfo:NULL ];
+   NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+   [openPanel setCanChooseFiles:YES];
+   [openPanel setCanChooseDirectories:NO];
+   [openPanel setAllowsMultipleSelection:NO];
+   [openPanel beginSheetForDirectory:nil
+                                file:[[NSUserDefaults standardUserDefaults]
+                                      objectForKey:CSPrefDictKey_AutoOpenPath]
+                               types:extensionArray
+                      modalForWindow:[self window]
+                       modalDelegate:self
+                      didEndSelector:@selector(selectPathSheetDidEnd:returnCode:contextInfo:)
+                         contextInfo:NULL];
 }
 
 
@@ -333,12 +333,12 @@ static CSPrefsController *sharedPrefsController = nil;
 - (IBAction) showWindow:(id)sender
 {
    static BOOL firstShow = YES;
-   if( firstShow )
+   if(firstShow)
    {
-      [ [ self window ] center ];
+      [[self window] center];
       firstShow = NO;
    }
-   [ super showWindow:sender ];
+   [super showWindow:sender];
 }
 
 
@@ -347,7 +347,7 @@ static CSPrefsController *sharedPrefsController = nil;
  */
 - (BOOL) windowShouldClose:(id)sender
 {
-   return [ sender makeFirstResponder:nil ];
+   return [sender makeFirstResponder:nil];
 }
 
 
@@ -358,9 +358,9 @@ static CSPrefsController *sharedPrefsController = nil;
                     returnCode:(int)returnCode
                    contextInfo:(void *)contextInfo
 {
-   if( returnCode == NSOKButton )
-      [ [ NSUserDefaults standardUserDefaults ] setObject:[ [ sheet filenames ] objectAtIndex:0 ]
-                                                   forKey:CSPrefDictKey_AutoOpenPath ];
+   if(returnCode == NSOKButton)
+      [[NSUserDefaults standardUserDefaults] setObject:[[sheet filenames] objectAtIndex:0]
+                                                forKey:CSPrefDictKey_AutoOpenPath];
 }
 
 @end
