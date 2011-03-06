@@ -80,7 +80,7 @@ static BOOL cryptoLoggingEnabled = YES;
  * Pull out 'len' bytes from /dev/random, returning in a mutable data so
  * they can be overwritten later, if necessary
  */
-+ (NSMutableData *) randomDataOfLength:(NSInteger)len
++ (NSMutableData *) randomDataOfLength:(ssize_t)len
 {
    NSMutableData *randomData = nil;
    ssize_t amtRead = 0;
@@ -123,7 +123,7 @@ static BOOL cryptoLoggingEnabled = YES;
 - (NSMutableData *) blowfishEncryptedDataWithKey:(NSData *)key iv:(NSData *)iv
 {
    NSMutableData *encryptedData = nil;
-   NSUInteger finalLen = 0;
+   int finalLen = 0;
    if([iv length] == 8)
    {
       EVP_CIPHER_CTX cipherContext;
@@ -133,12 +133,11 @@ static BOOL cryptoLoggingEnabled = YES;
          {
             if(EVP_EncryptInit(&cipherContext, NULL, [key bytes], NULL))
             {
-               NSUInteger encLen = [self length] + 8;   // Make sure we have enough space
+               int encLen = [self length] + 8;   // Make sure we have enough space
                encryptedData = [NSMutableData dataWithLength:encLen];
                if(EVP_EncryptUpdate(&cipherContext,
                                     [encryptedData mutableBytes],
-#warning 64BIT: Inspect pointer casting
-                                    (NSInteger *) &encLen,
+                                    &encLen,
                                     [self bytes],
                                     [self length]))
                {
@@ -146,8 +145,7 @@ static BOOL cryptoLoggingEnabled = YES;
                   encLen = [encryptedData length] - finalLen;
                   if(EVP_EncryptFinal(&cipherContext,
                                       [encryptedData mutableBytes] + finalLen,
-#warning 64BIT: Inspect pointer casting
-                                      (NSInteger *) &encLen))
+                                      &encLen))
                   {
                      finalLen += encLen;
                      [encryptedData setLength:finalLen];
@@ -185,7 +183,7 @@ static BOOL cryptoLoggingEnabled = YES;
 - (NSMutableData *) blowfishDecryptedDataWithKey:(NSData *)key iv:(NSData *)iv
 {
    NSMutableData *plainData = nil;
-   NSUInteger finalLen = 0;
+   int finalLen = 0;
    if([iv length] == 8)
    {
       EVP_CIPHER_CTX cipherContext;
@@ -195,12 +193,11 @@ static BOOL cryptoLoggingEnabled = YES;
          {
             if(EVP_DecryptInit(&cipherContext, NULL, [key bytes], NULL))
             {
-               NSUInteger decLen = [self length] + 8;   // Make sure there's enough room
+               int decLen = [self length] + 8;   // Make sure there's enough room
                plainData = [NSMutableData dataWithLength:decLen];
                if(EVP_DecryptUpdate(&cipherContext,
                                     [plainData mutableBytes],
-#warning 64BIT: Inspect pointer casting
-                                    (NSInteger *) &decLen,
+                                    &decLen,
                                     [self bytes],
                                     [self length]))
                {
@@ -208,8 +205,7 @@ static BOOL cryptoLoggingEnabled = YES;
                   decLen = [plainData length] - finalLen;
                   if(EVP_DecryptFinal(&cipherContext,
                                       [plainData mutableBytes] + finalLen,
-#warning 64BIT: Inspect pointer casting
-                                      (NSInteger *) &decLen))
+                                      &decLen))
                   {
                      finalLen += decLen;
                      [plainData setLength:finalLen];
@@ -247,11 +243,11 @@ static BOOL cryptoLoggingEnabled = YES;
 {
    EVP_MD_CTX digestContext;
    EVP_DigestInit(&digestContext, EVP_sha1());
-   NSUInteger hashLen = EVP_MD_CTX_size(&digestContext);
+   int hashLen = EVP_MD_CTX_size(&digestContext);
    NSMutableData *hashValue = [NSMutableData dataWithLength:hashLen];
    EVP_DigestUpdate(&digestContext, [self bytes], [self length]);
-   NSUInteger writtenLen;
-   EVP_DigestFinal(&digestContext, [hashValue mutableBytes], &writtenLen);
+   int writtenLen;
+   EVP_DigestFinal(&digestContext, [hashValue mutableBytes], (unsigned int *) &writtenLen);
    if(writtenLen != hashLen)
    {
       [NSData logCryptoMessage:NSLocalizedString(@"EVP_DigestFinal wrote %u bytes, not the expected of %u",

@@ -42,11 +42,11 @@
 #import "NSData_compress.h"
 #include <zlib.h>
 
-const NSInteger NSDataCompressionLevelNone = Z_NO_COMPRESSION;
-const NSInteger NSDataCompressionLevelDefault = Z_DEFAULT_COMPRESSION;
-const NSInteger NSDataCompressionLevelLow = Z_BEST_SPEED;
-const NSInteger NSDataCompressionLevelMedium = 5;
-const NSInteger NSDataCompressionLevelHigh = Z_BEST_COMPRESSION;
+const int NSDataCompressionLevelNone = Z_NO_COMPRESSION;
+const int NSDataCompressionLevelDefault = Z_DEFAULT_COMPRESSION;
+const int NSDataCompressionLevelLow = Z_BEST_SPEED;
+const int NSDataCompressionLevelMedium = 5;
+const int NSDataCompressionLevelHigh = Z_BEST_COMPRESSION;
 
 
 // Localized strings
@@ -95,15 +95,13 @@ static BOOL compressLoggingEnabled = YES;
  * Compress the data at the given compression level; stores the original data
  * size at the end of the compressed data
  */
-- (NSMutableData *) compressedDataAtLevel:(NSInteger)level
+- (NSMutableData *) compressedDataAtLevel:(int)level
 {
    /*
     * zlib says to make sure the destination has 0.1% more + 12 bytes; last
     * additional bytes to store the original size (needed for uncompress)
     */
-#warning 64BIT: Inspect use of unsigned long
-#warning 64BIT: Inspect use of sizeof
-   unsigned long bufferLength = ceil((CGFloat) [self length] * 1.001) + 12 + sizeof(NSUInteger);
+   unsigned long bufferLength = ceil((float) [self length] * 1.001) + 12 + sizeof(unsigned int);
    NSMutableData *newData = [NSMutableData dataWithLength:bufferLength];
    if(newData != nil)
    {
@@ -115,9 +113,8 @@ static BOOL compressLoggingEnabled = YES;
       if(zlibError == Z_OK)
       {
          // Add original size to the end of the buffer, written big-endian
-         *((NSUInteger *) ([newData mutableBytes] + bufferLength)) = NSSwapHostIntToBig([self length]);
-#warning 64BIT: Inspect use of sizeof
-         [newData setLength:bufferLength + sizeof(NSUInteger)];
+         *((unsigned int *) ([newData mutableBytes] + bufferLength)) = NSSwapHostIntToBig([self length]);
+         [newData setLength:bufferLength + sizeof(unsigned int)];
       }
       else
       {
@@ -142,9 +139,8 @@ static BOOL compressLoggingEnabled = YES;
    NSMutableData *newData = nil;
    if([self isCompressedFormat])
    {
-      NSUInteger originalSize = NSSwapBigIntToHost(*((NSUInteger *) ([self bytes] + [self length] -
-#warning 64BIT: Inspect use of sizeof
-                                                                     sizeof(NSUInteger))));
+      unsigned int originalSize = NSSwapBigIntToHost(*((unsigned int *) ([self bytes] + [self length] -
+                                                                         sizeof(unsigned int))));
       /*
        * In the rare circumstance that data which is not compressed happens to
        * pass the checks above, we need to deal with the possibility that there
@@ -170,13 +166,11 @@ static BOOL compressLoggingEnabled = YES;
       NS_ENDHANDLER
       if(newData != nil)
       {
-#warning 64BIT: Inspect use of unsigned long
          unsigned long outSize = originalSize;
          NSInteger zlibError = uncompress([newData mutableBytes],
                                           &outSize,
                                           [self bytes],
-#warning 64BIT: Inspect use of sizeof
-                                          [self length] - sizeof(NSUInteger));
+                                          [self length] - sizeof(unsigned int));
          if(zlibError != Z_OK)
          {
             [NSData logCompressMessage:NSLocalizedString(@"call to uncompress() failed: %d - %s", @""),

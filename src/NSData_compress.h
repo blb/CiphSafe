@@ -41,17 +41,17 @@
 
 #import <Foundation/Foundation.h>
 
-extern const NSInteger NSDataCompressionLevelNone;
-extern const NSInteger NSDataCompressionLevelDefault;
-extern const NSInteger NSDataCompressionLevelLow;
-extern const NSInteger NSDataCompressionLevelMedium;
-extern const NSInteger NSDataCompressionLevelHigh;
+extern const int NSDataCompressionLevelNone;
+extern const int NSDataCompressionLevelDefault;
+extern const int NSDataCompressionLevelLow;
+extern const int NSDataCompressionLevelMedium;
+extern const int NSDataCompressionLevelHigh;
 
 @interface NSData (withay_compress)
 
 + (void) setCompressLogging:(BOOL)logEnabled;
 - (NSMutableData *) compressedData;
-- (NSMutableData *) compressedDataAtLevel:(NSInteger)level;
+- (NSMutableData *) compressedDataAtLevel:(int)level;
 - (NSMutableData *) uncompressedData;
 - (BOOL) isCompressedFormat;
 

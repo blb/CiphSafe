@@ -43,7 +43,7 @@
 @interface NSData (withay_crypto)
 
 + (void) setCryptoLogging:(BOOL)logEnabled;
-+ (NSMutableData *) randomDataOfLength:(NSInteger)len;
++ (NSMutableData *) randomDataOfLength:(ssize_t)len;
 - (NSMutableData *) blowfishEncryptedDataWithKey:(NSData *)key iv:(NSData *)iv;
 - (NSMutableData *) blowfishDecryptedDataWithKey:(NSData *)key iv:(NSData *)iv;
 - (NSMutableData *) SHA1Hash;
