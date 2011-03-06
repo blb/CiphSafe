@@ -1003,14 +1003,12 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 - (NSString *) uniqueNameForName:(NSString *)name
 {
    NSString *uniqueName = name;
-   NSInteger index;
+   int index;
    for(index = 0; [self rowForName:uniqueName] != -1; index++)
    {
       if(index)
-#warning 64BIT: Check formatting arguments
          uniqueName = [NSString stringWithFormat:NSLocalizedString(@"%@ copy %d", @""), name, index];
       else
-#warning 64BIT: Check formatting arguments
          uniqueName = [NSString stringWithFormat:NSLocalizedString(@"%@ copy", @""), name];
    }
    
