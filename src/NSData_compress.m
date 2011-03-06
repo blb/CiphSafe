@@ -101,7 +101,7 @@ static BOOL compressLoggingEnabled = YES;
     * zlib says to make sure the destination has 0.1% more + 12 bytes; last
     * additional bytes to store the original size (needed for uncompress)
     */
-   unsigned long bufferLength = ceil((float) [self length] * 1.001) + 12 + sizeof(unsigned int);
+   unsigned long bufferLength = ceil((float) [self length] * 1.001) + 12 + sizeof(uint32_t);
    NSMutableData *newData = [NSMutableData dataWithLength:bufferLength];
    if(newData != nil)
    {
@@ -113,8 +113,8 @@ static BOOL compressLoggingEnabled = YES;
       if(zlibError == Z_OK)
       {
          // Add original size to the end of the buffer, written big-endian
-         *((unsigned int *) ([newData mutableBytes] + bufferLength)) = NSSwapHostIntToBig([self length]);
-         [newData setLength:bufferLength + sizeof(unsigned int)];
+         *((uint32_t *) ([newData mutableBytes] + bufferLength)) = CFSwapInt32HostToBig([self length]);
+         [newData setLength:bufferLength + sizeof(uint32_t)];
       }
       else
       {
@@ -139,8 +139,8 @@ static BOOL compressLoggingEnabled = YES;
    NSMutableData *newData = nil;
    if([self isCompressedFormat])
    {
-      unsigned int originalSize = NSSwapBigIntToHost(*((unsigned int *) ([self bytes] + [self length] -
-                                                                         sizeof(unsigned int))));
+      uint32_t originalSize = CFSwapInt32BigToHost(*((uint32_t *) ([self bytes] + [self length] -
+                                                                   sizeof(uint32_t))));
       /*
        * In the rare circumstance that data which is not compressed happens to
        * pass the checks above, we need to deal with the possibility that there
@@ -170,7 +170,7 @@ static BOOL compressLoggingEnabled = YES;
          NSInteger zlibError = uncompress([newData mutableBytes],
                                           &outSize,
                                           [self bytes],
-                                          [self length] - sizeof(unsigned int));
+                                          [self length] - sizeof(uint32_t));
          if(zlibError != Z_OK)
          {
             [NSData logCompressMessage:NSLocalizedString(@"call to uncompress() failed: %d - %s", @""),
@@ -202,18 +202,19 @@ static BOOL compressLoggingEnabled = YES;
    const unsigned char *bytes = [self bytes];
    /*
     * The checks are:
-    *    (*bytes & 0x0F) == 8           : method is deflate (this is called CM,
-    *                                       compression method, in the RFC)
-    *    (*bytes & 0x80) == 0           : info must be at most seven, this makes
-    *                                       sure the MSB is not set, otherwise it
-    *                                       is at least 8 (this is called CINFO,
-    *                                       compression info, in the RFC)
-    *    *((short *) bytes)) % 31 == 0 : the two first bytes as a whole (big
-    *                                       endian format) must be a multiple of 31
-    *                                       (this is discussed in the FCHECK in
-    *                                       FLG, flags, section)
+    *    (*bytes & 0x0F) == 8             : method is deflate (this is called CM,
+    *                                         compression method, in the RFC)
+    *    (*bytes & 0x80) == 0             : info must be at most seven, this makes
+    *                                         sure the MSB is not set, otherwise it
+    *                                         is at least 8 (this is called CINFO,
+    *                                         compression info, in the RFC)
+    *    *((uint16_t *) bytes)) % 31 == 0 : the two first bytes as a whole (big
+    *                                         endian format) must be a multiple of 31
+    *                                         (this is discussed in the FCHECK in
+    *                                         FLG, flags, section)
     */
-   if((*bytes & 0x0F) == 8 && (*bytes & 0x80) == 0 && NSSwapBigShortToHost(*((short *) bytes)) % 31 == 0)
+   if((*bytes & 0x0F) == 8 && (*bytes & 0x80) == 0
+      && CFSwapInt16BigToHost(*((uint16_t *) bytes)) % 31 == 0)
       return YES;
 
    return NO;
