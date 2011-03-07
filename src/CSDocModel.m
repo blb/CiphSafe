@@ -339,7 +339,7 @@ static NSArray *keyArray;
                                     forKey:(NSString *)key
 {
    NSRange searchRange = NSMakeRange(0, [findString length]);
-   NSUInteger compareOptions = 0;
+   NSStringCompareOptions compareOptions = 0;
    if(ignoreCase)
       compareOptions = NSCaseInsensitiveSearch;
    NSNumber *retval = nil;
@@ -365,7 +365,7 @@ static NSArray *keyArray;
                           forKey:(NSString *)key
 {
    NSMutableArray *retval = [NSMutableArray arrayWithCapacity:10];
-   NSUInteger compareOptions = 0;
+   NSStringCompareOptions compareOptions = 0;
    if(ignoreCase)
       compareOptions = NSCaseInsensitiveSearch;
    NSInteger index;
@@ -633,9 +633,9 @@ static NSArray *keyArray;
  * XXX Note that the deleted entries will live on in the undo manager
  * and the names are also given to the notification center
  */
-- (NSUInteger) deleteEntriesWithNamesInArray:(NSArray *)nameArray
+- (NSInteger) deleteEntriesWithNamesInArray:(NSArray *)nameArray
 {
-   NSUInteger numDeleted = 0;
+   NSInteger numDeleted = 0;
 
    /*
     * Build a list, do this in advance since they will be deleted soon, causing the entry array to be
@@ -784,7 +784,7 @@ NSInteger sortEntries(id dict1, id dict2, void *context)
    NSString *value1, *value2;
    if([sortKey isEqualToString:CSDocModelKey_Notes])
    {
-      NSUInteger row = [objSelf rowForName:[dictFirst objectForKey:CSDocModelKey_Name]];
+      NSInteger row = [objSelf rowForName:[dictFirst objectForKey:CSDocModelKey_Name]];
       value1 = [[objSelf RTFDStringNotesAtRow:row] string];
       row = [objSelf rowForName:[dictSecond objectForKey:CSDocModelKey_Name]];
       value2 = [[objSelf RTFDStringNotesAtRow:row] string];

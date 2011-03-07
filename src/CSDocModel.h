@@ -119,7 +119,7 @@ extern NSString * const CSDocModelNotificationInfoKey_DeletedNames;
                          URL:(NSString *)url
                     category:(NSString *)category
                    notesRTFD:(NSData *)notes;
-- (NSUInteger) deleteEntriesWithNamesInArray:(NSArray *)nameArray;
+- (NSInteger) deleteEntriesWithNamesInArray:(NSArray *)nameArray;
 - (BOOL) deleteEntryWithName:(NSString *)name;
 
 
