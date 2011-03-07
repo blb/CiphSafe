@@ -701,7 +701,7 @@ static NSArray *searchWhatArray;
                                                                   forKey:CSDocModelKey_Name];
       if(rowForKey != nil)
       {
-         NSInteger filteredRow = [self filteredRowForRow:[rowForKey intValue]];
+         NSInteger filteredRow = [self filteredRowForRow:[rowForKey integerValue]];
          if(filteredRow >= 0)
          {
             [tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:filteredRow]
