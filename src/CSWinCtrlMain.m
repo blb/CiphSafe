@@ -536,7 +536,7 @@ static NSArray *searchWhatArray;
    NSEnumerator *colEnum = [[documentView tableColumns] objectEnumerator];
    id aColumn;
    while((aColumn = [colEnum nextObject]) != nil)
-      [aColumn setWidth:10];
+      [aColumn setWidth:10.0];
    [documentView sizeToFit];
 }
 
@@ -690,7 +690,7 @@ static NSArray *searchWhatArray;
       NSSize contentViewSize = [[tableView enclosingScrollView] contentSize];
       CGFloat amtToKeepVisible = [[tableView enclosingScrollView] verticalPageScroll];
       [tableView scrollRectToVisible:NSOffsetRect([tableView visibleRect],
-                                                  0,
+                                                  0.0,
                                                   contentViewSize.height - amtToKeepVisible)];
       return YES;
    }
