@@ -242,7 +242,7 @@ static const NSInteger CSWinCtrlPassphrase_ShortPassPhrase = 8;
    {
       NSMutableData *newData = [NSMutableData dataWithLength:[passphraseData length]];
       unsigned char *newBytes = [newData mutableBytes];
-      NSUInteger position;
+      NSInteger position;
       for(position = 0; position < [passphraseData length]; position += 2)
       {
          newBytes[position] = dataBytes[position + 1];
