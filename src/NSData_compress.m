@@ -105,11 +105,11 @@ static BOOL compressLoggingEnabled = YES;
    NSMutableData *newData = [NSMutableData dataWithLength:bufferLength];
    if(newData != nil)
    {
-      NSInteger zlibError = compress2([newData mutableBytes],
-                                      &bufferLength,
-                                      [self bytes],
-                                      [self length],
-                                      level);
+      int zlibError = compress2([newData mutableBytes],
+                                &bufferLength,
+                                [self bytes],
+                                [self length],
+                                level);
       if(zlibError == Z_OK)
       {
          // Add original size to the end of the buffer, written big-endian
@@ -167,10 +167,10 @@ static BOOL compressLoggingEnabled = YES;
       if(newData != nil)
       {
          unsigned long outSize = originalSize;
-         NSInteger zlibError = uncompress([newData mutableBytes],
-                                          &outSize,
-                                          [self bytes],
-                                          [self length] - sizeof(uint32_t));
+         int zlibError = uncompress([newData mutableBytes],
+                                    &outSize,
+                                    [self bytes],
+                                    [self length] - sizeof(uint32_t));
          if(zlibError != Z_OK)
          {
             [NSData logCompressMessage:NSLocalizedString(@"call to uncompress() failed: %d - %s", @""),
@@ -179,7 +179,7 @@ static BOOL compressLoggingEnabled = YES;
             newData = nil;
          }
          else if(originalSize != outSize)
-            [NSData logCompressMessage:NSLocalizedString(@"(warning) data size was %u, expected %u", @""),
+            [NSData logCompressMessage:NSLocalizedString(@"(warning) data size was %u, expected %lu", @""),
                                        outSize,
                                        originalSize];
       }
