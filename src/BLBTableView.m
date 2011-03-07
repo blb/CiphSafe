@@ -147,8 +147,9 @@
  */
 - (void) keyDown:(NSEvent *)theEvent
 {
-   if(![[self delegate] respondsToSelector:@selector(blbTableView:didReceiveKeyDownEvent:)]
-      || ![[self delegate] blbTableView:self didReceiveKeyDownEvent:theEvent])
+   if([[self delegate] respondsToSelector:@selector(blbTableView:didReceiveKeyDownEvent:)])
+      [[self delegate] blbTableView:self didReceiveKeyDownEvent:theEvent];
+   else
       [super keyDown:theEvent];
 }
 
