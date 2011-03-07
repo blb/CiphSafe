@@ -276,10 +276,8 @@ static NSArray *searchWhatArray;
    {
       NSTableColumn *tableColumn = [tableColumns objectAtIndex:index];
       if(index == 0)
-#warning 64BIT: Check formatting arguments
          [infoString appendFormat:@"%@ %f", [tableColumn identifier], [tableColumn width]];
       else
-#warning 64BIT: Check formatting arguments
          [infoString appendFormat:@" %@ %f", [tableColumn identifier], [tableColumn width]];
    }
    [[NSUserDefaults standardUserDefaults] setObject:infoString
@@ -735,7 +733,6 @@ static NSArray *searchWhatArray;
       if([[documentView tableColumns] count] > 1 || enabled)
          [self setDisplayOfColumnID:[columnSelectionArray objectAtIndex:[sender tag]] enabled:enabled];
       else
-#warning 64BIT: Check formatting arguments
          NSBeginCriticalAlertSheet(
             NSLocalizedString(@"Need at least one column", @""),
             nil,
@@ -841,7 +838,6 @@ static NSArray *searchWhatArray;
    NSURL *theURL = [NSURL URLWithString:[[self document] stringForKey:CSDocModelKey_URL
                                                                 atRow:selectedRow]];
    if(theURL == nil || ![[NSWorkspace sharedWorkspace] openURL:theURL])
-#warning 64BIT: Check formatting arguments
       NSBeginInformationalAlertSheet(NSLocalizedString(@"Invalid URL", @""),
                                      nil,
                                      nil,
@@ -1007,14 +1003,12 @@ static NSArray *searchWhatArray;
    NSInteger selectedCount = [documentView numberOfSelectedRows];
    NSString *statusString;
    if(entryCount == 1)
-#warning 64BIT: Check formatting arguments
-      statusString = [NSString stringWithFormat:NSLocalizedString(@"1 entry, %d selected", @""),
-                                                selectedCount];
+      statusString = [NSString stringWithFormat:NSLocalizedString(@"1 entry, %ld selected", @""),
+                                                (long) selectedCount];
    else
-#warning 64BIT: Check formatting arguments
-      statusString = [NSString stringWithFormat:NSLocalizedString(@"%d entries, %d selected", @""),
-                                                entryCount,
-                                                selectedCount];
+      statusString = [NSString stringWithFormat:NSLocalizedString(@"%ld entries, %ld selected", @""),
+                                                (long) entryCount,
+                                                (long) selectedCount];
    if(searchResultList != nil)
       statusString = [NSString stringWithFormat:@"%@ (%@)",
                                                 statusString,
