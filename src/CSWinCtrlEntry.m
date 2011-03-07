@@ -278,7 +278,7 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 {
    if([aComboBox isEqual:category])
       return [[[self document] categories] indexOfObject:aString];
-   return -1;
+   return NSNotFound;
 }
 
 

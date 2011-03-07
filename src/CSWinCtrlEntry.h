@@ -62,12 +62,6 @@
 // Our implementation of whether the data is dirty
 - (void) updateDocumentEditedStatus;
 
-// Methods to make it a data source for category combo boxes
-- (NSInteger) numberOfItemsInComboBox:(NSComboBox *)aComboBox;
-- (id) comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index;
-- (NSUInteger) comboBox:(NSComboBox *)aComboBox
-               indexOfItemWithStringValue:(NSString *)aString;
-
 /*
  * Used by updateDocumentEditedStatus to determine if data is dirty; overridden
  * in subclasses
