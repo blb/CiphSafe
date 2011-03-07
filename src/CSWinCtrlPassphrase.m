@@ -85,7 +85,6 @@ static const NSInteger CSWinCtrlPassphrase_ShortPassPhrase = 8;
       if(![self doPassphrasesMatch])
       {
          // Ask for direction if the passphrases don't match
-#warning 64BIT: Check formatting arguments
          NSBeginAlertSheet(NSLocalizedString(@"Passphrases Don't Match", @""),
                            CSWINCTRLPASSPHRASE_LOC_ENTERAGAIN,
                            NSLocalizedString(@"Cancel", @""),
@@ -101,7 +100,6 @@ static const NSInteger CSWinCtrlPassphrase_ShortPassPhrase = 8;
       else if(([[passphrasePhrase2 stringValue] length] < CSWinCtrlPassphrase_ShortPassPhrase))
       {
          // Warn if it is short
-#warning 64BIT: Check formatting arguments
          NSBeginAlertSheet(NSLocalizedString(@"Short Passphrase", @""),
                            NSLocalizedString(@"Use It", @""),
                            CSWINCTRLPASSPHRASE_LOC_ENTERAGAIN,
@@ -281,7 +279,6 @@ static const NSInteger CSWinCtrlPassphrase_ShortPassPhrase = 8;
 - (NSMutableData *) getEncryptionKeyWithNote:(NSString *)noteType
                             forDocumentNamed:(NSString *)docName
 {
-#warning 64BIT: Check formatting arguments
    [[self window] setTitle:[NSString stringWithFormat:NSLocalizedString(@"Enter passphrase for %@", @""),
                                                       docName]];
    [passphraseNote1 setStringValue:NSLocalizedString(noteType, nil)];
