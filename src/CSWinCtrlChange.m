@@ -219,7 +219,6 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
          [[self window] performClose:self];
    }
    else
-#warning 64BIT: Check formatting arguments
       NSBeginInformationalAlertSheet(CSWINCTRLENTRY_LOC_ENTRYEXISTS,
                                      nil,
                                      nil,
@@ -265,7 +264,6 @@ static NSMutableDictionary *controllerList;   // Indexed by document, of arrays
  */
 - (void) synchronizeWindowTitleWithDocumentName
 {
-#warning 64BIT: Check formatting arguments
    [[self window] setTitle:[NSString stringWithFormat:NSLocalizedString(@"View/Change %@ in %@", @""),
                                                       myEntryName,
                                                       [[self document] displayName]]];
