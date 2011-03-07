@@ -84,7 +84,7 @@
 		646926190CE95FD7005B14AC /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/CSPassphrase.nib; sourceTree = "<group>"; };
 		6469261B0CE95FD7005B14AC /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/CSPreferences.nib; sourceTree = "<group>"; };
 		6469261D0CE95FD7005B14AC /* English */ = {isa = PBXFileReference; explicitFileType = text.plist; fileEncoding = 30; name = English; path = English.lproj/DefaultCategories.plist; sourceTree = "<group>"; };
-		6469261F0CE95FD7005B14AC /* English */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
+		6469261F0CE95FD7005B14AC /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		646926470CE95FF1005B14AC /* lightswitch.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = lightswitch.png; path = images/lightswitch.png; sourceTree = "<group>"; };
 		646926480CE95FF1005B14AC /* mini window ciphsafe.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "mini window ciphsafe.png"; path = "images/mini window ciphsafe.png"; sourceTree = "<group>"; };
 		6469264B0CE96008005B14AC /* NSArray_FOOC.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSArray_FOOC.h; path = src/NSArray_FOOC.h; sourceTree = "<group>"; };
