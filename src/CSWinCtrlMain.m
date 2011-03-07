@@ -247,7 +247,7 @@ static NSArray *searchWhatArray;
    if(tableInfoString != nil && [tableInfoString length] > 0)
    {
       NSArray *partsArray = [tableInfoString componentsSeparatedByString:@" "];
-      NSUInteger index;
+      NSInteger index;
       for(index = 0; index < [partsArray count]; index += 2)
       {
          NSString *colName = [partsArray objectAtIndex:index];
@@ -271,7 +271,7 @@ static NSArray *searchWhatArray;
 {
    NSArray *tableColumns = [documentView tableColumns];
    NSMutableString *infoString = [NSMutableString stringWithCapacity:70];
-   NSUInteger index;
+   NSInteger index;
    for(index = 0; index < [tableColumns count]; index++)
    {
       NSTableColumn *tableColumn = [tableColumns objectAtIndex:index];
@@ -339,7 +339,7 @@ static NSArray *searchWhatArray;
 {
    if(searchResultList != nil)
    {
-      NSUInteger index;
+      NSInteger index;
       for(index = 0; index < [searchResultList count]; index++)
       {
          if([[searchResultList objectAtIndex:index] integerValue] == row)
@@ -546,7 +546,7 @@ static NSArray *searchWhatArray;
  */
 - (void) updateCornerMenu
 {
-   NSUInteger index;
+   NSInteger index;
    for(index = 1; index < [columnSelectionArray count]; index++)
    {
       if([documentView columnWithIdentifier:[columnSelectionArray objectAtIndex:index]] >= 0)
@@ -723,7 +723,7 @@ static NSArray *searchWhatArray;
 {
    if([sender tag] == 0)   // Show all columns
    {
-      NSUInteger index;
+      NSInteger index;
       for(index = 1; index < [columnSelectionArray count]; index++)
          [self setDisplayOfColumnID:[columnSelectionArray objectAtIndex:index] enabled:YES];
    }
@@ -1023,7 +1023,7 @@ static NSArray *searchWhatArray;
 - (NSArray *) namesFromIndexes:(NSIndexSet *)indexes
 {
    NSMutableArray *nameArray = [NSMutableArray arrayWithCapacity:[indexes count]];
-   NSUInteger rowIndex;
+   NSInteger rowIndex;
    for(rowIndex = [indexes firstIndex];
        rowIndex != NSNotFound;
        rowIndex = [indexes indexGreaterThanIndex:rowIndex])
