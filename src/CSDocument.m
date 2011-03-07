@@ -403,7 +403,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
                                                          NSLocalizedString(CSDocModelKey_Category, @""),
                                                          NSLocalizedString(CSDocModelKey_Notes, @"")]
                            dataUsingEncoding:NSUTF8StringEncoding]];
-   NSUInteger rowIndex;
+   NSInteger rowIndex;
    for(rowIndex = [indexes firstIndex];
        rowIndex != NSNotFound;
        rowIndex = [indexes indexGreaterThanIndex:rowIndex])
@@ -441,7 +441,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
    NSArray *keyArray = [NSArray arrayWithObjects:CSDocModelKey_Name, CSDocModelKey_Acct,
                                                  CSDocModelKey_Passwd, CSDocModelKey_URL,
                                                  CSDocModelKey_Category, CSDocModelKey_Notes, nil];
-   NSUInteger rowIndex;
+   NSInteger rowIndex;
    for(rowIndex = [indexes firstIndex];
        rowIndex != NSNotFound;
        rowIndex = [indexes indexGreaterThanIndex:rowIndex])
@@ -826,7 +826,7 @@ NSString * const CSDocumentXML_EntryNode = @"entry";
 /*
  * Delete all entries with the given names
  */
-- (NSUInteger) deleteEntriesWithNamesInArray:(NSArray *)nameArray
+- (NSInteger) deleteEntriesWithNamesInArray:(NSArray *)nameArray
 {
    return [[self model] deleteEntriesWithNamesInArray:nameArray];
 }
