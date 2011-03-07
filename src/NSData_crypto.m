@@ -45,7 +45,7 @@
 
 // Localized strings
 #define NSDATA_CRYPTO_LOC_SETKEYLENFAIL NSLocalizedString(@"EVP_CIPHER_CTX_set_key_length failed", @"")
-#define NSDATA_CRYPTO_LOC_IVBAD         NSLocalizedString(@"iv is %d bytes, not 8", @"")
+#define NSDATA_CRYPTO_LOC_IVBAD         NSLocalizedString(@"iv is %ld bytes, not 8", @"")
 
 
 @implementation NSData (withay_crypto)
@@ -167,7 +167,7 @@ static BOOL cryptoLoggingEnabled = YES;
          [NSData logCryptoMessage:NSLocalizedString(@"EVP_EncryptInit() failed (initial)", @"")];
    }
    else
-      [NSData logCryptoMessage:NSDATA_CRYPTO_LOC_IVBAD, [iv length]];
+      [NSData logCryptoMessage:NSDATA_CRYPTO_LOC_IVBAD, (long) [iv length]];
 
    if(encryptedData != nil && [encryptedData length] != finalLen)
       encryptedData = nil;
@@ -227,7 +227,7 @@ static BOOL cryptoLoggingEnabled = YES;
          [NSData logCryptoMessage:NSLocalizedString(@"EVP_DecryptInit() failed (initial)", @"")];
    }
    else
-      [NSData logCryptoMessage:NSDATA_CRYPTO_LOC_IVBAD, [iv length]];
+      [NSData logCryptoMessage:NSDATA_CRYPTO_LOC_IVBAD, (long) [iv length]];
 
    if(plainData != nil && [plainData length] != finalLen)
       plainData = nil;
@@ -250,7 +250,7 @@ static BOOL cryptoLoggingEnabled = YES;
    EVP_DigestFinal(&digestContext, [hashValue mutableBytes], (unsigned int *) &writtenLen);
    if(writtenLen != hashLen)
    {
-      [NSData logCryptoMessage:NSLocalizedString(@"EVP_DigestFinal wrote %u bytes, not the expected of %u",
+      [NSData logCryptoMessage:NSLocalizedString(@"EVP_DigestFinal wrote %d bytes, not the expected of %d",
                                                  @""),
                                writtenLen,
                                hashLen];
