@@ -125,7 +125,6 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 {
    NSURL *theURL = [NSURL URLWithString:[urlText stringValue]];
    if(theURL == nil || ![[NSWorkspace sharedWorkspace] openURL:theURL])
-#warning 64BIT: Check formatting arguments
       NSBeginInformationalAlertSheet(NSLocalizedString(@"Invalid URL", @""),
                                      nil,
                                      nil,
@@ -201,7 +200,6 @@ static const char *genAll      = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwW
 {
    if([[self window] isDocumentEdited])
    {
-#warning 64BIT: Check formatting arguments
       id alertPanel = NSGetCriticalAlertPanel(
                          NSLocalizedString(@"Entry Not Saved", @""),
                          NSLocalizedString(@"The entry has not been saved, close anyway?", @""),
