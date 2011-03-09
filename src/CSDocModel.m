@@ -756,6 +756,7 @@ static NSArray *keyArray;
     */
    [allEntries release];
    [entryASCache release];
+   [nameRowCache release];
    [undoManager release];
    [super dealloc];
 }
